@@ -1,9 +1,13 @@
-from dataclasses import dataclass
-from datetime import date 
+from dataclasses import dataclass, field
+import uuid
 
 @dataclass
 class Challenge:
-    name: str # наименование очивки
-    description: str # описание очивки 
-    score_challenge: bool = False # есть ли это достижение
-    when_received: date # дата получения очивки
+    """Определение достижения"""
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
+    name: str
+    description: str
+    requirement_type: str   # "water_streak", "grow_to_mature", "keep_alive_days"
+    target_value: int
+    reward_coins: int = 50
+    is_active: bool = True

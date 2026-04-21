@@ -1,39 +1,47 @@
 import uuid
 from datetime import date, datetime
-from sqlalchemy import Column, String, Integer, Date, DateTime, Boolean, Float, JSON, ForeignKey
+from sqlalchemy import Column, String, Integer, Date, DateTime, Boolean, Float, JSON, ForeignKey, Text
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
+
 def generate_uuid() -> str:
     return str(uuid.uuid4())
+
 
 class Profile(Base):
     __tablename__ = "profiles"
     id = Column(String(36), primary_key=True, default=generate_uuid)
     username = Column(String(50), unique=True, nullable=False)
-    password_hash = Column(String(255), nullable=False)  # ⚠️ Только хеш!
+    password_hash = Column(String(255), nullable=False)
     last_entry = Column(Date, nullable=False, default=date.today)
     created_at = Column(DateTime, default=datetime.utcnow)
-    coins = Column(Integer, default=0)
     level = Column(Integer, default=1)
+    coins = Column(Integer, default=0)
     plants = relationship("UserPlant", back_populates="owner", cascade="all, delete-orphan")
+    user_challenges = relationship("UserChallenge", back_populates="user", cascade="all, delete-orphan")
+
 
 class PlantTemplate(Base):
     __tablename__ = "plant_templates"
     id = Column(String(36), primary_key=True, default=generate_uuid)
-    species_name = Column(String(100), unique=True, nullable=False)
+    species_id = Column(Integer, unique=True, nullable=False)
+    species_name = Column(String(100), nullable=False)
     nickname = Column(String(100))
-    description = Column(String)
+    description = Column(Text)
     character_trait = Column(String(100))
     water_interval_min = Column(Integer)
     water_interval_max = Column(Integer)
     light_requirement = Column(String(20))
-    watering_advice = Column(String)
-    light_advice = Column(String)
-    flowering_conditions = Column(String)
+    humidity_preference = Column(String(20))
+    watering_advice = Column(Text)
+    light_advice = Column(Text)
+    flowering_conditions = Column(Text)
+    temp_advice = Column(Text)
     tips = Column(JSON, default=list)
     symptoms = Column(JSON, default=list)
+
 
 class UserPlant(Base):
     __tablename__ = "user_plants"
@@ -48,18 +56,21 @@ class UserPlant(Base):
     current_light_level = Column(String(20), default="medium")
     acquired_at = Column(DateTime, default=datetime.utcnow)
     is_alive = Column(Boolean, default=True)
+    last_care_date = Column(Date, default=date.today)
     owner = relationship("Profile", back_populates="plants")
     template = relationship("PlantTemplate")
+
 
 class Challenge(Base):
     __tablename__ = "challenges"
     id = Column(String(36), primary_key=True, default=generate_uuid)
     name = Column(String(100), unique=True, nullable=False)
-    description = Column(String)
+    description = Column(Text)
     requirement_type = Column(String(50))
     target_value = Column(Integer)
     reward_coins = Column(Integer, default=50)
     is_active = Column(Boolean, default=True)
+
 
 class UserChallenge(Base):
     __tablename__ = "user_challenges"
@@ -68,3 +79,5 @@ class UserChallenge(Base):
     current_progress = Column(Integer, default=0)
     is_completed = Column(Boolean, default=False)
     completed_at = Column(Date, nullable=True)
+    user = relationship("Profile", back_populates="user_challenges")
+    challenge = relationship("Challenge")

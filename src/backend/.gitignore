@@ -1,0 +1,44 @@
+# 🔴 БАЗА ДАННЫХ (самое важное!)
+*.db
+*.sqlite
+*.sqlite3
+careforme.db
+
+# 🔴 ДАННЫЕ МАРИАДБ (если кто-то использует)
+mariadb_data/
+
+# 🔴 КЭШИ И ВРЕМЕННЫЕ ФАЙЛЫ
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ЛОГИ
+*.log
+logs/
+
+# КОНФИГИ С СЕКРЕТАМИ
+.env
+.env.local
+config.local.py
+secrets.py
+
+# ВИРТУАЛЬНОЕ ОКРУЖЕНИЕ (если создали внутри backend)
+venv/
+venv_backend/
+.venv
+
+# ФАЙЛЫ БЭКАПОВ (ваши CSV-бэкапы, если будут)
+backups/
+*.backup
+*.bak
+
+# ФАЙЛЫ ТЕСТОВЫХ ДАННЫХ (но не исходные CSV!)
+test_*.db
+temp_*.db
+
+# РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ
+test_reports/
+junit.xml

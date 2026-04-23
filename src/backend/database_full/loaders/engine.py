@@ -1,5 +1,3 @@
-# Если вы не используете SQLAlchemy, этот файл не нужен
-# Но оставлю для обратной совместимости
 
 import os
 from sqlalchemy import create_engine

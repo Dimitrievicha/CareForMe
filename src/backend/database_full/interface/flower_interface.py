@@ -1,84 +1,86 @@
-"""Интерфейс для работы с растениями"""
+"""API интерфейс для работы с растениями.
+
+Предоставляет внешний API для вызовов из приложения.
+Служит прослойкой между клиентским кодом и FlowerService.
+"""
+
 from typing import List, Dict, Any, Optional
 from ..service.flower_service import FlowerService
 
 
 class FlowerInterface:
-    """Интерфейс для API - вызывает методы FlowerService"""
+    """Интерфейс для API - вызывает методы FlowerService.
+
+    Все методы этого класса предназначены для вызова из внешнего кода.
+
+    Attributes:
+        _service (FlowerService): Сервисный слой для бизнес-логики
+    """
 
     def __init__(self, db_path: str = None):
+        """Инициализирует интерфейс с сервисным слоем.
+
+        :param db_path: Путь к БД (опционально)
+        :type db_path: str, optional
+        """
         self._service = FlowerService()
 
-    # ==================== ШАБЛОНЫ ====================
-
-    def get_available_plants(self) -> List[Dict[str, Any]]:
-        """Получить список доступных растений"""
-        return self._service.get_all_plant_templates()
-
-    def get_plant_info(self, species_id: int) -> Optional[Dict[str, Any]]:
-        """Получить информацию о растении"""
-        return self._service.get_plant_template_by_id(species_id)
-
-    # ==================== РАСТЕНИЯ ПОЛЬЗОВАТЕЛЯ ====================
-
     def get_my_garden(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить сад пользователя (только живые)"""
+        """Получить сад пользователя (только живые растения).
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Список живых растений пользователя
+        :rtype: List[Dict[str, Any]]
+
+        :example:
+            >>> interface = FlowerInterface()
+            >>> plants = interface.get_my_garden("user123")
+            >>> for p in plants:
+            ...     print(f"{p['custom_name']} - {p['health_status']}")
+        """
         return self._service.get_user_plants(user_id, only_alive=True)
 
-    def get_all_user_plants(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить все растения пользователя (включая мёртвые)"""
-        return self._service.get_user_plants(user_id, only_alive=False)
-
-    def get_plant_details(self, plant_id: str, user_id: str) -> Optional[Dict[str, Any]]:
-        """Получить детали растения"""
-        plant = self._service.get_plant_by_id(plant_id)
-        return plant if plant and plant['user_id'] == user_id else None
-
-    # ==================== ДЕЙСТВИЯ ====================
-
     def plant_flower(self, user_id: str, species_id: int, name: str = None) -> Dict[str, Any]:
-        """Посадить цветок"""
+        """Посадить новый цветок.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :param species_id: ID вида растения (из каталога)
+        :type species_id: int
+        :param name: Пользовательское имя (если не указано, используется видовое)
+        :type name: str, optional
+        :return: Результат посадки
+        :rtype: Dict[str, Any]
+
+        :example:
+            >>> result = interface.plant_flower("user123", 1, "Мой кактус")
+            >>> if result['success']:
+            ...     print(f"Растение посажено! ID: {result['plant_id']}")
+        """
         return self._service.plant_flower(user_id, species_id, name)
 
     def water_flower(self, plant_id: str, user_id: str) -> Dict[str, Any]:
-        """Полить цветок"""
+        """Полить цветок.
+
+        :param plant_id: ID растения
+        :type plant_id: str
+        :param user_id: ID пользователя (для проверки прав)
+        :type user_id: str
+        :return: Результат полива
+        :rtype: Dict[str, Any]
+        """
         return self._service.water_flower(plant_id, user_id)
 
-    def check_health(self, plant_id: str, user_id: str) -> Dict[str, Any]:
-        """Проверить здоровье"""
-        return self._service.check_health(plant_id, user_id)
+    def get_plant_details(self, plant_id: str, user_id: str) -> Optional[Dict[str, Any]]:
+        """Получить детальную информацию о растении.
 
-    def update_growth(self, plant_id: str, user_id: str) -> Dict[str, Any]:
-        """Обновить рост"""
-        return self._service.update_growth(plant_id, user_id)
-
-    def revive_plant(self, plant_id: str, user_id: str) -> Dict[str, Any]:
-        """Воскресить растение"""
-        return self._service.revive_plant(plant_id, user_id)
-
-    # ==================== СОВЕТЫ ====================
-
-    def get_care_tips(self, plant_id: str, user_id: str) -> Dict[str, Any]:
-        """Получить советы по уходу"""
+        :param plant_id: ID растения
+        :type plant_id: str
+        :param user_id: ID пользователя (для проверки прав)
+        :type user_id: str
+        :return: Данные растения или None
+        :rtype: Optional[Dict[str, Any]]
+        """
         plant = self._service.get_plant_by_id(plant_id)
-
-        if not plant or plant['user_id'] != user_id:
-            return {"success": False, "error": "Растение не найдено"}
-
-        tips = plant.get('tips', [])
-        if isinstance(tips, str):
-            import json
-            try:
-                tips = json.loads(tips)
-            except:
-                tips = [tips]
-
-        return {
-            "success": True,
-            "plant_name": plant['custom_name'],
-            "health_status": plant['health_status'],
-            "growth_stage": plant['growth_stage'],
-            "tips": tips,
-            "watering_advice": plant.get('watering_advice', ''),
-            "light_advice": plant.get('light_advice', '')
-        }
+        return plant if plant and plant['user_id'] == user_id else None

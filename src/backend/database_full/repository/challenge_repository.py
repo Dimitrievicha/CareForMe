@@ -1,13 +1,33 @@
-"""Репозиторий для работы с достижениями"""
+"""Репозиторий для работы с достижениями.
+
+Содержит методы для работы с таблицами:
+    - achievements: справочник достижений
+    - user_achievements: прогресс пользователей по достижениям
+
+Пример:
+    >>> repo = ChallengeRepository()
+    >>> achievements = repo.get_user_achievements("user123")
+    >>> for ach in achievements:
+    ...     print(f"{ach['name']}: {ach['current_progress']}/{ach['target_value']}")
+"""
+
 from typing import Optional, List, Dict, Any
 from .base_repository import BaseRepository
 
 
 class ChallengeRepository(BaseRepository):
-    """Репозиторий для таблиц achievements и user_achievements"""
+    """Репозиторий для таблиц achievements и user_achievements."""
+
+    # ==================== ACHIEVEMENTS ====================
 
     def get_all_achievements(self, only_active: bool = True) -> List[Dict[str, Any]]:
-        """Получить все достижения"""
+        """Получает все достижения.
+
+        :param only_active: Если True, только активные достижения
+        :type only_active: bool
+        :return: Список достижений
+        :rtype: List[Dict[str, Any]]
+        """
         active_filter = "WHERE is_active = 1" if only_active else ""
         return self.db.execute_query(f"""
             SELECT id, name, description, requirement_type, target_value, 
@@ -17,11 +37,25 @@ class ChallengeRepository(BaseRepository):
         """)
 
     def get_achievement_by_id(self, achievement_id: str) -> Optional[Dict[str, Any]]:
-        """Получить достижение по ID"""
+        """Получает достижение по ID.
+
+        :param achievement_id: UUID достижения
+        :type achievement_id: str
+        :return: Данные достижения или None
+        :rtype: Optional[Dict[str, Any]]
+        """
         return self.get_by_id("achievements", "id", achievement_id)
 
+    # ==================== USER ACHIEVEMENTS ====================
+
     def get_user_achievements(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить достижения пользователя с прогрессом"""
+        """Получает достижения пользователя с прогрессом.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Список достижений с прогрессом
+        :rtype: List[Dict[str, Any]]
+        """
         return self.db.execute_query("""
             SELECT a.*, ua.current_progress, ua.is_completed, ua.completed_at, ua.claimed
             FROM achievements a
@@ -31,7 +65,13 @@ class ChallengeRepository(BaseRepository):
         """, (user_id,))
 
     def get_completed_achievements(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить завершённые достижения пользователя"""
+        """Получает завершенные достижения пользователя.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Список завершенных достижений
+        :rtype: List[Dict[str, Any]]
+        """
         return self.db.execute_query("""
             SELECT a.*, ua.completed_at
             FROM user_achievements ua
@@ -41,7 +81,13 @@ class ChallengeRepository(BaseRepository):
         """, (user_id,))
 
     def get_unclaimed_rewards(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить незабранные награды"""
+        """Получает незабранные награды пользователя.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Список достижений с незабранными наградами
+        :rtype: List[Dict[str, Any]]
+        """
         return self.db.execute_query("""
             SELECT a.id, a.name, a.reward_coins, a.reward_xp
             FROM user_achievements ua
@@ -50,7 +96,17 @@ class ChallengeRepository(BaseRepository):
         """, (user_id,))
 
     def update_progress(self, user_id: str, achievement_id: str, progress: int) -> bool:
-        """Обновить прогресс достижения"""
+        """Обновляет прогресс достижения.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :param achievement_id: UUID достижения
+        :type achievement_id: str
+        :param progress: Текущий прогресс
+        :type progress: int
+        :return: True при успехе
+        :rtype: bool
+        """
         return self.db.execute_update("""
             INSERT INTO user_achievements (user_id, achievement_id, current_progress)
             VALUES (?, ?, ?)
@@ -59,7 +115,15 @@ class ChallengeRepository(BaseRepository):
         """, (user_id, achievement_id, progress))
 
     def complete_achievement(self, user_id: str, achievement_id: str) -> bool:
-        """Отметить достижение как выполненное"""
+        """Отмечает достижение как выполненное.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :param achievement_id: UUID достижения
+        :type achievement_id: str
+        :return: True при успехе
+        :rtype: bool
+        """
         return self.db.execute_update("""
             UPDATE user_achievements 
             SET is_completed = 1, completed_at = CURRENT_DATE
@@ -67,24 +131,46 @@ class ChallengeRepository(BaseRepository):
         """, (user_id, achievement_id))
 
     def claim_reward(self, user_id: str, achievement_id: str) -> bool:
-        """Забрать награду"""
+        """Отмечает награду как забранную.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :param achievement_id: UUID достижения
+        :type achievement_id: str
+        :return: True при успехе
+        :rtype: bool
+        """
         return self.db.execute_update("""
             UPDATE user_achievements SET claimed = 1
             WHERE user_id = ? AND achievement_id = ?
         """, (user_id, achievement_id))
 
     def is_achievement_completed(self, user_id: str, achievement_id: str) -> bool:
-        """Проверить, выполнено ли достижение"""
+        """Проверяет, выполнено ли достижение.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :param achievement_id: UUID достижения
+        :type achievement_id: str
+        :return: True если выполнено
+        :rtype: bool
+        """
         result = self.db.execute_query("""
             SELECT is_completed FROM user_achievements 
             WHERE user_id = ? AND achievement_id = ?
         """, (user_id, achievement_id))
         return result[0]['is_completed'] == 1 if result else False
 
-    # ==================== УСЛОВИЯ ДЛЯ ПРОВЕРКИ ====================
+    # ==================== CONDITION CHECKS ====================
 
     def check_grow_to_maturity(self, user_id: str) -> int:
-        """Количество растений, выращенных до зрелости"""
+        """Подсчитывает количество растений, выращенных до зрелости.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Количество зрелых растений
+        :rtype: int
+        """
         result = self.db.execute_query("""
             SELECT COUNT(*) as count FROM user_plants 
             WHERE user_id = ? AND growth_stage = 'mature' AND is_alive = 1
@@ -92,7 +178,13 @@ class ChallengeRepository(BaseRepository):
         return result[0]['count'] if result else 0
 
     def check_death_first(self, user_id: str) -> int:
-        """Первая смерть растения"""
+        """Подсчитывает количество первых смертей растений.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Количество растений, умерших впервые
+        :rtype: int
+        """
         result = self.db.execute_query("""
             SELECT COUNT(*) as count FROM user_plants 
             WHERE user_id = ? AND is_alive = 0 AND times_reborn = 1
@@ -100,7 +192,13 @@ class ChallengeRepository(BaseRepository):
         return result[0]['count'] if result else 0
 
     def check_species_collected(self, user_id: str) -> int:
-        """Количество собранных видов"""
+        """Подсчитывает количество собранных видов растений.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Количество уникальных видов
+        :rtype: int
+        """
         result = self.db.execute_query("""
             SELECT COUNT(DISTINCT template_id) as count FROM user_plants 
             WHERE user_id = ? AND is_alive = 1
@@ -108,7 +206,13 @@ class ChallengeRepository(BaseRepository):
         return result[0]['count'] if result else 0
 
     def get_level(self, user_id: str) -> int:
-        """Уровень пользователя"""
+        """Получает уровень пользователя.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Уровень (по умолчанию 1)
+        :rtype: int
+        """
         result = self.db.execute_query(
             "SELECT level FROM player_profiles WHERE user_id = ?",
             (user_id,)
@@ -116,7 +220,13 @@ class ChallengeRepository(BaseRepository):
         return result[0]['level'] if result else 1
 
     def get_consecutive_days(self, user_id: str) -> int:
-        """Серия дней подряд"""
+        """Получает серию дней подряд.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Количество дней подряд
+        :rtype: int
+        """
         result = self.db.execute_query(
             "SELECT consecutive_days FROM player_profiles WHERE user_id = ?",
             (user_id,)

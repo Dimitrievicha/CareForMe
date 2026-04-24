@@ -1,3 +1,8 @@
+"""Модуль загрузки данных из CSV файлов в базу данных.
+
+Содержит функции для импорта шаблонов растений и достижений из CSV.
+"""
+
 import csv
 import json
 import logging
@@ -9,8 +14,26 @@ logger = logging.getLogger(__name__)
 
 
 def load_plants_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
-    """Загрузка шаблонов растений из CSV"""
+    """Загружает шаблоны растений из CSV файла в таблицу plant_templates.
 
+    Поддерживает два формата для JSON полей (tips и symptoms):
+        - JSON массив: '["tip1", "tip2"]'
+        - Разделитель | : 'tip1|tip2'
+
+    :param csv_path: Путь к CSV файлу с растениями
+    :type csv_path: str
+    :param db_path: Путь к файлу БД (по умолчанию 'careforme.db')
+    :type db_path: str
+    :return: True если загружено хотя бы одно растение, иначе False
+    :rtype: bool
+
+    :raises FileNotFoundError: Если CSV файл не найден
+
+    :example:
+        >>> success = load_plants_from_csv_raw("csv/plant_catalog.csv")
+        >>> print(success)
+        True
+    """
     if not Path(csv_path).exists():
         logger.error(f"CSV файл не найден: {csv_path}")
         return False
@@ -92,8 +115,20 @@ def load_plants_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bo
 
 
 def load_achievements_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
-    """Загрузка достижений из CSV"""
+    """Загружает достижения из CSV файла в таблицу achievements.
 
+    :param csv_path: Путь к CSV файлу с достижениями
+    :type csv_path: str
+    :param db_path: Путь к файлу БД (по умолчанию 'careforme.db')
+    :type db_path: str
+    :return: True если загружено хотя бы одно достижение, иначе False
+    :rtype: bool
+
+    :example:
+        >>> success = load_achievements_from_csv_raw("csv/achievements_catalog.csv")
+        >>> print(success)
+        True
+    """
     if not Path(csv_path).exists():
         logger.error(f"CSV файл не найден: {csv_path}")
         return False
@@ -151,7 +186,24 @@ def load_achievements_from_csv_raw(csv_path: str, db_path: str = "careforme.db")
 
 
 def verify_data(db_path: str = "careforme.db") -> dict:
-    """Проверка загруженных данных"""
+    """Проверяет количество записей в основных таблицах.
+
+    :param db_path: Путь к файлу БД
+    :type db_path: str
+    :return: Словарь с количеством записей в таблицах
+    :rtype: dict
+
+    :returns::
+        {
+            'plants_count': 15,
+            'achievements_count': 10,
+            'users_count': 0
+        }
+
+    :example:
+        >>> stats = verify_data()
+        >>> print(f"Растений в БД: {stats['plants_count']}")
+    """
     db = get_db_manager(db_path)
 
     plants = db.execute_query("SELECT COUNT(*) as count FROM plant_templates")
@@ -166,7 +218,18 @@ def verify_data(db_path: str = "careforme.db") -> dict:
 
 
 def get_all_plants(db_path: str = "careforme.db") -> list:
-    """Получить все растения из БД"""
+    """Получает все шаблоны растений из БД.
+
+    :param db_path: Путь к файлу БД
+    :type db_path: str
+    :return: Список всех растений, отсортированных по sort_order
+    :rtype: list
+
+    :example:
+        >>> plants = get_all_plants()
+        >>> for p in plants:
+        ...     print(p['species_name'])
+    """
     db = get_db_manager(db_path)
     return db.execute_query("""
         SELECT species_id, species_name, nickname, description, character_trait,
@@ -178,7 +241,20 @@ def get_all_plants(db_path: str = "careforme.db") -> list:
 
 
 def get_plant_by_id(species_id: int, db_path: str = "careforme.db") -> Optional[dict]:
-    """Получить растение по ID"""
+    """Получает шаблон растения по species_id.
+
+    :param species_id: ID вида растения
+    :type species_id: int
+    :param db_path: Путь к файлу БД
+    :type db_path: str
+    :return: Словарь с данными растения или None
+    :rtype: Optional[dict]
+
+    :example:
+        >>> plant = get_plant_by_id(1)
+        >>> if plant:
+        ...     print(plant['species_name'])
+    """
     db = get_db_manager(db_path)
     result = db.execute_query(
         "SELECT * FROM plant_templates WHERE species_id = ?",

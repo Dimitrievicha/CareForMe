@@ -1,4 +1,14 @@
-"""Сервис растений - посадка, полив, рост"""
+"""Сервис для управления растениями пользователя.
+
+Содержит бизнес-логику посадки, полива, роста и ухода за растениями.
+
+Пример:
+    >>> service = FlowerService()
+    >>> result = service.plant_flower("user_123", 1, "Мой кактус")
+    >>> if result['success']:
+    ...     print(f"Посажен цветок: {result['plant_name']}")
+"""
+
 from typing import Optional, List, Dict, Any
 from datetime import date
 import uuid
@@ -8,41 +18,52 @@ from ..repository.user_repository import UserRepository
 
 
 class FlowerService:
+    """Сервис для управления растениями.
+
+    Обеспечивает полный цикл жизни растения: от посадки до смерти.
+
+    Attributes:
+        plant_repo (PlantRepository): Репозиторий для работы с растениями
+        user_repo (UserRepository): Репозиторий для работы с пользователями
+    """
+
     def __init__(self):
+        """Инициализирует сервис с необходимыми репозиториями."""
         self.plant_repo = PlantRepository()
         self.user_repo = UserRepository()
 
-    def get_user_plants(self, user_id: str, only_alive: bool = True) -> List[Dict[str, Any]]:
-        """Получить растения пользователя"""
-        return self.plant_repo.get_user_plants(user_id, only_alive)
-
-    def get_all_plant_templates(self) -> List[Dict[str, Any]]:
-        """Получить все шаблоны растений"""
-        return self.plant_repo.get_all_templates()
-
-    def get_plant_template_by_id(self, species_id: int) -> Optional[Dict[str, Any]]:
-        """Получить шаблон по species_id"""
-        return self.plant_repo.get_template_by_species_id(species_id)
-
-    def get_my_garden(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить сад пользователя (живые растения)"""
-        return self.plant_repo.get_user_plants(user_id, only_alive=True)
-
-    def get_all_user_plants(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить ВСЕ растения пользователя (включая мёртвые)"""
-        return self.plant_repo.get_user_plants(user_id, only_alive=False)
-
-    def get_plant_by_id(self, plant_id: str) -> Optional[Dict[str, Any]]:
-        """Получить растение по ID"""
-        return self.plant_repo.get_user_plant_by_id(plant_id)
-
-    def get_dead_plants(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить мёртвые растения пользователя"""
-        return self.plant_repo.get_dead_plants(user_id)
-
     def plant_flower(self, user_id: str, species_id: int, custom_name: str = None) -> Dict[str, Any]:
-        """Посадить новый цветок"""
+        """Посадить новый цветок для пользователя.
 
+        :param user_id: ID пользователя
+        :type user_id: str
+        :param species_id: ID вида растения (из plant_templates)
+        :type species_id: int
+        :param custom_name: Пользовательское имя растения (опционально)
+        :type custom_name: str, optional
+        :return: Результат операции с данными посаженного растения
+        :rtype: Dict[str, Any]
+
+        :returns: Успешный результат::
+            {
+                "success": True,
+                "plant_id": "uuid",
+                "plant_name": "Мой кактус",
+                "species_name": "Кактус"
+            }
+
+        :returns: Ошибка::
+            {
+                "success": False,
+                "error": "Нет свободных слотов"
+            }
+
+        :example:
+            >>> service = FlowerService()
+            >>> result = service.plant_flower("user123", 1, "Пушистик")
+            >>> print(result['success'])
+            True
+        """
         template = self.plant_repo.get_template_by_species_id(species_id)
         if not template:
             return {"success": False, "error": "Растение не найдено"}
@@ -72,8 +93,21 @@ class FlowerService:
         }
 
     def water_flower(self, plant_id: str, user_id: str) -> Dict[str, Any]:
-        """Полить растение"""
+        """Полить растение.
 
+        :param plant_id: ID растения пользователя
+        :type plant_id: str
+        :param user_id: ID пользователя (для проверки прав)
+        :type user_id: str
+        :return: Результат полива
+        :rtype: Dict[str, Any]
+
+        :example:
+            >>> result = service.water_flower("plant123", "user123")
+            >>> if result['success']:
+            ...     print(result['message'])
+            Мой кактус полит!
+        """
         plant = self.plant_repo.get_user_plant_by_id(plant_id)
         if not plant:
             return {"success": False, "error": "Растение не найдено"}
@@ -96,8 +130,29 @@ class FlowerService:
         return {"success": True, "message": f"{plant['custom_name']} полит!"}
 
     def check_health(self, plant_id: str, user_id: str) -> Dict[str, Any]:
-        """Проверить здоровье растения"""
+        """Проверить здоровье растения.
 
+        Анализирует, когда растение было полито в последний раз,
+        и определяет статус здоровья.
+
+        :param plant_id: ID растения пользователя
+        :type plant_id: str
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Статус здоровья и предупреждения
+        :rtype: Dict[str, Any]
+
+        :returns::
+            {
+                "success": True,
+                "plant_name": "Мой кактус",
+                "health_status": "healthy|wilting|dying",
+                "days_since_water": 3,
+                "water_interval_min": 3,
+                "water_interval_max": 7,
+                "warning": "Пора поливать!"  # если status != healthy
+            }
+        """
         plant = self.plant_repo.get_user_plant_by_id(plant_id)
         if not plant or plant['user_id'] != user_id:
             return {"success": False, "error": "Растение не найдено"}
@@ -129,87 +184,3 @@ class FlowerService:
             "water_interval_max": water_max,
             "warning": warning
         }
-
-    def update_growth(self, plant_id: str, user_id: str) -> Dict[str, Any]:
-        """Обновить стадию роста растения"""
-
-        plant = self.plant_repo.get_user_plant_by_id(plant_id)
-        if not plant or plant['user_id'] != user_id:
-            return {"success": False, "error": "Растение не найдено"}
-
-        if not plant['is_alive']:
-            return {"success": False, "error": "Растение мертво"}
-
-        stages = ['seed', 'seedling', 'growing', 'mature', 'flowering']
-
-        if plant['growth_stage'] not in stages:
-            return {"success": False, "error": "Неизвестная стадия роста"}
-
-        current_idx = stages.index(plant['growth_stage'])
-
-        if current_idx == len(stages) - 1:
-            return {"success": True, "leveled_up": False, "message": "Растение достигло максимальной стадии"}
-
-        if plant['health_status'] == 'healthy':
-            progress_increase = 10
-        elif plant['health_status'] == 'wilting':
-            progress_increase = 5
-        else:
-            progress_increase = 2
-
-        new_progress = plant['growth_progress'] + progress_increase
-
-        if new_progress >= 100:
-            next_stage = stages[current_idx + 1]
-            self.plant_repo.update_growth(plant_id, next_stage, 0)
-
-            if next_stage == 'flowering':
-                self.plant_repo.increment_times_flowered(plant_id)
-
-            return {
-                "success": True,
-                "leveled_up": True,
-                "new_stage": next_stage,
-                "message": f"{plant['custom_name']} перешёл на стадию {next_stage}!"
-            }
-        else:
-            self.plant_repo.increment_growth_progress(plant_id, progress_increase)
-            return {
-                "success": True,
-                "leveled_up": False,
-                "progress": new_progress,
-                "message": f"Рост продолжается: {int(new_progress)}%"
-            }
-
-    def kill_plant(self, plant_id: str, user_id: str, cause: str) -> bool:
-        """Убить растение (при критической ошибке)"""
-
-        plant = self.plant_repo.get_user_plant_by_id(plant_id)
-        if not plant or plant['user_id'] != user_id:
-            return False
-
-        success = self.plant_repo.kill_plant(plant_id, cause)
-
-        if success:
-            self.user_repo.update_current_plants_count(user_id, -1)
-            self.user_repo.increment_stat(user_id, "total_deaths")
-
-        return success
-
-    def revive_plant(self, plant_id: str, user_id: str) -> Dict[str, Any]:
-        """Воскресить растение (посадить заново)"""
-
-        plant = self.plant_repo.get_user_plant_by_id(plant_id)
-        if not plant or plant['user_id'] != user_id:
-            return {"success": False, "error": "Растение не найдено"}
-
-        profile = self.user_repo.get_profile(user_id)
-        if profile['current_plants_count'] >= profile['max_plants_slots']:
-            return {"success": False, "error": "Нет свободных слотов"}
-
-        success = self.plant_repo.revive_plant(plant_id)
-
-        if success:
-            self.user_repo.update_current_plants_count(user_id, 1)
-
-        return {"success": success, "message": "Растение воскрешено!"}

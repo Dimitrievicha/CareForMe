@@ -1,4 +1,18 @@
-"""Сервис пользователя - профиль, опыт, монеты, серии"""
+"""Сервис пользователя - профиль, опыт, монеты, серии.
+
+Содержит бизнес-логику для:
+    - управления опытом и уровнями
+    - начисления монет
+    - ежедневных серий
+    - слотов для растений
+
+Пример:
+    >>> service = UserService()
+    >>> result = service.add_xp("user123", 50)
+    >>> if result['leveled_up']:
+    ...     print(f"Новый уровень: {result['new_level']}")
+"""
+
 from typing import Optional, Dict, Any, List
 from datetime import date
 
@@ -6,13 +20,45 @@ from ..repository.user_repository import UserRepository
 
 
 class UserService:
+    """Сервис для работы с пользовательскими данными.
+
+    Attributes:
+        user_repo (UserRepository): Репозиторий пользователей
+    """
+
     def __init__(self):
+        """Инициализирует сервис с репозиторием пользователей."""
         self.user_repo = UserRepository()
 
     def get_profile(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Получает игровой профиль пользователя.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Данные профиля или None
+        :rtype: Optional[Dict[str, Any]]
+        """
         return self.user_repo.get_profile(user_id)
 
     def get_stats(self, user_id: str) -> Dict[str, Any]:
+        """Получает основную статистику пользователя.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Словарь со статистикой
+        :rtype: Dict[str, Any]
+
+        :returns::
+            {
+                "level": 5,
+                "xp": 250,
+                "coins": 150,
+                "total_plants_grown": 10,
+                "total_waterings": 45,
+                "current_plants": 3,
+                "max_plants_slots": 5
+            }
+        """
         profile = self.user_repo.get_profile(user_id)
         if not profile:
             return {"level": 0, "xp": 0, "coins": 0}
@@ -28,6 +74,24 @@ class UserService:
         }
 
     def add_xp(self, user_id: str, amount: int) -> Dict[str, Any]:
+        """Добавляет опыт пользователю и обрабатывает повышение уровня.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :param amount: Количество опыта
+        :type amount: int
+        :return: Результат начисления опыта
+        :rtype: Dict[str, Any]
+
+        :returns::
+            {
+                "success": True,
+                "old_level": 1,
+                "new_level": 2,
+                "xp_gained": 100,
+                "leveled_up": True
+            }
+        """
         profile = self.user_repo.get_profile(user_id)
         if not profile:
             return {"success": False}
@@ -65,9 +129,32 @@ class UserService:
         }
 
     def add_coins(self, user_id: str, amount: int) -> bool:
+        """Добавляет монеты пользователю.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :param amount: Количество монет
+        :type amount: int
+        :return: True при успехе
+        :rtype: bool
+        """
         return self.user_repo.add_coins(user_id, amount)
 
     def update_daily_streak(self, user_id: str) -> Dict[str, Any]:
+        """Обновляет ежедневную серию пользователя.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Результат обновления серии
+        :rtype: Dict[str, Any]
+
+        :returns::
+            {
+                "success": True,
+                "consecutive_days": 5,
+                "best_streak": 5
+            }
+        """
         profile = self.user_repo.get_profile(user_id)
         if not profile:
             return {"success": False}
@@ -93,6 +180,20 @@ class UserService:
         }
 
     def get_plant_slots(self, user_id: str) -> Dict[str, int]:
+        """Получает информацию о слотах для растений.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :return: Словарь с информацией о слотах
+        :rtype: Dict[str, int]
+
+        :returns::
+            {
+                "current": 2,
+                "max": 5,
+                "available": 3
+            }
+        """
         profile = self.user_repo.get_profile(user_id)
         if not profile:
             return {"current": 0, "max": 1, "available": 1}
@@ -104,6 +205,15 @@ class UserService:
         }
 
     def increment_current_plants(self, user_id: str, delta: int = 1) -> bool:
+        """Изменяет количество текущих растений.
+
+        :param user_id: ID пользователя
+        :type user_id: str
+        :param delta: На сколько изменить (+1 или -1)
+        :type delta: int
+        :return: True при успехе
+        :rtype: bool
+        """
         return self.user_repo.update_current_plants_count(user_id, delta)
 
 

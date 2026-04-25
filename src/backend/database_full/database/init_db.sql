@@ -1,7 +1,7 @@
-PRAGMA foreign_keys = ON;
+PRAGMA foreign_keys = ON;  -- Включение поддержки внешних ключей
 
 -- -----------------------------------------------------
--- Таблица пользователей (аккаунты)
+-- Таблица пользователей (учетные записи)
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY DEFAULT (LOWER(HEX(RANDOMBLOB(16)))),
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- -----------------------------------------------------
--- Таблица сессий (для поддержания входа)
+-- Таблица сессий (поддержание входа)
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS sessions (
     id VARCHAR(36) PRIMARY KEY DEFAULT (LOWER(HEX(RANDOMBLOB(16)))),
@@ -25,26 +25,27 @@ CREATE TABLE IF NOT EXISTS sessions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-
 -- -----------------------------------------------------
--- Таблица профилей игроков (игровая статистика)
+-- Таблица профилей игроков
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS player_profiles (
     user_id VARCHAR(36) PRIMARY KEY,
     display_name VARCHAR(50),
-    level INTEGER DEFAULT 1,
-    xp INTEGER DEFAULT 0,
-    coins INTEGER DEFAULT 0,
+    current_level INTEGER DEFAULT 1,
+    max_plants_slots INTEGER DEFAULT 1,
     total_plants_grown INTEGER DEFAULT 0,
     total_waterings INTEGER DEFAULT 0,
     total_mistakes INTEGER DEFAULT 0,
     total_deaths INTEGER DEFAULT 0,
     current_plants_count INTEGER DEFAULT 0,
-    max_plants_slots INTEGER DEFAULT 1,
     tutorial_completed BOOLEAN DEFAULT 0,
     last_entry DATE DEFAULT CURRENT_DATE,
     consecutive_days INTEGER DEFAULT 1,
     best_streak INTEGER DEFAULT 1,
+    unlocked_pots TEXT DEFAULT '["standard"]',
+    unlocked_watering_cans TEXT DEFAULT '["standard"]',
+    current_pot VARCHAR(50) DEFAULT 'standard',
+    current_watering_can VARCHAR(50) DEFAULT 'standard',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -97,12 +98,13 @@ CREATE TABLE IF NOT EXISTS user_plants (
     times_reborn INTEGER DEFAULT 0,
     times_flowered INTEGER DEFAULT 0,
     last_advice_shown DATETIME,
+    has_perfect_growth BOOLEAN DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (template_id) REFERENCES plant_templates(id)
 );
 
 -- -----------------------------------------------------
--- Таблица достижений
+-- Таблица достижений (справочник)
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS achievements (
     id VARCHAR(36) PRIMARY KEY DEFAULT (LOWER(HEX(RANDOMBLOB(16)))),
@@ -110,8 +112,6 @@ CREATE TABLE IF NOT EXISTS achievements (
     description TEXT,
     requirement_type VARCHAR(50),
     target_value INTEGER,
-    reward_coins INTEGER DEFAULT 50,
-    reward_xp INTEGER DEFAULT 0,
     is_active BOOLEAN DEFAULT 1,
     sort_order INTEGER DEFAULT 0
 );
@@ -125,25 +125,76 @@ CREATE TABLE IF NOT EXISTS user_achievements (
     current_progress INTEGER DEFAULT 0,
     is_completed BOOLEAN DEFAULT 0,
     completed_at DATE,
-    claimed BOOLEAN DEFAULT 0,
     PRIMARY KEY (user_id, achievement_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (achievement_id) REFERENCES achievements(id) ON DELETE CASCADE
 );
 
 -- -----------------------------------------------------
--- Таблица уровней
+-- Таблица требований к уровням (задания)
+-- -----------------------------------------------------
+-- Назначение: Определение заданий для каждого уровня (1-5)
+-- За выполнение заданий даются дизайны и слоты
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS level_requirements (
     level INTEGER PRIMARY KEY,
-    required_xp INTEGER NOT NULL,
-    reward_coins INTEGER DEFAULT 0,
-    reward_new_plant_slot BOOLEAN DEFAULT 0,
-    reward_title VARCHAR(100)
+
+    -- ЗАДАНИЕ 1
+    quest1_type VARCHAR(50),
+    quest1_target INTEGER,
+    quest1_description TEXT,
+
+    -- ЗАДАНИЕ 2
+    quest2_type VARCHAR(50),
+    quest2_target INTEGER,
+    quest2_description TEXT,
+
+    -- ЗАДАНИЕ 3 (может быть NULL)
+    quest3_type VARCHAR(50),
+    quest3_target INTEGER,
+    quest3_description TEXT,
+
+    -- НАГРАДА
+    reward_type VARCHAR(50),
+    reward_value TEXT,
+    reward_description TEXT
 );
 
 -- -----------------------------------------------------
--- Таблица истории ошибок (для умных советов)
+-- Таблица прогресса выполнения заданий пользователя
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS user_level_progress (
+    user_id VARCHAR(36) NOT NULL,
+    level INTEGER NOT NULL,
+    quest1_progress INTEGER DEFAULT 0,
+    quest1_completed BOOLEAN DEFAULT 0,
+    quest2_progress INTEGER DEFAULT 0,
+    quest2_completed BOOLEAN DEFAULT 0,
+    quest3_progress INTEGER DEFAULT 0,
+    quest3_completed BOOLEAN DEFAULT 0,
+    level_completed BOOLEAN DEFAULT 0,
+    reward_claimed BOOLEAN DEFAULT 0,
+    completed_at DATE,
+    PRIMARY KEY (user_id, level),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- -----------------------------------------------------
+-- Таблица дизайнов
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS designs (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (LOWER(HEX(RANDOMBLOB(16)))),
+    design_type VARCHAR(20) NOT NULL CHECK (design_type IN ('pot', 'watering_can')),
+    design_id VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    image_path VARCHAR(255),
+    is_default BOOLEAN DEFAULT 0,
+    sort_order INTEGER DEFAULT 0
+);
+
+-- -----------------------------------------------------
+-- Таблица истории ошибок
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS user_mistakes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -169,66 +220,14 @@ CREATE TABLE IF NOT EXISTS tips (
 );
 
 -- -----------------------------------------------------
--- Таблица кастомизации (открываемые предметы)
+-- Индексы
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS customizations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    type VARCHAR(20) NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    image_path VARCHAR(255),
-    unlock_level INTEGER DEFAULT 1,
-    unlock_achievement_id VARCHAR(36),
-    price_coins INTEGER DEFAULT 0,
-    is_default BOOLEAN DEFAULT 0,
-    FOREIGN KEY (unlock_achievement_id) REFERENCES achievements(id)
-);
-
--- -----------------------------------------------------
--- Таблица владения кастомизацией пользователем
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS user_customizations (
-    user_id VARCHAR(36) NOT NULL,
-    customization_id INTEGER NOT NULL,
-    is_equipped BOOLEAN DEFAULT 0,
-    acquired_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, customization_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (customization_id) REFERENCES customizations(id) ON DELETE CASCADE
-);
-
--- =====================================================
--- ИНДЕКСЫ
--- =====================================================
-
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_plants_user ON user_plants(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_plants_alive ON user_plants(is_alive);
-CREATE INDEX IF NOT EXISTS idx_player_profiles_level ON player_profiles(level);
+CREATE INDEX IF NOT EXISTS idx_player_profiles_level ON player_profiles(current_level);
 CREATE INDEX IF NOT EXISTS idx_user_achievements_user ON user_achievements(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_mistakes_user ON user_mistakes(user_id);
-
--- Уровни
-INSERT OR IGNORE INTO level_requirements (level, required_xp, reward_coins, reward_new_plant_slot, reward_title) VALUES
-(1, 0, 0, 0, '🌱 Новичок'),
-(2, 100, 50, 1, '🌿 Садовод'),
-(3, 250, 100, 0, '🍃 Любитель'),
-(4, 500, 150, 1, '🌸 Ценитель'),
-(5, 1000, 200, 0, '🌳 Профи');
-
--- Советы
-INSERT OR IGNORE INTO tips (tip_type, title, message, is_positive) VALUES
-('overwater', '💧 Перелив', 'Ой, кажется, ты слишком любишь свой цветок. Перелив опаснее засухи!', 0),
-('drought', '🏜️ Засуха', 'Пить хочется... Пора поливать!', 0),
-('light', '☀️ Свет', 'Кажется, твоему другу не нравится его место.', 0),
-('cold', '❌ Сквозняк', 'Бр-р, холодно! Убери цветок от окна.', 0),
-('death_first', '💔 Первая потеря', 'Ничего страшного! Посади новый цветок.', 0),
-('perfect_water', '✨ Идеально!', 'Ты чувствуешь своего зелёного друга!', 1),
-('healed', '🎉 Выздоровел!', 'Ура! Снова здоров. Горжусь тобой!', 1),
-('flowered', '🌸 Красота!', 'Смотри-ка, цветок! Ты делаешь всё правильно.', 1);
-
--- Базовая кастомизация
-INSERT OR IGNORE INTO customizations (type, name, image_path, unlock_level, is_default) VALUES
-('pot', 'Стандартный горшок', '/static/pots/default.png', 1, 1),
-('watering_can', 'Стандартная лейка', '/static/cans/default.png', 1, 1);
+CREATE INDEX IF NOT EXISTS idx_user_level_progress_user ON user_level_progress(user_id);

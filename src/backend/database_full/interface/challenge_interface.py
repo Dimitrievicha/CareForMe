@@ -1,6 +1,9 @@
-"""Интерфейс для работы с достижениями.
+"""
+Интерфейс для работы с достижениями (ачивками).
 
-Предоставляет внешний API для работы с достижениями и наградами.
+Предоставляет внешний API для работы с достижениями.
+Все методы предназначены для вызова из GUI, CLI или REST API.
+
 """
 
 from typing import List, Dict, Any
@@ -8,115 +11,168 @@ from ..service.challenge_service import ChallengeService
 
 
 class ChallengeInterface:
-    """Интерфейс для API - вызывает методы ChallengeService.
+    """
+    Интерфейс для API - вызывает методы ChallengeService.
+
+    Предоставляет упрощенный доступ к функционалу ачивок:
+        - Просмотр достижений и прогресса
+        - Проверка выполнения
+        - Статистика
 
     Attributes:
         _service (ChallengeService): Сервисный слой для бизнес-логики
     """
 
     def __init__(self, db_path: str = None):
-        """Инициализирует интерфейс с сервисным слоем.
+        """
+        Инициализирует интерфейс с сервисным слоем.
 
-        :param db_path: Путь к БД (опционально)
-        :type db_path: str, optional
+        Args:
+            db_path: Путь к БД (опционально)
         """
         self._service = ChallengeService()
 
-    def get_all_achievements(self, user_id: str = None) -> List[Dict[str, Any]]:
-        """Получить все достижения.
+    # =====================================================
+    # ПОЛУЧЕНИЕ ДАННЫХ
+    # =====================================================
 
-        :param user_id: ID пользователя (если указан, возвращает прогресс)
-        :type user_id: str, optional
-        :return: Список достижений
-        :rtype: List[Dict[str, Any]]
+    def get_all_achievements(self, user_id: str) -> List[Dict[str, Any]]:
         """
-        return self._service.get_achievements(user_id) if user_id else self._service.get_achievements(None)
+        Получить все достижения с прогрессом пользователя.
+
+        Args:
+            user_id: ID пользователя
+
+        Returns:
+            Список достижений с прогрессом
+
+        """
+        return self._service.get_achievements(user_id)
 
     def get_completed(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить выполненные достижения пользователя.
+        """
+        Получить выполненные достижения пользователя.
 
-        :param user_id: ID пользователя
-        :type user_id: str
-        :return: Список выполненных достижений
-        :rtype: List[Dict[str, Any]]
+        Args:
+            user_id: ID пользователя
+
+        Returns:
+            Список выполненных достижений
+
         """
         return self._service.get_completed(user_id)
 
-    def get_pending_rewards(self, user_id: str) -> List[Dict[str, Any]]:
-        """Получить незабранные награды пользователя.
-
-        :param user_id: ID пользователя
-        :type user_id: str
-        :return: Список достижений с незабранными наградами
-        :rtype: List[Dict[str, Any]]
+    def get_completed_count(self, user_id: str) -> int:
         """
-        return self._service.get_unclaimed(user_id)
+        Получить количество выполненных достижений.
+
+        Args:
+            user_id: ID пользователя
+
+        Returns:
+            Количество выполненных ачивок
+        """
+        return self._service.get_completed_count(user_id)
+
+    def get_statistics(self, user_id: str) -> Dict[str, Any]:
+        """
+        Получить статистику пользователя по достижениям.
+
+        Args:
+            user_id: ID пользователя
+
+        Returns:
+            Словарь со статистикой
+
+        Returns структура:
+            {
+                "plants_grown_to_maturity_perfect": 1,  # идеальных растений
+                "death_count": 1,                        # смертей
+                "mistake_count": 5,                      # ошибок
+                "species_collected": 3,                  # видов
+                "consecutive_days": 7,                   # серия дней
+                "level": 3,                              # уровень
+                "total_achievements": 2                  # получено ачивок
+            }
+
+        """
+        return self._service.get_statistics(user_id)
+
+    # =====================================================
+    # ПРОВЕРКА И ОБНОВЛЕНИЕ
+    # =====================================================
 
     def check_all_achievements(self, user_id: str) -> List[Dict[str, Any]]:
-        """Проверить все достижения пользователя.
+        """
+        Проверить все достижения пользователя.
 
-        :param user_id: ID пользователя
-        :type user_id: str
-        :return: Список вновь выполненных достижений
-        :rtype: List[Dict[str, Any]]
+        Вызывается после каждого действия.
+
+        Args:
+            user_id: ID пользователя
+
+        Returns:
+            Список вновь выполненных достижений
+
         """
         return self._service.check_all(user_id)
 
-    def claim_achievement_reward(self, user_id: str, achievement_id: str) -> Dict[str, Any]:
-        """Забрать награду за достижение.
-
-        :param user_id: ID пользователя
-        :type user_id: str
-        :param achievement_id: ID достижения
-        :type achievement_id: str
-        :return: Результат получения награды
-        :rtype: Dict[str, Any]
-
-        :example:
-            >>> interface = ChallengeInterface()
-            >>> result = interface.claim_achievement_reward("user123", "ach_001")
-            >>> if result['success']:
-            ...     print(result['message'])
-            Награда получена! +50 монет
-        """
-        return self._service.claim_reward(user_id, achievement_id)
+    # =====================================================
+    # ЗАПИСЬ СОБЫТИЙ (для автоматической проверки)
+    # =====================================================
 
     def record_mistake(self, user_id: str, plant_id: str, mistake_type: str) -> Dict[str, Any]:
-        """Записать ошибку пользователя.
+        """
+        Записать ошибку пользователя.
 
-        :param user_id: ID пользователя
-        :type user_id: str
-        :param plant_id: ID растения
-        :type plant_id: str
-        :param mistake_type: Тип ошибки (overwater, drought, light, cold)
-        :type mistake_type: str
-        :return: Результат с новыми достижениями
-        :rtype: Dict[str, Any]
+        Args:
+            user_id: ID пользователя
+            plant_id: ID растения
+            mistake_type: Тип ошибки (overwater, drought, light, cold)
 
-        :example:
-            >>> interface = ChallengeInterface()
-            >>> result = interface.record_mistake("user123", "plant456", "overwater")
-            >>> print(result['new_achievements'])
+        Returns:
+            Результат с новыми достижениями
         """
         return self._service.record_mistake(user_id, plant_id, mistake_type)
 
-    def get_stats(self, user_id: str) -> Dict[str, Any]:
-        """Получить статистику пользователя по достижениям.
-
-        :param user_id: ID пользователя
-        :type user_id: str
-        :return: Словарь со статистикой
-        :rtype: Dict[str, Any]
-
-        :returns::
-            {
-                "plants_grown_to_maturity": 3,
-                "death_count": 1,
-                "mistake_count": 5,
-                "species_collected": 4,
-                "consecutive_days": 7,
-                "level": 3,
-                "total_achievements": 2
-            }
+    def record_perfect_growth(self, user_id: str, plant_id: str) -> Dict[str, Any]:
         """
-        return self._service.get_statistics(user_id)
+        Записать, что растение выращено без ошибок.
+
+        Args:
+            user_id: ID пользователя
+            plant_id: ID растения
+
+        Returns:
+            Результат с новыми достижениями
+        """
+        return self._service.record_perfect_growth(user_id, plant_id)
+
+    def record_plant_death(self, user_id: str, plant_id: str) -> Dict[str, Any]:
+        """
+        Записать смерть растения.
+
+        Args:
+            user_id: ID пользователя
+            plant_id: ID растения
+
+        Returns:
+            Результат с новыми достижениями
+        """
+        return self._service.record_plant_death(user_id, plant_id)
+
+    def record_species_collected(self, user_id: str) -> Dict[str, Any]:
+        """
+        Записать сбор нового вида.
+
+        Args:
+            user_id: ID пользователя
+
+        Returns:
+            Результат с новыми достижениями
+        """
+        return self._service.record_species_collected(user_id)
+
+
+# Глобальный экземпляр
+challenge_interface = ChallengeInterface()

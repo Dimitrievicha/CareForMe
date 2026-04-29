@@ -1,0 +1,6 @@
+design_type,design_id,name,description,image_path,is_default,sort_order
+pot,standard,Стандартный горшок,Простой терракотовый горшок,,1,1
+pot,design_pot_1,Винтажный горшок,Керамический горшок с узорами,,0,2
+pot,design_pot_2,Модерн горшок,Стильный белый горшок (за 5 уровень),,0,3
+watering_can,standard_leika,Стандартная лейка,Обычная зеленая лейка,,1,1
+watering_can,design_can_1,Медная лейка,Элегантная медная лейка,,0,2

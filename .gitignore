@@ -1,0 +1,37 @@
+# IDE и редакторы
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python (общие)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Виртуальные окружения
+venv/
+env/
+ENV/
+.env
+.venv
+
+# Логи
+*.log
+logs/
+
+# Временные файлы
+*.tmp
+*.temp
+
+# Документация (если генерируется)
+docs/_build/
+site/
+
+# OS-specific
+Thumbs.db
+.desktop.ini

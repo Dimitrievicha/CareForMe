@@ -4,10 +4,10 @@
 Содержит методы для работы с таблицами:
     - plant_templates: шаблоны растений (справочник)
     - user_plants: растения конкретных пользователей
-
 """
 
 from typing import Optional, List, Dict, Any
+from datetime import date, datetime
 from .base_repository import BaseRepository
 
 
@@ -18,6 +18,7 @@ class PlantRepository(BaseRepository):
     Обрабатывает все операции с растениями:
         - Получение шаблонов растений
         - Посадка, полив, рост, смерть растений
+        - Статистика по растениям
     """
 
     def get_all_templates(self) -> List[Dict[str, Any]]:
@@ -25,7 +26,19 @@ class PlantRepository(BaseRepository):
         Получает все шаблоны растений, отсортированные по sort_order.
 
         Returns:
-            Список всех шаблонов растений
+            Список всех шаблонов растений (Спатифиллюм, Кактус, Фикус, ...)
+
+        Returns структура:
+            [
+                {
+                    "species_id": 1,
+                    "species_name": "Спатифиллюм",
+                    "nickname": "Женское счастье",
+                    "water_interval_min": 3,
+                    "water_interval_max": 7,
+                    ...
+                }
+            ]
         """
         return self.db.execute_query("""
             SELECT species_id, species_name, nickname, description, character_trait,
@@ -41,35 +54,35 @@ class PlantRepository(BaseRepository):
         Получает шаблон растения по species_id.
 
         Args:
-            species_id: ID вида растения (1=Спатифиллюм, 2=Кактус, 3=Фикус)
+            species_id: ID вида растения
+                1 = Спатифиллюм (Женское счастье)
+                2 = Кактус (Корифанта)
+                3 = Фикус (Бенджамина)
 
         Returns:
             Данные шаблона или None
         """
-        result = self.db.execute_query(
-            "SELECT * FROM plant_templates WHERE species_id = ?",
-            (species_id,)
-        )
-        return result[0] if result else None
+        return self.get_one_by_field("plant_templates", "species_id", species_id)
 
     def get_template_by_id(self, template_id: str) -> Optional[Dict[str, Any]]:
         """
         Получает шаблон растения по внутреннему UUID.
 
         Args:
-            template_id: UUID шаблона
+            template_id: UUID шаблона (первичный ключ)
 
         Returns:
             Данные шаблона или None
         """
         return self.get_by_id("plant_templates", "id", template_id)
 
-    def create_user_plant(self, plant_id: str, user_id: str, template_id: str, custom_name: str) -> bool:
+    def create_user_plant(self, plant_id: str, user_id: str,
+                          template_id: str, custom_name: str) -> bool:
         """
         Создает новое растение пользователя (посадка).
 
         Args:
-            plant_id: UUID нового растения
+            plant_id: UUID нового растения (генерируется заранее)
             user_id: ID пользователя
             template_id: ID шаблона растения
             custom_name: Пользовательское имя растения
@@ -77,27 +90,55 @@ class PlantRepository(BaseRepository):
         Returns:
             True при успехе
         """
-        return self.db.execute_update("""
-            INSERT INTO user_plants (id, user_id, template_id, custom_name, growth_stage)
-            VALUES (?, ?, ?, ?, 'seed')
-        """, (plant_id, user_id, template_id, custom_name))
+        return self.insert("user_plants", {
+            "id": plant_id,
+            "user_id": user_id,
+            "template_id": template_id,
+            "custom_name": custom_name,
+            "growth_stage": "seed",
+            "last_watered": date.today().isoformat(),
+            "last_checked": date.today().isoformat()
+        })
 
     def get_user_plants(self, user_id: str, only_alive: bool = True) -> List[Dict[str, Any]]:
         """
-        Получает растения пользователя.
+        Получает растения пользователя с данными из шаблона.
 
         Args:
             user_id: ID пользователя
-            only_alive: Если True, только живые растения
+            only_alive: Если True, только живые растения (is_alive = 1)
 
         Returns:
-            Список растений с данными из шаблона
+            Список растений с JOIN-данными из plant_templates
+
+        Returns структура:
+            [
+                {
+                    "id": "uuid",
+                    "custom_name": "Мой кактус",
+                    "health_status": "healthy",
+                    "growth_stage": "growing",
+                    "species_name": "Кактус Корифанта",
+                    "water_interval_min": 3,
+                    "water_interval_max": 10,
+                    ...
+                }
+            ]
         """
         alive_filter = "AND up.is_alive = 1" if only_alive else ""
+
         return self.db.execute_query(f"""
-            SELECT up.*, pt.species_name, pt.nickname as plant_nickname, pt.character_trait,
-                   pt.water_interval_min, pt.water_interval_max, pt.light_requirement,
-                   pt.watering_advice, pt.light_advice, pt.tips, pt.symptoms
+            SELECT up.*, 
+                   pt.species_name, 
+                   pt.nickname as plant_nickname, 
+                   pt.character_trait,
+                   pt.water_interval_min, 
+                   pt.water_interval_max, 
+                   pt.light_requirement,
+                   pt.watering_advice, 
+                   pt.light_advice, 
+                   pt.tips, 
+                   pt.symptoms
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.user_id = ? {alive_filter}
@@ -106,18 +147,26 @@ class PlantRepository(BaseRepository):
 
     def get_user_plant_by_id(self, plant_id: str) -> Optional[Dict[str, Any]]:
         """
-        Получает растение пользователя по UUID.
+        Получает конкретное растение пользователя по UUID.
 
         Args:
             plant_id: UUID растения
 
         Returns:
-            Данные растения или None
+            Данные растения с JOIN-полями из шаблона или None
         """
         result = self.db.execute_query("""
-            SELECT up.*, pt.species_name, pt.nickname as plant_nickname, pt.character_trait,
-                   pt.water_interval_min, pt.water_interval_max, pt.light_requirement,
-                   pt.watering_advice, pt.light_advice, pt.tips, pt.symptoms
+            SELECT up.*, 
+                   pt.species_name, 
+                   pt.nickname as plant_nickname, 
+                   pt.character_trait,
+                   pt.water_interval_min, 
+                   pt.water_interval_max, 
+                   pt.light_requirement,
+                   pt.watering_advice, 
+                   pt.light_advice, 
+                   pt.tips, 
+                   pt.symptoms
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.id = ?
@@ -126,7 +175,9 @@ class PlantRepository(BaseRepository):
 
     def water_plant(self, plant_id: str) -> bool:
         """
-        Обновляет дату последнего полива растения.
+        Поливает растение - обновляет дату последнего полива.
+
+        Также обновляет статус здоровья на 'healthy', если он был плохим.
 
         Args:
             plant_id: UUID растения
@@ -135,7 +186,10 @@ class PlantRepository(BaseRepository):
             True при успехе
         """
         return self.db.execute_update("""
-            UPDATE user_plants SET last_watered = CURRENT_DATE, last_checked = CURRENT_DATE 
+            UPDATE user_plants 
+            SET last_watered = CURRENT_DATE, 
+                last_checked = CURRENT_DATE,
+                health_status = 'healthy'
             WHERE id = ?
         """, (plant_id,))
 
@@ -145,15 +199,19 @@ class PlantRepository(BaseRepository):
 
         Args:
             plant_id: UUID растения
-            status: Статус (healthy, wilting, overwatered, dying, dead)
+            status: Статус здоровья
+                - healthy: здоров
+                - wilting: увядает (пора поливать)
+                - overwatered: перелит
+                - dying: умирает (срочно полить)
+                - dead: мертв
 
         Returns:
             True при успехе
         """
-        return self.db.execute_update(
-            "UPDATE user_plants SET health_status = ? WHERE id = ?",
-            (status, plant_id)
-        )
+        return self.update("user_plants", "id", plant_id, {
+            "health_status": status
+        })
 
     def update_growth(self, plant_id: str, growth_stage: str, growth_progress: float) -> bool:
         """
@@ -161,15 +219,21 @@ class PlantRepository(BaseRepository):
 
         Args:
             plant_id: UUID растения
-            growth_stage: Стадия (seed, seedling, growing, mature, flowering)
-            growth_progress: Прогресс (0-100)
+            growth_stage: Стадия развития
+                - seed: семечко (0%)
+                - seedling: росток (25%)
+                - growing: растет (50%)
+                - mature: взрослое (75%)
+                - flowering: цветет (100%)
+            growth_progress: Прогресс в процентах (0-100)
 
         Returns:
             True при успехе
         """
-        return self.db.execute_update("""
-            UPDATE user_plants SET growth_stage = ?, growth_progress = ? WHERE id = ?
-        """, (growth_stage, growth_progress, plant_id))
+        return self.update("user_plants", "id", plant_id, {
+            "growth_stage": growth_stage,
+            "growth_progress": growth_progress
+        })
 
     def increment_growth_progress(self, plant_id: str, increment: float) -> bool:
         """
@@ -177,13 +241,15 @@ class PlantRepository(BaseRepository):
 
         Args:
             plant_id: UUID растения
-            increment: Прирост прогресса (обычно 10-20%)
+            increment: Прирост прогресса (обычно 5-20% в зависимости от здоровья)
 
         Returns:
             True при успехе
         """
         return self.db.execute_update("""
-            UPDATE user_plants SET growth_progress = growth_progress + ? WHERE id = ?
+            UPDATE user_plants 
+            SET growth_progress = growth_progress + ? 
+            WHERE id = ?
         """, (increment, plant_id))
 
     def mark_perfect_growth(self, plant_id: str) -> bool:
@@ -198,8 +264,25 @@ class PlantRepository(BaseRepository):
         Returns:
             True при успехе
         """
+        return self.update("user_plants", "id", plant_id, {
+            "has_perfect_growth": True
+        })
+
+    def increment_times_flowered(self, plant_id: str) -> bool:
+        """
+        Увеличивает счетчик цветений растения.
+
+        Вызывается каждый раз, когда растение достигает стадии 'flowering'.
+
+        Args:
+            plant_id: UUID растения
+
+        Returns:
+            True при успехе
+        """
         return self.db.execute_update("""
-            UPDATE user_plants SET has_perfect_growth = 1 WHERE id = ?
+            UPDATE user_plants SET times_flowered = times_flowered + 1 
+            WHERE id = ?
         """, (plant_id,))
 
     def kill_plant(self, plant_id: str, cause: str) -> bool:
@@ -208,21 +291,28 @@ class PlantRepository(BaseRepository):
 
         Args:
             plant_id: UUID растения
-            cause: Причина смерти (overwater, drought, neglect)
+            cause: Причина смерти
+                - drought: засуха (не поливали слишком долго)
+                - overwater: перелив (поливали слишком часто)
+                - neglect: запустение (комбинация факторов)
 
         Returns:
             True при успехе
         """
         return self.db.execute_update("""
             UPDATE user_plants 
-            SET is_alive = 0, death_cause = ?, death_date = CURRENT_DATE, 
+            SET is_alive = 0, 
+                death_cause = ?, 
+                death_date = CURRENT_DATE, 
                 times_reborn = times_reborn + 1
             WHERE id = ?
         """, (cause, plant_id))
 
     def revive_plant(self, plant_id: str) -> bool:
         """
-        Воскрешает мертвое растение (пересадка заново).
+        Воскрешает мертвое растение - пересаживает заново.
+
+        Сбрасывает все параметры к начальным (как при посадке).
 
         Args:
             plant_id: UUID растения
@@ -232,26 +322,16 @@ class PlantRepository(BaseRepository):
         """
         return self.db.execute_update("""
             UPDATE user_plants 
-            SET is_alive = 1, health_status = 'healthy', growth_stage = 'seed', 
-                growth_progress = 0, death_cause = NULL, death_date = NULL, 
-                last_watered = CURRENT_DATE, last_checked = CURRENT_DATE
+            SET is_alive = 1, 
+                health_status = 'healthy', 
+                growth_stage = 'seed', 
+                growth_progress = 0, 
+                death_cause = NULL, 
+                death_date = NULL, 
+                last_watered = CURRENT_DATE, 
+                last_checked = CURRENT_DATE
             WHERE id = ?
         """, (plant_id,))
-
-    def increment_times_flowered(self, plant_id: str) -> bool:
-        """
-        Увеличивает счетчик цветений растения.
-
-        Args:
-            plant_id: UUID растения
-
-        Returns:
-            True при успехе
-        """
-        return self.db.execute_update(
-            "UPDATE user_plants SET times_flowered = times_flowered + 1 WHERE id = ?",
-            (plant_id,)
-        )
 
     def get_dead_plants(self, user_id: str) -> List[Dict[str, Any]]:
         """
@@ -261,7 +341,7 @@ class PlantRepository(BaseRepository):
             user_id: ID пользователя
 
         Returns:
-            Список мертвых растений с причиной смерти
+            Список мертвых растений с причиной смерти, отсортированные по дате смерти
         """
         return self.db.execute_query("""
             SELECT up.*, pt.species_name, pt.nickname as plant_nickname, up.death_cause
@@ -288,3 +368,37 @@ class PlantRepository(BaseRepository):
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.user_id = ? AND up.growth_stage = ? AND up.is_alive = 1
         """, (user_id, stage))
+
+    def get_plants_by_species(self, user_id: str, species_id: int) -> List[Dict[str, Any]]:
+        """
+        Получает растения пользователя по виду.
+
+        Args:
+            user_id: ID пользователя
+            species_id: ID вида растения
+
+        Returns:
+            Список растений указанного вида
+        """
+        return self.db.execute_query("""
+            SELECT up.*, pt.species_name
+            FROM user_plants up
+            JOIN plant_templates pt ON up.template_id = pt.id
+            WHERE up.user_id = ? AND pt.species_id = ? AND up.is_alive = 1
+        """, (user_id, species_id))
+
+    def count_user_plants(self, user_id: str, only_alive: bool = True) -> int:
+        """
+        Подсчитывает количество растений пользователя.
+
+        Args:
+            user_id: ID пользователя
+            only_alive: Считать только живые растения
+
+        Returns:
+            Количество растений
+        """
+        alive_filter = "is_alive = 1" if only_alive else ""
+        return self.count("user_plants",
+                          f"user_id = ? AND {alive_filter}" if only_alive else "user_id = ?",
+                          (user_id,))

@@ -134,3 +134,5 @@ class FlowerInterface:
         from ..repository.plant_repository import PlantRepository
         repo = PlantRepository()
         return repo.get_all_templates()
+
+flower_interface = FlowerInterface()

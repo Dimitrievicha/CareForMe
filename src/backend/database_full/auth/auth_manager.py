@@ -25,14 +25,6 @@ class AuthManager:
 
     Attributes:
         user_repo (UserRepository): Репозиторий пользователей
-
-    Example:
-        >>> auth = AuthManager()
-        >>> # Регистрация
-        >>> auth.register("player1", "pass123")
-        >>> # Вход
-        >>> session = auth.login("player1", "pass123")
-        >>> print(session['session_token'])
     """
 
     def __init__(self):

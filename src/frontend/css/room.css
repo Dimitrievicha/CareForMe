@@ -1,0 +1,248 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+/* Фон - комната */
+.room-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+}
+
+/* ─── Места для горшков ─── */
+.pot-slot {
+    position: absolute;
+    z-index: 20;
+    cursor: pointer;
+    transition: transform 0.18s ease, filter 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pot-slot:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(120, 200, 100, 0.7));
+}
+
+.pot-slot:active {
+    transform: scale(0.97);
+}
+
+.slot-img {
+    width: 72px;
+    height: auto;
+    display: block;
+    pointer-events: none;
+}
+
+/* Подсказка при наведении */
+.slot-hint {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(50, 40, 20, 0.82);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.pot-slot:hover .slot-hint {
+    opacity: 1;
+}
+
+/* ─── Позиции слотов - ОПУСТИЛ ГОРШКИ (увеличил top значения) ─── */
+/* Подоконник — 3 места */
+.slot-windowsill-1 {
+    top: 82%;
+    left: 12%;
+}
+.slot-windowsill-2 {
+    top: 82%;
+    left: 23%;
+}
+.slot-windowsill-3 {
+    top: 82%;
+    left: 33%;
+}
+
+/* Слева от компьютера */
+.slot-desk-left {
+    top: 70%;
+    left: 45%;
+}
+
+/* Справа от компьютера — 2 места */
+.slot-desk-right-1 {
+    top: 70%;
+    left: 70%;
+}
+.slot-desk-right-2 {
+    top: 70%;
+    left: 80%;
+}
+
+/* ─── Модальное окно ─── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 15, 8, 0.55);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-window {
+    background: linear-gradient(160deg, #fffbe8 0%, #f3e9d0 100%);
+    border-radius: 20px;
+    padding: 36px 44px 32px;
+    min-width: 280px;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(80, 50, 10, 0.25), 0 2px 8px rgba(0,0,0,0.1);
+    border: 2px solid rgba(180, 140, 70, 0.3);
+    transform: scale(0.88);
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+
+.modal-overlay.active .modal-window {
+    transform: scale(1);
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #3b2e1e;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+}
+
+.modal-preview {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.modal-pot-img {
+    width: 120px;
+    height: auto;
+    filter: drop-shadow(0 4px 10px rgba(100,70,20,0.2));
+    animation: potBob 1.8s ease-in-out infinite;
+}
+
+@keyframes potBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.modal-pot-name {
+    font-size: 15px;
+    color: #7a5e38;
+    margin-bottom: 24px;
+    font-style: italic;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    font-family: inherit;
+}
+
+.confirm-btn {
+    background: linear-gradient(135deg, #6bbf5e 0%, #4a9e40 100%);
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(80, 160, 60, 0.35);
+}
+
+.confirm-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 18px rgba(80, 160, 60, 0.5);
+}
+
+.confirm-btn:active {
+    transform: scale(0.97);
+}
+
+.cancel-btn {
+    background: rgba(180, 150, 100, 0.18);
+    color: #6b5030;
+    border: 1.5px solid rgba(180, 140, 70, 0.35);
+}
+
+.cancel-btn:hover {
+    background: rgba(180, 150, 100, 0.32);
+    transform: scale(1.04);
+}
+
+.cancel-btn:active {
+    transform: scale(0.97);
+}
+
+/* Горшок в слоте (когда поставлен) */
+.pot-slot.filled .slot-img {
+    display: none;
+}
+
+.slot-placed-pot {
+    width: 120px;
+    height: auto;
+    display: block;
+    pointer-events: none;
+    animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.4); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Адаптив */
+@media (max-width: 600px) {
+    .slot-img {
+        width: 52px;
+    }
+    .modal-window {
+        padding: 28px 24px 24px;
+        min-width: 240px;
+    }
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Комната | Care For Me</title>
+    <link rel="stylesheet" href="css/room.css">
+</head>
+<body>
+    <!-- Фон - комната -->
+    <img src="images/комната.png" class="room-bg" alt="Фон комнаты">
+
+    <!-- Название комнаты -->
+    <div class="room-label">Комната</div>
+
+    <!-- Пунктиры - места для горшков -->
+
+    <!-- Подоконник: 3 места -->
+    <div class="pot-slot slot-windowsill-1" data-slot="windowsill-1" title="Поставить горшок">
+        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
+        <div class="slot-hint">Поставить горшок</div>
+    </div>
+    <div class="pot-slot slot-windowsill-2" data-slot="windowsill-2" title="Поставить горшок">
+        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
+        <div class="slot-hint">Поставить горшок</div>
+    </div>
+    <div class="pot-slot slot-windowsill-3" data-slot="windowsill-3" title="Поставить горшок">
+        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
+        <div class="slot-hint">Поставить горшок</div>
+    </div>
+
+    <!-- Слева от компьютера: 1 место -->
+    <div class="pot-slot slot-desk-left" data-slot="desk-left" title="Поставить горшок">
+        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
+        <div class="slot-hint">Поставить горшок</div>
+    </div>
+
+    <!-- Справа от компьютера: 2 места -->
+    <div class="pot-slot slot-desk-right-1" data-slot="desk-right-1" title="Поставить горшок">
+        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
+        <div class="slot-hint">Поставить горшок</div>
+    </div>
+    <div class="pot-slot slot-desk-right-2" data-slot="desk-right-2" title="Поставить горшок">
+        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
+        <div class="slot-hint">Поставить горшок</div>
+    </div>
+
+    <!-- Модальное окно: предложение поставить горшок -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-window">
+            <div class="modal-title">Поставить горшок?</div>
+            <div class="modal-preview">
+                <img src="images/горшок1.png" alt="Горшок" class="modal-pot-img">
+            </div>
+            <div class="modal-pot-name">Горшок 1</div>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm-btn" id="confirmBtn">Поставить</button>
+                <button class="modal-btn cancel-btn" id="cancelBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/room.js"></script>
+</body>
+</html>

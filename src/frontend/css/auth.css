@@ -1,0 +1,195 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+/* Фон - комната */
+.room-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+}
+
+/* Название игры сверху - ЕЩЕ БОЛЬШЕ! */
+.game-title {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 10;
+}
+
+.game-title img {
+    /* Увеличиваем с 140px до 180px */
+    height: 180px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+/* Адаптив для названия на маленьких экранах */
+@media (max-width: 550px) {
+    .game-title img {
+        height: 100px;
+    }
+}
+
+/* Окно регистрации */
+.register-window {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px;
+    min-height: 400px; /* Уменьшили с 450px */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.window-content {
+    width: 70%;
+    margin-top: 60px;
+    margin-bottom: 50px;
+}
+
+/* Поля ввода */
+.input-field {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 16px;
+    border: none;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 25px;
+    outline: none;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.input-field input:focus {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 10px rgba(100, 150, 100, 0.5);
+}
+
+.error-message {
+    font-size: 12px;
+    color: #ff6b6b;
+    margin-top: 5px;
+    padding-left: 15px;
+    min-height: 18px;
+}
+
+/* КНОПКА - ИСПРАВЛЕНА - теперь не растягивается */
+#submitBtn {
+    display: block;
+    width: auto;
+    min-width: 200px; /* Увеличили минимальную ширину */
+    max-width: 100%;
+    margin: 25px auto 0 auto;
+    border: none;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 0;
+    height: 70px; /* Увеличили высоту */
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+#submitBtn span {
+    display: none;
+}
+
+#submitBtn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.02);
+}
+
+#submitBtn:active {
+    transform: scale(0.97);
+}
+
+#submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Адаптив для кнопки на мобильных */
+@media (max-width: 550px) {
+    #submitBtn {
+        height: 55px;
+        min-width: 170px;
+    }
+}
+
+/* Уведомление */
+.notification {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 100;
+    transition: transform 0.3s ease;
+    font-size: 14px;
+}
+
+.notification.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.notif-icon {
+    font-size: 20px;
+}
+
+/* Адаптив для окна регистрации */
+@media (max-width: 550px) {
+    .register-window {
+        width: 90%;
+        min-height: auto;
+    }
+
+    .window-content {
+        width: 75%;
+        margin-top: 80px;
+        margin-bottom: 60px;
+    }
+
+    .input-field input {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+}

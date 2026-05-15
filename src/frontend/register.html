@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация | Care For Me</title>
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <div class="room-bg" style="background-image: url('images/комната размытая.png');"></div>
+
+    <div class="game-title">
+        <img src="images/название.png">
+    </div>
+
+    <div class="register-window" style="background-image: url('images/регистрация.png');">
+        <div class="window-content">
+            <form id="registerForm">
+                <div class="input-field">
+                    <input type="text" id="username" placeholder="Имя пользователя" autocomplete="off">
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+
+                <div class="input-field">
+                    <input type="password" id="password" placeholder="Пароль">
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+
+                <button type="submit" id="submitBtn" style="background-image: url('images/продолжить.png');">
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <span class="notif-icon"></span>
+        <span class="notif-text"></span>
+    </div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

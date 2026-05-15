@@ -6,19 +6,22 @@
 import sys
 import os
 from pathlib import Path
-from database.db_manager import get_db_manager
+
+# Добавляем путь для импорта модулей backend/
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from database_full.database.db_manager import get_db_manager
 
 
 def init_database():
     """Инициализирует структуру БД из SQL файла"""
 
-    # Добавляем путь для импорта модулей
-    sys.path.insert(0, str(Path(__file__).parent.parent))
+    # Путь к БД — рядом с app.py в папке backend/
+    db_path = str(Path(__file__).parent.parent / 'careforme.db')
+    db = get_db_manager(db_path)
 
-    db = get_db_manager()
-
-    # Путь к SQL файлу
-    sql_path = Path(__file__).parent.parent / 'database' / 'init_db.sql'
+    # Путь к SQL файлу (исправлен: database_full/database/)
+    sql_path = Path(__file__).parent.parent / 'database_full' / 'database' / 'init_db.sql'
 
     if not sql_path.exists():
         print(f"❌ Файл {sql_path} не найден")
@@ -27,19 +30,15 @@ def init_database():
     print(f"📂 Загрузка схемы БД из {sql_path}")
 
     try:
-        # Выполняем SQL скрипт
         with open(sql_path, 'r', encoding='utf-8') as f:
             sql_script = f.read()
 
-        # Разделяем скрипт на отдельные команды
-        # (простой способ - выполнить весь скрипт целиком)
         conn = db.connect()
         conn.executescript(sql_script)
         conn.commit()
 
         print("✅ Структура БД успешно создана")
 
-        # Проверяем создание таблиц
         tables = ['users', 'player_profiles', 'plant_templates', 'user_plants',
                   'achievements', 'level_requirements', 'designs']
 
@@ -48,7 +47,7 @@ def init_database():
             if result:
                 print(f"  ✓ Таблица {table} создана")
             else:
-                print(f"  ⚠️ Таблица {table} не найдена")
+                print(f"  ⚠️  Таблица {table} не найдена")
 
         return True
 

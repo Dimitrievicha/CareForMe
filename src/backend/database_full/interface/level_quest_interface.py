@@ -277,6 +277,19 @@ class LevelQuestInterface:
         current_level = self._user_service.get_current_level(user_id)
         return current_level >= 5
 
+    def get_user_progress(self, user_id: str, level: int) -> dict:
+        """
+        Получить прогресс пользователя по конкретному уровню.
+
+        Args:
+            user_id: ID пользователя
+            level: Номер уровня (1-5)
+
+        Returns:
+            Строка из user_level_progress или None
+        """
+        return level_quest_repo.get_user_progress(user_id, level)
+
 
 # Глобальный экземпляр
 level_quest_interface = LevelQuestInterface()

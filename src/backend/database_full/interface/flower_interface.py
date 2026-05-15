@@ -135,4 +135,46 @@ class FlowerInterface:
         repo = PlantRepository()
         return repo.get_all_templates()
 
+    def check_death(self, plant_id: str, user_id: str) -> dict:
+        """
+        Проверить, погибло ли растение (вызывается в check_all).
+
+        Args:
+            plant_id: ID растения
+            user_id: ID пользователя
+
+        Returns:
+            { "is_dead": bool, "cause": str | None }
+        """
+        plant = self.get_plant_details(plant_id, user_id)
+        if not plant:
+            return {"is_dead": False, "cause": None}
+
+        if not plant.get("is_alive", True):
+            return {"is_dead": True, "cause": plant.get("death_cause")}
+
+        # Растение считается умирающим → переходит в dead
+        if plant.get("health_status") == "dying":
+            from ..database.db_manager import get_db_manager
+            from datetime import date
+            db = get_db_manager()
+            db.execute_update(
+                """UPDATE user_plants
+                   SET is_alive = 0, health_status = 'dead',
+                       death_cause = 'neglect', death_date = ?
+                   WHERE id = ? AND user_id = ?""",
+                (date.today().isoformat(), plant_id, user_id)
+            )
+            db.execute_update(
+                """UPDATE player_profiles
+                   SET total_deaths = total_deaths + 1,
+                       current_plants_count = MAX(0, current_plants_count - 1)
+                   WHERE user_id = ?""",
+                (user_id,)
+            )
+            return {"is_dead": True, "cause": "neglect"}
+
+        return {"is_dead": False, "cause": None}
+
+
 flower_interface = FlowerInterface()

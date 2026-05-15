@@ -26,10 +26,12 @@ class BaseRepository:
         Инициализирует репозиторий с подключением к БД.
 
         Args:
-            db_path: Путь к файлу БД (по умолчанию 'careforme.db')
-                    Используется только при первом создании, дальше синглтон.
+            db_path: Путь к файлу БД. Если не указан — используется синглтон,
+                     который уже должен быть инициализирован в app.py.
         """
-        self.db = get_db_manager(db_path)
+        # Не передаём None в get_db_manager — синглтон уже создан в app.py.
+        # Если db_path передан явно, он будет учтён только при первом вызове.
+        self.db = get_db_manager(db_path or 'careforme.db')
 
     def get_by_id(self, table_name: str, id_column: str, id_value: str) -> Optional[Dict[str, Any]]:
         """

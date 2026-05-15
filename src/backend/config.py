@@ -21,7 +21,7 @@ class Config:
     DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///careforme.db')
 
     # Настройки сессии
-    SESSION_TYPE = 'filesystem'
+    # SESSION_TYPE = 'filesystem'  # требует flask-session, используем встроенные cookie-сессии Flask
     PERMANENT_SESSION_LIFETIME = 86400  # 24 часа
 
     # CORS

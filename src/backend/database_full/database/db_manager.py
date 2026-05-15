@@ -47,7 +47,7 @@ class DatabaseManager:
             Объект соединения SQLite
         """
         if self._connection is None:
-            self._connection = sqlite3.connect(self.db_path)
+            self._connection = sqlite3.connect(self.db_path, check_same_thread=False)
             # Преобразуем строки в словари для удобства
             self._connection.row_factory = sqlite3.Row
             # Включаем поддержку FOREIGN KEY
@@ -205,19 +205,24 @@ class DatabaseManager:
 _db_manager = None
 
 
-def get_db_manager(db_path: str = "careforme.db") -> DatabaseManager:
+def get_db_manager(db_path: str = None) -> DatabaseManager:
     """
     Возвращает глобальный экземпляр DatabaseManager (синглтон).
 
     Args:
-        db_path: Путь к файлу БД. Используется только при первом вызове
+        db_path: Путь к файлу БД. Используется ТОЛЬКО при первом вызове.
+                 При последующих вызовах возвращается уже созданный синглтон.
+                 Если None и синглтон ещё не создан — используется careforme.db.
 
     Returns:
         Единственный экземпляр DatabaseManager
 
+    ВАЖНО: первый вызов должен быть в app.py с явным путём, ДО импорта
+    репозиториев. Иначе синглтон создастся с путём None и упадёт.
     """
     global _db_manager
     if _db_manager is None:
-        _db_manager = DatabaseManager(db_path)
-        logger.info(f"Создан глобальный экземпляр DatabaseManager: {db_path}")
+        resolved = db_path or "careforme.db"
+        _db_manager = DatabaseManager(resolved)
+        logger.info(f"Создан глобальный экземпляр DatabaseManager: {resolved}")
     return _db_manager

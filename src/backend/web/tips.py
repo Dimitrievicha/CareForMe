@@ -10,7 +10,7 @@ API маршруты для советов (tips)
 """
 
 from flask import Blueprint, jsonify, session
-from src.backend.database_full.database.db_manager import get_db_manager
+from database_full.database.db_manager import get_db_manager
 
 tips_bp = Blueprint('tips', __name__)
 

@@ -12,7 +12,6 @@ from database.raw_sql_loader import (
     load_achievements_from_csv_raw,
     load_tips_from_csv_raw,
     load_level_requirements_from_csv_raw,
-    load_designs_from_csv_raw,
     verify_data
 )
 
@@ -64,12 +63,6 @@ def main():
     else:
         print(f"Файл не найден: {level_csv}")
 
-    print("\n6. Загрузка дизайнов...")
-    designs_csv = Path(__file__).parent.parent / "csv" / "designs.csv"
-    if designs_csv.exists():
-        load_designs_from_csv_raw(str(designs_csv))
-    else:
-        print(f"Файл не найден: {designs_csv}")
 
     stats = verify_data()
 

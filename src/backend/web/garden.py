@@ -3,12 +3,11 @@ API маршруты для сада и растений
 """
 
 from flask import Blueprint, request, jsonify, session
-from src.backend.database_full.interface.flower_interface import flower_interface
-from src.backend.database_full.interface.user_interface import user_interface
-from src.backend.database_full.interface.level_quest_interface import level_quest_interface
-from src.backend.utils.decorators import login_required_api
+from database_full.interface.flower_interface import flower_interface
+from database_full.interface.user_interface import user_interface
+from database_full.interface.level_quest_interface import level_quest_interface
 from datetime import datetime
-from src.backend.database_full.interface.challenge_interface import challenge_interface
+from database_full.interface.challenge_interface import challenge_interface
 
 garden_bp = Blueprint('garden', __name__)
 

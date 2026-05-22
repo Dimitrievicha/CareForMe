@@ -7,59 +7,240 @@
     <link rel="stylesheet" href="css/room.css">
 </head>
 <body>
-    <!-- Фон - комната -->
-    <img src="images/комната.png" class="room-bg" alt="Фон комнаты">
+<script>
+    if (!localStorage.getItem('username')) { window.location.href = 'unauthorized.html'; }
+</script>
 
-    <!-- Название комнаты -->
-    <div class="room-label">Комната</div>
+<img src="images/room/комната.png" class="room-bg" alt="Фон комнаты">
 
-    <!-- Пунктиры - места для горшков -->
+<!-- КРУЖОК УРОВНЯ -->
+<div class="level-circle light-level-circle" id="levelCircle">
+    <span class="level-label">Ур.</span>
+    <span class="level-num" id="levelNum">1</span>
+</div>
 
-    <!-- Подоконник: 3 места -->
-    <div class="pot-slot slot-windowsill-1" data-slot="windowsill-1" title="Поставить горшок">
-        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
-        <div class="slot-hint">Поставить горшок</div>
+<!-- ПАНЕЛЬ ЗАДАНИЙ -->
+<div class="quests-panel light-quests-panel" id="questsPanel">
+    <div class="quests-title light-quests-title">📋 Задания</div>
+    <div class="quests-list light-quests-list" id="questsList">
+        <div class="quest-item light-quest-item loading">Загрузка...</div>
     </div>
-    <div class="pot-slot slot-windowsill-2" data-slot="windowsill-2" title="Поставить горшок">
-        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
-        <div class="slot-hint">Поставить горшок</div>
-    </div>
-    <div class="pot-slot slot-windowsill-3" data-slot="windowsill-3" title="Поставить горшок">
-        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
-        <div class="slot-hint">Поставить горшок</div>
-    </div>
+</div>
 
-    <!-- Слева от компьютера: 1 место -->
-    <div class="pot-slot slot-desk-left" data-slot="desk-left" title="Поставить горшок">
-        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
-        <div class="slot-hint">Поставить горшок</div>
-    </div>
+<!-- Кнопки управления -->
+<div class="control-buttons">
+    <button class="ctrl-btn light-ctrl-btn" id="musicBtn" title="Музыка">🎵</button>
+    <button class="ctrl-btn light-ctrl-btn" id="helpBtn" title="Обучение">❓</button>
+    <button class="ctrl-btn light-ctrl-btn" id="waterCanBtn" title="Сменить лейку">💧</button>
+    <button class="ctrl-btn light-ctrl-btn" id="achievementsBtn" title="Достижения">🏆</button>
+    <button class="ctrl-btn light-ctrl-btn exit-btn" id="exitBtn" title="Выход">🚪</button>
+</div>
 
-    <!-- Справа от компьютера: 2 места -->
-    <div class="pot-slot slot-desk-right-1" data-slot="desk-right-1" title="Поставить горшок">
-        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
-        <div class="slot-hint">Поставить горшок</div>
-    </div>
-    <div class="pot-slot slot-desk-right-2" data-slot="desk-right-2" title="Поставить горшок">
-        <img src="images/пунктир.png" class="slot-img" alt="место для горшка">
-        <div class="slot-hint">Поставить горшок</div>
-    </div>
+<!-- Слоты горшков -->
+<div class="pot-slot slot-windowsill-1" data-slot="windowsill-1"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+    <div class="slot-hint">Поставить горшок</div>
+</div>
+<div class="pot-slot slot-windowsill-2" data-slot="windowsill-2"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+    <div class="slot-hint">Поставить горшок</div>
+</div>
+<div class="pot-slot slot-windowsill-3" data-slot="windowsill-3"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+    <div class="slot-hint">Поставить горшок</div>
+</div>
+<div class="pot-slot slot-desk-left" data-slot="desk-left"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+    <div class="slot-hint">Поставить горшок</div>
+</div>
+<div class="pot-slot slot-desk-right-1" data-slot="desk-right-1"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+    <div class="slot-hint">Поставить горшок</div>
+</div>
+<div class="pot-slot slot-desk-right-2" data-slot="desk-right-2"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+    <div class="slot-hint">Поставить горшок</div>
+</div>
 
-    <!-- Модальное окно: предложение поставить горшок -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-window">
-            <div class="modal-title">Поставить горшок?</div>
-            <div class="modal-preview">
-                <img src="images/горшок1.png" alt="Горшок" class="modal-pot-img">
+<!-- МОДАЛКА: ВЫБОР ГОРШКА -->
+<div class="modal-overlay" id="modalPlacePot">
+    <div class="modal-window light-modal">
+        <div class="modal-title light-title">Выбери горшок 🪴</div>
+        <div class="modal-pots-row" id="potChoicesRow"></div>
+        <button class="modal-btn cancel-btn light-cancel-btn" id="cancelPlacePot">Отмена</button>
+    </div>
+</div>
+
+<!-- МОДАЛКА: ПЕРЕСТАНОВКА ГОРШКОВ -->
+<div class="modal-overlay" id="modalMovePlant">
+    <div class="modal-window light-modal">
+        <div class="modal-title light-title">Переставить горшок 🪴</div>
+        <div class="modal-pots-row" id="moveChoicesRow"></div>
+        <button class="modal-btn cancel-btn light-cancel-btn" id="cancelMove">Отмена</button>
+    </div>
+</div>
+
+<!-- МОДАЛКА: ВЫБОР ЦВЕТКА -->
+<div class="modal-overlay" id="modalPickFlower">
+    <div class="modal-window light-modal">
+        <div class="modal-title light-title">Выбери цветок 🌱</div>
+        <div class="modal-pots-row" id="flowerChoicesRow"></div>
+        <button class="modal-btn cancel-btn light-cancel-btn" id="cancelPickFlower">Ещё не знаю</button>
+    </div>
+</div>
+
+<!-- МОДАЛКА: ВЫБОР ЛЕЙКИ -->
+<div class="modal-overlay" id="modalWaterCan">
+    <div class="modal-window light-modal">
+        <div class="modal-title light-title">Выбери лейку 💧</div>
+        <div class="modal-pots-row" id="waterCanChoicesRow"></div>
+        <button class="modal-btn cancel-btn light-cancel-btn" id="closeWaterCan">Отмена</button>
+    </div>
+</div>
+
+<!-- ЗУМ ГОРШКА -->
+<div class="zoom-overlay" id="zoomOverlay">
+    <div class="zoom-panel">
+        <button class="zoom-close-btn" id="zoomClose">✕</button>
+        <img src="images/room/стол.png" class="zoom-table-bg" alt="стол">
+        <div class="zoom-content-wrapper">
+            <div class="zoom-left">
+                <div class="zoom-pot-container">
+                    <img id="zoomPotImg" src="" alt="горшок" class="zoom-pot-img">
+                    <img id="zoomPlantImg" src="" alt="растение" class="zoom-plant-img">
+                </div>
             </div>
-            <div class="modal-pot-name">Горшок 1</div>
-            <div class="modal-buttons">
-                <button class="modal-btn confirm-btn" id="confirmBtn">Поставить</button>
-                <button class="modal-btn cancel-btn" id="cancelBtn">Отмена</button>
+            <div class="zoom-left-panel light-panel">
+                <button class="repot-btn-left light-repot-btn" id="repotBtnLeft">🪴 Пересадить</button>
+                <button class="remove-btn-left light-remove-btn" id="removeBtnLeft" style="display:none;">🗑️ Выбросить</button>
+                <button class="move-btn-left light-move-btn" id="moveBtnLeft">🔄 Переставить горшок</button>
+                <button class="plant-btn-left light-plant-btn" id="plantBtnLeft">🌱 Посадить</button>
+                <div class="disease-box light-disease-box" id="diseaseBox" style="display:none;">
+                    <div class="disease-title">🤒 Болезнь</div>
+                    <div class="disease-text" id="diseaseText"></div>
+                </div>
+                <div class="timer-box light-timer-box" id="growthTimerBox" style="display:none;"></div>
+                <div class="timer-box light-timer-box" id="waterTimerBox" style="display:none;"></div>
+            </div>
+            <div class="zoom-right-panel light-panel">
+                <div class="plant-name-zoom light-name" id="zoomPlantName">Пустой горшок</div>
+                <div class="plant-stage light-stage" id="zoomStageLabel"></div>
+                <button class="water-btn-right light-water-btn" id="waterBtnRight">💧 Полить</button>
+                <button class="desc-btn-right light-desc-btn" id="descBtnRight">📖 Описание</button>
+                <div class="watering-info light-watering-info" id="wateringInfo"></div>
+                <div class="description-box light-description-box" id="descriptionBox" style="display:none;">
+                    <div class="desc-text light-desc-text" id="plantDescription"></div>
+                </div>
+            </div>
+        </div>
+        <div class="watering-anim" id="wateringAnim">
+            <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img" id="wateringCanImg">
+            <div class="water-drops" id="waterDrops"></div>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛКА: ПЕРЕСАДКА -->
+<div class="modal-overlay" id="modalRepot">
+    <div class="modal-window light-modal">
+        <div class="modal-title light-title">Выбери новый горшок 🪴</div>
+        <div class="modal-pots-row" id="repotChoicesRow"></div>
+        <button class="modal-btn cancel-btn light-cancel-btn" id="cancelRepot">Отмена</button>
+    </div>
+</div>
+
+<!-- ДОСТИЖЕНИЯ -->
+<div class="modal-overlay" id="modalAchievements">
+    <div class="achievements-custom-window">
+        <img src="images/achivement/Окно достижений.png" alt="Окно достижений" class="achievements-bg-img">
+        <button class="achievements-close-btn" id="closeAchievements">✕</button>
+        <div class="achievements-grid-custom" id="achievementsGrid">
+            <div class="achievement-card" data-id="caring_parent">
+                <img src="images/achivement/parents/Заботливый родитель.png" alt="Заботливый родитель">
+            </div>
+            <div class="achievement-card" data-id="collector">
+                <img src="images/achivement/collection/Коллекционер.png" alt="Коллекционер">
+            </div>
+            <div class="achievement-card locked" data-id="flora_guard">
+                <img src="images/achivement/flora/Страж флоры.png" alt="Страж флоры">
+            </div>
+            <div class="achievement-card locked" data-id="patient_gardener">
+                <img src="images/achivement/gardens/Терпеливый садовод.png" alt="Терпеливый садовод">
+            </div>
+            <div class="achievement-card locked" data-id="oops_error">
+                <img src="images/achivement/error/Упс, ошибка.png" alt="Упс, ошибка">
+            </div>
+            <div class="achievement-card locked" data-id="all_lost">
+                <img src="images/achivement/abyss/Ой все пропало.png" alt="Ой, всё пропало">
             </div>
         </div>
     </div>
+</div>
 
-    <script src="js/room.js"></script>
+<!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ ДЛЯ ДОСТИЖЕНИЙ (за что) -->
+<div class="achievement-toast" id="achievementToast">
+    <img id="achievementToastImg" src="" alt="За что">
+</div>
+
+<!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ ДЛЯ НАГРАД -->
+<div class="reward-toast" id="rewardToast">
+    <img id="rewardToastImg" src="" alt="Награда">
+</div>
+
+<!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ ДЛЯ ПОЛУЧЕНИЯ ДОСТИЖЕНИЯ -->
+<div class="achievement-unlock-toast" id="achievementUnlockToast">
+    <img id="achievementUnlockToastImg" src="" alt="Достижение получено">
+</div>
+
+<!-- ОБУЧАЛКА -->
+<div class="tutorial-overlay" id="tutorialOverlay">
+    <div class="tutorial-window">
+        <img src="images/traning/окно обучения.png" alt="Окно обучения">
+        <div class="tutorial-content">
+            <div class="tutorial-step active" id="tutStep0">
+                <div class="tut-icon">🌿</div>
+                <h2>Добро пожаловать в Care For Me!</h2>
+                <p>Ты — начинающий садовод. Здесь ты будешь ухаживать за растениями,<br>выполнять задания и открывать новые возможности!</p>
+                <p><strong>🌱 Как играть?</strong><br>• Кликай на пунктирные места → ставь горшок → сажай цветок<br>• Поливай вовремя, иначе растение засохнет или загниёт<br>• Выполняй задания, чтобы получать новые уровни и награды</p>
+            </div>
+            <div class="tutorial-step" id="tutStep1">
+                <div class="tut-icon">🪴</div>
+                <h2>Горшки и посадка</h2>
+                <p><strong>Как поставить горшок?</strong><br>Кликни на пунктирное место в комнате → выбери горшок.<br>Сначала доступен только Горшок 1, новые открываются с уровнями!</p>
+                <p><strong>Как посадить цветок?</strong><br>Кликни на горшок → нажми "Посадить" → выбери растение.<br>Новые растения открываются на 3 и 5 уровнях.</p>
+                <p><strong>Как поливать?</strong><br>Кликни на горшок → в увеличении нажми кнопку "Полить".</p>
+            </div>
+            <div class="tutorial-step" id="tutStep2">
+                <div class="tut-icon">💧</div>
+                <h2>Уход и болезни</h2>
+                <p><strong>Полив</strong><br>У каждого растения свой график полива (от 1 до 10 дней).<br>Поливай вовремя — не заливай и не пересушивай!</p>
+                <p><strong>Болезни</strong><br>Неправильный полив или неподходящее место → растение болеет.<br>Если видишь предупреждение — переставь горшок в другое место!</p>
+                <p><strong>Перестановка</strong><br>Кнопка "Переставить горшок" в зуме поможет найти идеальное место.</p>
+            </div>
+            <div class="tutorial-step" id="tutStep3">
+                <div class="tut-icon">📋</div>
+                <h2>Задания и уровни</h2>
+                <p><strong>Как повысить уровень?</strong><br>Выполняй задания из левой панели. За каждые 3 задания — новый уровень!</p>
+                <p><strong>Награды за уровни:</strong><br>Уровень 2 → 🪴 Новый горшок<br>Уровень 3 → 🌵 Кактус<br>Уровень 4 → 💧 Новая лейка<br>Уровень 5 → 🌿 Фикус<br>Уровень 6 → 🏆 Горшок 3 + ачивка</p>
+                <p><strong>Достижения</strong><br>Нажми 🏆 вверху экрана, чтобы увидеть свои достижения!</p>
+                <p style="margin-top:8px;"><strong>🍀 Удачи в выращивании!</strong></p>
+            </div>
+            <div class="tutorial-dots">
+                <span class="tut-dot active" onclick="window.goToTutorialStep(0)"></span>
+                <span class="tut-dot" onclick="window.goToTutorialStep(1)"></span>
+                <span class="tut-dot" onclick="window.goToTutorialStep(2)"></span>
+                <span class="tut-dot" onclick="window.goToTutorialStep(3)"></span>
+            </div>
+            <div class="tutorial-nav">
+                <button class="tut-skip-btn" onclick="window.closeTutorialGlobal()"><img src="images/button/кнопка пропуска обучения.png" alt="Пропустить"></button>
+                <button class="tut-next-btn" onclick="window.nextTutorialGlobal()"><img src="images/button/кнопка-стрелка обучения.png" alt="Далее"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Уведомление -->
+<div class="notification light-notification" id="notification">
+    <span class="notif-icon"></span>
+    <span class="notif-text"></span>
+</div>
+
+<audio id="bgMusic" loop></audio>
+
+<script src="js/room.js"></script>
 </body>
 </html>

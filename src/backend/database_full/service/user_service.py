@@ -157,20 +157,6 @@ class UserService:
         Обновляет ежедневную серию пользователя.
 
         Вызывается при каждом входе в игру.
-
-        Args:
-            user_id: ID пользователя
-
-        Returns:
-            Результат обновления серии
-
-        Returns структура:
-            {
-                "success": True,
-                "consecutive_days": 5,
-                "best_streak": 5,
-                "streak_increased": True
-            }
         """
         profile = self.user_repo.get_profile(user_id)
         if not profile:
@@ -179,6 +165,12 @@ class UserService:
         today = date.today()
         last_entry = profile['last_entry']
 
+        # ПРЕОБРАЗОВАНИЕ: если last_entry строка, конвертируем в date
+        if last_entry and isinstance(last_entry, str):
+            from datetime import datetime
+            last_entry = datetime.strptime(last_entry, '%Y-%m-%d').date()
+
+        # Проверка: заходил ли уже сегодня
         if last_entry == today:
             return {
                 "success": True,
@@ -187,6 +179,7 @@ class UserService:
                 "streak_increased": False
             }
 
+        # Проверка: был ли вчера
         if last_entry and (today - last_entry).days == 1:
             new_streak = profile['consecutive_days'] + 1
         else:

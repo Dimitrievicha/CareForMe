@@ -2,247 +2,1114 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    user-select: none;
 }
 
 body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    font-family: 'Segoe UI', 'Arial', sans-serif;
+    font-family: 'Segoe UI', 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+    background: #2a1f14;
 }
 
-/* Фон - комната */
+/* ФОН КОМНАТЫ*/
 .room-bg {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
     z-index: 0;
 }
 
-/* ─── Места для горшков ─── */
-.pot-slot {
-    position: absolute;
-    z-index: 20;
-    cursor: pointer;
-    transition: transform 0.18s ease, filter 0.18s ease;
+/* КРУЖОК УРОВНЯ */
+.level-circle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 20;
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
-.pot-slot:hover {
-    transform: scale(1.1);
-    filter: drop-shadow(0 0 8px rgba(120, 200, 100, 0.7));
+.light-level-circle {
+    background: linear-gradient(135deg, #fff9f0, #fff0e0);
+    border: 2px solid #d4a373;
+    color: #5d3a1a;
 }
 
-.pot-slot:active {
-    transform: scale(0.97);
+.level-circle:hover {
+    transform: scale(1.05);
 }
 
-.slot-img {
-    width: 72px;
-    height: auto;
-    display: block;
-    pointer-events: none;
-}
-
-/* Подсказка при наведении */
-.slot-hint {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(50, 40, 20, 0.82);
-    color: #fff;
+.level-label {
     font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 10px;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s ease;
+    letter-spacing: 1px;
 }
 
-.pot-slot:hover .slot-hint {
-    opacity: 1;
+.level-num {
+    font-size: 28px;
+    line-height: 1;
 }
 
-/* ─── Позиции слотов - ОПУСТИЛ ГОРШКИ (увеличил top значения) ─── */
-/* Подоконник — 3 места */
-.slot-windowsill-1 {
-    top: 82%;
-    left: 12%;
-}
-.slot-windowsill-2 {
-    top: 82%;
-    left: 23%;
-}
-.slot-windowsill-3 {
-    top: 82%;
-    left: 33%;
-}
-
-/* Слева от компьютера */
-.slot-desk-left {
-    top: 70%;
-    left: 45%;
-}
-
-/* Справа от компьютера — 2 места */
-.slot-desk-right-1 {
-    top: 70%;
-    left: 70%;
-}
-.slot-desk-right-2 {
-    top: 70%;
-    left: 80%;
-}
-
-/* ─── Модальное окно ─── */
-.modal-overlay {
+/*  ПАНЕЛЬ ЗАДАНИЙ */
+.quests-panel {
     position: fixed;
-    inset: 0;
-    background: rgba(20, 15, 8, 0.55);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-}
-
-.modal-overlay.active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.modal-window {
-    background: linear-gradient(160deg, #fffbe8 0%, #f3e9d0 100%);
+    left: 20px;
+    top: 20px;
+    width: 260px;
     border-radius: 20px;
-    padding: 36px 44px 32px;
-    min-width: 280px;
+    padding: 15px;
+    z-index: 20;
+    font-size: 14px;
+}
+
+.light-quests-panel {
+    background: rgba(255, 248, 235, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid #d4a373;
+    color: #5d3a1a;
+}
+
+.quests-title {
+    font-size: 18px;
+    font-weight: bold;
     text-align: center;
-    box-shadow: 0 8px 40px rgba(80, 50, 10, 0.25), 0 2px 8px rgba(0,0,0,0.1);
-    border: 2px solid rgba(180, 140, 70, 0.3);
-    transform: scale(0.88);
-    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
-}
-
-.modal-overlay.active .modal-window {
-    transform: scale(1);
-}
-
-.modal-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #3b2e1e;
-    margin-bottom: 18px;
-    letter-spacing: 0.5px;
-}
-
-.modal-preview {
-    display: flex;
-    justify-content: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #d4a373;
     margin-bottom: 10px;
 }
 
-.modal-pot-img {
-    width: 120px;
-    height: auto;
-    filter: drop-shadow(0 4px 10px rgba(100,70,20,0.2));
-    animation: potBob 1.8s ease-in-out infinite;
+.light-quests-title {
+    color: #d4a373;
 }
 
-@keyframes potBob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
+.quests-list {
+    max-height: 300px;
+    overflow-y: auto;
 }
 
-.modal-pot-name {
-    font-size: 15px;
-    color: #7a5e38;
-    margin-bottom: 24px;
-    font-style: italic;
-}
-
-.modal-buttons {
+.quest-item {
     display: flex;
-    gap: 14px;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.light-quest-item {
+    color: #5d3a1a;
+}
+
+.quest-check {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.quest-desc {
+    flex: 1;
+}
+
+.quest-item.done {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+
+.quest-item.done .quest-check {
+    color: #4caf50;
+}
+
+/*  КНОПКИ УПРАВЛЕНИЯ */
+.control-buttons {
+    position: fixed;
+    top: 20px;
+    right: 110px;
+    display: flex;
+    gap: 10px;
+    z-index: 20;
+}
+
+.ctrl-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
     justify-content: center;
 }
 
-.modal-btn {
-    padding: 10px 28px;
-    border: none;
-    border-radius: 50px;
-    font-size: 15px;
-    font-weight: 600;
+.light-ctrl-btn {
+    background: rgba(255, 248, 235, 0.95);
+    border: 2px solid #d4a373;
+    color: #5d3a1a;
+}
+
+.light-ctrl-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 235, 205, 0.95);
+    border-color: #ffaa33;
+}
+
+.exit-btn:hover {
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
+}
+
+/* СЛОТЫ ГОРШКОВ */
+.pot-slot {
+    position: absolute;
+    width: 100px;
+    height: 110px;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    font-family: inherit;
+    transition: transform 0.2s;
+    z-index: 10;
 }
 
-.confirm-btn {
-    background: linear-gradient(135deg, #6bbf5e 0%, #4a9e40 100%);
-    color: #fff;
-    box-shadow: 0 3px 12px rgba(80, 160, 60, 0.35);
-}
-
-.confirm-btn:hover {
+.pot-slot:hover {
     transform: scale(1.05);
-    box-shadow: 0 5px 18px rgba(80, 160, 60, 0.5);
 }
 
-.confirm-btn:active {
-    transform: scale(0.97);
-}
-
-.cancel-btn {
-    background: rgba(180, 150, 100, 0.18);
-    color: #6b5030;
-    border: 1.5px solid rgba(180, 140, 70, 0.35);
-}
-
-.cancel-btn:hover {
-    background: rgba(180, 150, 100, 0.32);
-    transform: scale(1.04);
-}
-
-.cancel-btn:active {
-    transform: scale(0.97);
-}
-
-/* Горшок в слоте (когда поставлен) */
 .pot-slot.filled .slot-img {
     display: none;
 }
 
+.slot-img {
+    width: 100%;
+    height: auto;
+    opacity: 0.7;
+}
+
 .slot-placed-pot {
-    width: 120px;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85px;
+    height: auto;
+    z-index: 1;
+}
+
+.slot-plant-img {
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: auto;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.slot-hint {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    color: #ffd966;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.slot-windowsill-1 { left: 280px; top: 320px; }
+.slot-windowsill-2 { left: 410px; top: 320px; }
+.slot-windowsill-3 { left: 540px; top: 320px; }
+.slot-desk-left { left: 720px; top: 380px; }
+.slot-desk-right-1 { left: 880px; top: 420px; }
+.slot-desk-right-2 { left: 1010px; top: 420px; }
+
+/* МОДАЛЬНЫЕ ОКНА */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-window {
+    background: linear-gradient(145deg, #fff9f0, #fff0e0);
+    border-radius: 30px;
+    padding: 25px;
+    min-width: 400px;
+    max-width: 90vw;
+    border: 2px solid #d4a373;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.modal-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #5d3a1a;
+    margin-bottom: 20px;
+}
+
+.modal-pots-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.pot-choice, .flower-choice, .watercan-choice {
+    width: 100px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.2s;
+    padding: 10px;
+    border-radius: 15px;
+    background: rgba(255, 248, 235, 0.8);
+}
+
+.pot-choice:hover, .flower-choice:hover, .watercan-choice:hover {
+    transform: scale(1.05);
+    background: rgba(255, 235, 205, 0.9);
+}
+
+.pot-choice img, .flower-choice img, .watercan-choice img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+.pot-choice span, .flower-choice span, .watercan-choice span {
+    display: block;
+    color: #5d3a1a;
+    font-size: 12px;
+}
+
+.locked-choice {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.locked-choice:hover {
+    transform: none;
+    background: rgba(255, 248, 235, 0.5);
+}
+
+.unlock-hint {
+    font-size: 10px;
+    color: #d4a373;
+    margin-top: 4px;
+}
+
+.current-pot, .current-can {
+    border: 2px solid #4caf50;
+    background: rgba(76, 175, 80, 0.2);
+}
+
+.current-label {
+    font-size: 9px;
+    color: #4caf50;
+    display: block;
+    margin-top: 4px;
+}
+
+.modal-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 40px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 5px;
+}
+
+.cancel-btn {
+    background: #f0e0c0;
+    color: #5d3a1a;
+    border: 1px solid #d4a373;
+}
+
+.cancel-btn:hover {
+    background: #e8d4b0;
+}
+
+.confirm-btn {
+    background: #ffd966;
+    color: #5d3a1a;
+}
+
+.confirm-btn:hover {
+    background: #ffcc44;
+    transform: scale(1.05);
+}
+
+/* ЗУМ ОКНО */
+.zoom-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+}
+
+.zoom-overlay.active {
+    display: flex;
+}
+
+.zoom-panel {
+    position: relative;
+    width: 90vw;
+    max-width: 1100px;
+    background: transparent;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.zoom-table-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.zoom-content-wrapper {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 20px;
+    padding: 30px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.zoom-left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.zoom-pot-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.zoom-pot-img {
+    width: 200px;
+    height: auto;
+    position: absolute;
+    bottom: 0;
+    z-index: 2;
+}
+
+.zoom-plant-img {
+    width: 180px;
+    height: auto;
+    position: absolute;
+    bottom: 35px;
+    z-index: 3;
+}
+
+.zoom-left-panel {
+    width: 200px;
+    background: rgba(255, 248, 235, 0.95);
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px solid #d4a373;
+}
+
+.zoom-right-panel {
+    width: 260px;
+    background: rgba(255, 248, 235, 0.95);
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px solid #d4a373;
+}
+
+.zoom-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 248, 235, 0.9);
+    border: 2px solid #d4a373;
+    color: #5d3a1a;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.zoom-close-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 200, 150, 0.9);
+}
+
+.repot-btn-left {
+    width: 100%;
+    background: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.repot-btn-left:hover {
+    opacity: 0.9;
+}
+
+.remove-btn-left {
+    width: 100%;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.remove-btn-left:hover {
+    opacity: 0.9;
+}
+
+.plant-btn-left {
+    width: 100%;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.plant-btn-left:hover {
+    opacity: 0.9;
+}
+
+.disease-box {
+    background: rgba(200, 100, 100, 0.9);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.disease-title {
+    font-weight: bold;
+    color: #fff;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.disease-text {
+    color: #fff;
+    font-size: 11px;
+}
+
+.timer-box {
+    background: rgba(255, 235, 205, 0.9);
+    border-radius: 10px;
+    padding: 8px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 12px;
+    color: #5d3a1a;
+    border: 1px solid #d4a373;
+}
+
+.water-btn-right {
+    width: 100%;
+    background: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.water-btn-right:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.plant-name-zoom {
+    font-size: 18px;
+    font-weight: bold;
+    color: #5d3a1a;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.plant-stage {
+    font-size: 12px;
+    color: #8b6914;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.watering-info {
+    font-size: 12px;
+    margin-bottom: 15px;
+    padding: 8px;
+    background: rgba(255, 235, 205, 0.9);
+    border-radius: 10px;
+    color: #5d3a1a;
+}
+
+.water-ok { color: #2e7d32; }
+.water-ready { color: #e65100; font-weight: bold; }
+.water-danger { color: #c62828; font-weight: bold; }
+
+.watering-schedule .schedule-title {
+    color: #5d3a1a;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.watering-schedule .schedule-advice {
+    color: #5d3a1a;
+    font-style: italic;
+}
+
+.description-box {
+    background: rgba(255, 235, 205, 0.9);
+    border-radius: 10px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #d4a373;
+}
+
+.desc-text {
+    font-size: 12px;
+    color: #3d2b1a;
+    line-height: 1.4;
+}
+
+.desc-text h4 {
+    color: #d4a373;
+    margin: 8px 0 4px 0;
+    font-size: 13px;
+}
+
+.desc-text p {
+    margin-bottom: 8px;
+    color: #3d2b1a;
+}
+
+.watering-anim {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 20;
+    display: none;
+}
+
+.watering-anim.active {
+    display: block;
+}
+
+.watering-can-img {
+    position: absolute;
+    top: 20%;
+    left: 45%;
+    width: 70px;
+    animation: waterCanShake 0.5s ease-in-out infinite;
+}
+
+.water-drops {
+    position: absolute;
+    top: 28%;
+    left: 48%;
+    width: 100px;
+    height: 120px;
+}
+
+.drop {
+    position: absolute;
+    width: 4px;
+    height: 12px;
+    background: #4fc3f7;
+    border-radius: 2px;
+    animation: dropFall 0.5s linear infinite;
+}
+
+@keyframes waterCanShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+@keyframes dropFall {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(60px); opacity: 0; }
+}
+
+/* ОКНО ДОСТИЖЕНИЙ - КАСТОМНЫЙ ДИЗАЙН */
+.achievements-custom-window {
+    position: relative;
+    width: 800px;
+    max-width: 85vw;
+    height: auto;
+    background: transparent;
+    border: none;
+    overflow: visible;
+}
+
+.achievements-bg-img {
+    width: 100%;
     height: auto;
     display: block;
+}
+
+.achievements-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 248, 235, 0.9);
+    border: 2px solid #d4a373;
+    color: #5d3a1a;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.achievements-close-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 200, 150, 0.9);
+}
+
+.achievements-grid-custom {
+    position: absolute;
+    top: 12%;
+    left: 8%;
+    right: 8%;
+    bottom: 12%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.achievements-grid-custom::-webkit-scrollbar {
+    width: 8px;
+}
+
+.achievements-grid-custom::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+.achievements-grid-custom::-webkit-scrollbar-thumb {
+    background: #d4a373;
+    border-radius: 10px;
+}
+
+.achievement-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+    background: transparent;
+    border: none;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.achievement-card:hover {
+    transform: scale(1.05);
+}
+
+.achievement-card.locked {
+    opacity: 0.5;
+    filter: grayscale(0.8);
+    cursor: not-allowed;
+}
+
+.achievement-card.locked:hover {
+    transform: none;
+}
+
+.achievement-card img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+}
+
+/* ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ */
+.achievement-toast,
+.reward-toast,
+.achievement-unlock-toast {
+    position: fixed;
+    bottom: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 700;
+    transition: all 0.3s ease;
+    opacity: 0;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.4));
+}
+
+.achievement-toast.show,
+.reward-toast.show,
+.achievement-unlock-toast.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+.achievement-toast img,
+.reward-toast img,
+.achievement-unlock-toast img {
+    width: 250px;
+    height: auto;
+    object-fit: contain;
+}
+
+@keyframes toastPopReward {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    40% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+}
+
+.achievement-toast.show,
+.reward-toast.show,
+.achievement-unlock-toast.show {
+    animation: toastPopReward 3s ease forwards;
+}
+
+/* ОБУЧАЛКА */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+}
+
+.tutorial-overlay.active {
+    display: flex;
+}
+
+.tutorial-window {
+    width: 550px;
+    max-width: 85vw;
+    background: none;
+    border: none;
+    box-shadow: none;
+    position: relative;
+    overflow: visible;
+}
+
+.tutorial-window img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.tutorial-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 18% 12% 12% 12%;
+    box-sizing: border-box;
+}
+
+.tutorial-step {
+    display: none;
+    width: 100%;
+    text-align: center;
+}
+
+.tutorial-step.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+.tut-icon {
+    font-size: 45px;
+    margin-bottom: 8px;
+}
+
+.tutorial-step h2 {
+    color: #5d3a1a;
+    margin-bottom: 10px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.tutorial-step p {
+    color: #3d2b1a;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.tutorial-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0 15px 0;
+}
+
+.tut-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tut-dot.active {
+    background: #d4a373;
+    transform: scale(1.3);
+}
+
+.tutorial-nav {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 5px;
+}
+
+.tut-skip-btn, .tut-next-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+}
+
+.tut-skip-btn img, .tut-next-btn img {
+    width: 110px;
+    height: auto;
+}
+
+.tut-skip-btn:hover, .tut-next-btn:hover {
+    transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* УВЕДОМЛЕНИЯ */
+.notification {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    border-radius: 12px;
+    padding: 12px 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    z-index: 400;
+    transition: transform 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     pointer-events: none;
-    animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1);
 }
 
-@keyframes popIn {
-    from { transform: scale(0.4); opacity: 0; }
-    to   { transform: scale(1);   opacity: 1; }
+.light-notification {
+    background: linear-gradient(135deg, #fff9f0, #fff0e0);
+    border-left: 5px solid #d4a373;
+    color: #5d3a1a;
 }
 
-/* Адаптив */
-@media (max-width: 600px) {
-    .slot-img {
-        width: 52px;
-    }
-    .modal-window {
-        padding: 28px 24px 24px;
-        min-width: 240px;
-    }
+.notification.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.notif-icon {
+    font-size: 20px;
+}
+
+/* СКРОЛЛБАР */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d4a373;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #b8894f;
+}
+
+/*  
+   АДАПТИВНОСТЬ
+     */
+@media (max-width: 1200px) {
+    .pot-slot { transform: scale(0.9); }
+    .slot-windowsill-1 { left: 260px; top: 310px; }
+    .slot-windowsill-2 { left: 380px; top: 310px; }
+    .slot-windowsill-3 { left: 500px; top: 310px; }
+    .slot-desk-left { left: 650px; top: 360px; }
+    .slot-desk-right-1 { left: 790px; top: 400px; }
+    .slot-desk-right-2 { left: 910px; top: 400px; }
+}
+
+@media (max-width: 1000px) {
+    .zoom-content-wrapper { flex-direction: column; align-items: center; }
+    .zoom-right-panel { width: 100%; }
+    .quests-panel { width: 220px; font-size: 12px; }
+    .quests-title { font-size: 16px; }
+}
+
+@media (max-width: 800px) {
+    .quests-panel { display: none; }
+    .control-buttons { right: 20px; }
+    .level-circle { right: 20px; }
+}
+
+.desc-btn-right {
+    width: 100%;
+    background: #9c27b0;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.desc-btn-right:hover {
+    opacity: 0.9;
+}
+
+.light-desc-btn {
+    background: #9c27b0;
+}
+
+.move-btn-left {
+    width: 100%;
+    background: #9c27b0;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.move-btn-left:hover {
+    opacity: 0.9;
+}
+
+.light-move-btn {
+    background: #9c27b0;
+}
+
+#fixAdviceBox {
+    background: rgba(33, 150, 243, 0.9);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#fixAdviceText {
+    color: white;
+    font-size: 12px;
 }

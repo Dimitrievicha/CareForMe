@@ -4,8 +4,8 @@ API маршруты для заданий и уровней
 """
 
 from flask import Blueprint, jsonify, session
-from src.backend.database_full.interface.level_quest_interface import level_quest_interface
-from src.backend.database_full.interface.user_interface import user_interface
+from database_full.interface.level_quest_interface import level_quest_interface
+from database_full.interface.user_interface import user_interface
 
 quests_bp = Blueprint('quests', __name__)
 

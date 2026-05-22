@@ -12,8 +12,8 @@ API маршруты для профиля пользователя
 """
 
 from flask import Blueprint, request, jsonify, session
-from src.backend.database_full.interface.user_interface import user_interface
-from src.backend.database_full.repository.user_repository import UserRepository
+from database_full.interface.user_interface import user_interface
+from database_full.repository.user_repository import UserRepository
 
 user_bp = Blueprint('user', __name__)
 
@@ -209,23 +209,8 @@ def set_design():
 
 
 # ── Доступные дизайны ─────────────────────────────────────────────────────────
-
 @user_bp.route('/designs', methods=['GET'])
 def get_designs():
-    """
-    Получить все доступные и разблокированные дизайны.
-
-    GET /api/user/designs
-
-    Returns: {
-        "success": bool,
-        "current": { "pot": str, "watering_can": str },
-        "unlocked_pots": [str],
-        "unlocked_cans": [str],
-        "all_pots": [{ "id": str, "name": str, "image": str }],
-        "all_cans": [{ "id": str, "name": str, "image": str }]
-    }
-    """
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'success': False, 'error': 'Не авторизован'}), 401
@@ -234,20 +219,20 @@ def get_designs():
     unlocked_pots = user_interface.get_unlocked_pots(user_id)
     unlocked_cans = user_interface.get_unlocked_watering_cans(user_id)
 
-    # Полный справочник дизайнов (можно перенести в БД позже)
+    profile = user_interface.get_profile(user_id)
+    user_level = profile.get('current_level', 1) if profile else 1
+
+    # Горшок 2 разблокируется на 2 уровне, Горшок 3 на 5 уровне
     all_pots = [
-        {'id': 'standard',     'name': 'Стандартный',   'image': '/assets/pots/standard.png'},
-        {'id': 'ceramic',      'name': 'Керамический',  'image': '/assets/pots/ceramic.png'},
-        {'id': 'wooden',       'name': 'Деревянный',    'image': '/assets/pots/wooden.png'},
-        {'id': 'golden',       'name': 'Золотой',       'image': '/assets/pots/golden.png'},
-        {'id': 'design_pot_1', 'name': 'Дизайнерский 1','image': '/assets/pots/design_pot_1.png'},
-        {'id': 'design_pot_2', 'name': 'Дизайнерский 2','image': '/assets/pots/design_pot_2.png'},
+        {'id': '1', 'name': 'Горшок 1', 'image': '/images/pot/горшок1.png', 'unlock_level': 1},
+        {'id': '2', 'name': 'Горшок 2', 'image': '/images/pot/горшок2.png', 'unlock_level': 2},
+        {'id': '3', 'name': 'Горшок 3', 'image': '/images/pot/горшок3.png', 'unlock_level': 5},
     ]
+
+    # Кактус должен разблокироваться на 2 уровне
     all_cans = [
-        {'id': 'standard',    'name': 'Стандартная',   'image': '/assets/cans/standard.png'},
-        {'id': 'wooden',      'name': 'Деревянная',    'image': '/assets/cans/wooden.png'},
-        {'id': 'golden',      'name': 'Золотая',       'image': '/assets/cans/golden.png'},
-        {'id': 'design_can_1','name': 'Дизайнерская',  'image': '/assets/cans/design_can_1.png'},
+        {'id': '1', 'name': 'Лейка', 'image': '/images/water can/лейка.png', 'unlock_level': 1},
+        {'id': '2', 'name': 'Лейка 2', 'image': '/images/water can/лейка2.png', 'unlock_level': 3},
     ]
 
     return jsonify({
@@ -255,6 +240,7 @@ def get_designs():
         'current': designs,
         'unlocked_pots': unlocked_pots,
         'unlocked_cans': unlocked_cans,
+        'user_level': user_level,
         'all_pots': all_pots,
         'all_cans': all_cans
     })

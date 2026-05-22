@@ -3,10 +3,33 @@ API маршруты для авторизации
 """
 
 from flask import Blueprint, request, jsonify, session
-from src.backend.database_full.interface.user_interface import user_interface
-from src.backend.database_full.repository.user_repository import UserRepository
+from database_full.interface.user_interface import user_interface
+from database_full.repository.user_repository import UserRepository
 
 auth_bp = Blueprint('auth', __name__)
+
+
+@auth_bp.route('/check_user', methods=['POST'])
+def check_user():
+    """
+    Проверить существует ли пользователь в БД.
+
+    POST /api/auth/check_user
+    Body: { "username": "string" }
+
+    Returns: { "exists": bool }
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({'exists': False}), 400
+
+    username = data.get('username', '').strip()
+    if not username:
+        return jsonify({'exists': False}), 400
+
+    repo = UserRepository()
+    exists = repo.user_exists(username)
+    return jsonify({'exists': bool(exists)})
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -23,7 +46,6 @@ def register():
     username = data.get('username', '').strip()
     password = data.get('password', '')
 
-    # Валидация
     if len(username) < 3:
         return jsonify({'success': False, 'error': 'Имя пользователя не менее 3 символов'}), 400
 
@@ -49,15 +71,6 @@ def login():
 
     POST /api/auth/login
     Body: { "username": "string", "password": "string", "remember_me": bool }
-
-    Returns: {
-        "success": bool,
-        "user_id": str,
-        "username": str,
-        "last_login": str,        # Дата последнего входа
-        "consecutive_days": int,  # Текущая серия дней
-        "error": str
-    }
     """
     data = request.get_json()
     username = data.get('username', '').strip()
@@ -67,15 +80,11 @@ def login():
     result = user_interface.login(username, password, remember_me)
 
     if result['success']:
-        # Сохраняем в сессию Flask
         session['user_id'] = result['user_id']
         session['username'] = result['username']
         session['session_token'] = result['session_token']
 
-        # Обновляем ежедневную серию (проверка когда заходил в последний раз)
         streak_result = user_interface.update_daily_streak(result['user_id'])
-
-        # Получаем профиль для информации о последнем входе
         profile = user_interface.get_profile(result['user_id'])
 
         return jsonify({
@@ -93,45 +102,24 @@ def login():
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
-    """
-    Выход из системы
-
-    POST /api/auth/logout
-    Returns: { "success": bool }
-    """
     session_token = session.get('session_token')
     if session_token:
         user_interface.logout(session_token)
-
     session.clear()
     return jsonify({'success': True})
 
 
 @auth_bp.route('/verify', methods=['GET'])
 def verify():
-    """
-    Проверка валидности сессии (при загрузке страницы)
-
-    GET /api/auth/verify
-    Returns: { "success": bool, "user_id": str, "username": str }
-    """
     session_token = session.get('session_token')
-
     if not session_token:
         return jsonify({'success': False, 'error': 'Нет сессии'}), 401
 
     user = user_interface.verify_session(session_token)
-
     if user:
-        # Обновляем сессию
         session['user_id'] = user['user_id']
         session['username'] = user['username']
-
-        return jsonify({
-            'success': True,
-            'user_id': user['user_id'],
-            'username': user['username']
-        })
+        return jsonify({'success': True, 'user_id': user['user_id'], 'username': user['username']})
     else:
         session.clear()
         return jsonify({'success': False, 'error': 'Сессия истекла'}), 401
@@ -139,39 +127,20 @@ def verify():
 
 @auth_bp.route('/complete_tutorial', methods=['POST'])
 def complete_tutorial():
-    """
-    Отметить, что обучение пройдено
-
-    POST /api/auth/complete_tutorial
-    Returns: { "success": bool }
-    """
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'success': False, 'error': 'Не авторизован'}), 401
 
-    # Обновляем профиль - отмечаем обучение пройденным
     repo = UserRepository()
-
-    success = repo.db.execute_update("""
-        UPDATE player_profiles SET tutorial_completed = 1 WHERE user_id = ?
-    """, (user_id,))
-
+    success = repo.db.execute_update(
+        "UPDATE player_profiles SET tutorial_completed = 1 WHERE user_id = ?",
+        (user_id,)
+    )
     return jsonify({'success': success})
 
 
 @auth_bp.route('/check_streak', methods=['GET'])
 def check_streak():
-    """
-    Проверить текущую серию дней (для отображения)
-
-    GET /api/auth/check_streak
-    Returns: {
-        "success": bool,
-        "consecutive_days": int,
-        "best_streak": int,
-        "last_entry": str
-    }
-    """
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'success': False, 'error': 'Не авторизован'}), 401

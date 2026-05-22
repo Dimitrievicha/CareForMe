@@ -4,7 +4,7 @@ API маршруты для достижений
 """
 
 from flask import Blueprint, jsonify, session
-from src.backend.database_full.interface.challenge_interface import challenge_interface
+from database_full.interface.challenge_interface import challenge_interface
 
 achievements_bp = Blueprint('achievements', __name__)
 

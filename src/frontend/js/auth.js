@@ -1,4 +1,3 @@
-// Конфигурация
 const API_BASE_URL = 'http://localhost:5000/api';
 
 // DOM элементы
@@ -6,145 +5,269 @@ const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
 const submitBtn = document.getElementById('submitBtn');
 const form = document.getElementById('registerForm');
-
-// Элементы ошибок
 const usernameError = document.getElementById('usernameError');
 const passwordError = document.getElementById('passwordError');
 
-// Состояние валидации
-let validation = {
-    username: false,
-    password: false
-};
+let validation = { username: false, password: false };
 
-// Валидация имени пользователя
+// Валидация
 function validateUsername(value) {
     value = value.trim();
-
     if (!value) {
         usernameError.textContent = '';
+        removeErr(usernameInput);
         return false;
     }
-
     if (value.length < 3) {
         usernameError.textContent = '❌ Минимум 3 символа';
+        addErr(usernameInput);
         return false;
     }
-
     if (value.length > 50) {
         usernameError.textContent = '❌ Максимум 50 символов';
+        addErr(usernameInput);
         return false;
     }
-
-    const regex = /^[a-zA-Z0-9а-яА-Я_-]+$/;
-    if (!regex.test(value)) {
+    if (!/^[a-zA-Z0-9а-яА-Я_-]+$/.test(value)) {
         usernameError.textContent = '❌ Только буквы, цифры, _ и -';
+        addErr(usernameInput);
         return false;
     }
-
     usernameError.textContent = '✓';
+    usernameError.style.color = '#4caf50';
+    removeErr(usernameInput);
     return true;
 }
 
-// Валидация пароля
 function validatePassword(value) {
     if (!value) {
         passwordError.textContent = '';
+        removeErr(passwordInput);
         return false;
     }
-
     if (value.length < 4) {
         passwordError.textContent = '❌ Минимум 4 символа';
+        addErr(passwordInput);
         return false;
     }
-
     if (value.length > 100) {
         passwordError.textContent = '❌ Слишком длинный';
+        addErr(passwordInput);
         return false;
     }
-
     passwordError.textContent = '✓';
+    passwordError.style.color = '#4caf50';
+    removeErr(passwordInput);
     return true;
 }
 
-// Обновление состояния кнопки
-function updateSubmitButton() {
-    const isValid = validation.username && validation.password;
-    submitBtn.disabled = !isValid;
+function addErr(el) {
+    el.closest('.input-field')?.classList.add('error');
+}
+function removeErr(el) {
+    el.closest('.input-field')?.classList.remove('error');
+}
+function updateBtn() {
+    submitBtn.disabled = !(validation.username && validation.password);
 }
 
-// Обработчики ввода
-usernameInput.addEventListener('input', (e) => {
+usernameInput.addEventListener('input', e => {
     validation.username = validateUsername(e.target.value);
-    updateSubmitButton();
+    updateBtn();
 });
-
-passwordInput.addEventListener('input', (e) => {
+passwordInput.addEventListener('input', e => {
     validation.password = validatePassword(e.target.value);
-    updateSubmitButton();
+    updateBtn();
 });
 
-// Показ уведомления
+// Уведомления
 function showNotification(message, isError = true) {
-    const notification = document.getElementById('notification');
-    const icon = notification.querySelector('.notif-icon');
-    const text = notification.querySelector('.notif-text');
+    const n = document.getElementById('notification');
+    n.querySelector('.notif-icon').textContent = isError ? '❌' : '✅';
+    n.querySelector('.notif-text').textContent = message;
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 3000);
+}
 
-    if (isError) {
-        icon.textContent = '❌';
-    } else {
-        icon.textContent = '✅';
+// HTTP helper
+async function post(url, body) {
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body)
+    });
+    let data = {};
+    try {
+        data = await res.json();
+    } catch (e) {
+        data = { success: false, error: 'Ошибка парсинга ответа' };
     }
-    text.textContent = message;
+    return { ok: res.ok, status: res.status, data };
+}
 
-    notification.classList.add('show');
+async function get(url) {
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+    });
+    let data = {};
+    try {
+        data = await res.json();
+    } catch (e) {
+        data = { success: false, error: 'Ошибка парсинга ответа' };
+    }
+    return { ok: res.ok, status: res.status, data };
+}
 
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
+// Проверка существования пользователя
+async function checkUserExists(username) {
+    try {
+        const result = await post(`${API_BASE_URL}/auth/check_user`, { username });
+        return result.data.exists === true;
+    } catch (err) {
+        console.error('checkUserExists error:', err);
+        return false;
+    }
 }
 
 // Регистрация
 async function register(username, password) {
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        });
+        const result = await post(`${API_BASE_URL}/auth/register`, { username, password });
 
-        const data = await response.json();
-
-        if (data.success) {
-            showNotification(`Добро пожаловать, ${data.username}! 🎉`, false);
-
-            localStorage.setItem('userId', data.user_id);
-            localStorage.setItem('username', data.username);
-
-            setTimeout(() => {
-                window.location.href = 'welcome.html';
-            }, 1500);
+        if (result.ok && result.data.success) {
+            showNotification(`Аккаунт создан! Добро пожаловать, ${username}! 🌱`, false);
+            // После регистрации сразу логинимся
+            await login(username, password);
         } else {
-            showNotification(data.error || 'Ошибка регистрации');
+            showNotification(result.data.error || 'Ошибка регистрации');
+            return false;
         }
-    } catch (error) {
-        console.error('Ошибка:', error);
+        return true;
+    } catch (err) {
+        console.error('register error:', err);
         showNotification('Ошибка соединения с сервером');
+        return false;
     }
 }
 
-// Отправка формы
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+// Логин
+async function login(username, password) {
+    try {
+        const result = await post(`${API_BASE_URL}/auth/login`, {
+            username,
+            password,
+            remember_me: true
+        });
 
-    if (!submitBtn.disabled) {
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value;
-
-        await register(username, password);
+        if (result.ok && result.data.success) {
+            onLoginSuccess(result.data);
+            return true;
+        } else if (result.status === 401) {
+            showNotification(result.data.error || '❌ Неверный пароль');
+            resetPassword();
+            return false;
+        } else {
+            showNotification(result.data.error || 'Ошибка авторизации');
+            resetPassword();
+            return false;
+        }
+    } catch (err) {
+        console.error('login error:', err);
+        showNotification('Ошибка соединения с сервером');
+        resetPassword();
+        return false;
     }
+}
+
+// Основная логика
+async function handleAuth(username, password) {
+    // Проверяем, существует ли пользователь
+    const exists = await checkUserExists(username);
+
+    if (!exists) {
+        // Новый пользователь - регистрируем
+        await register(username, password);
+    } else {
+        // Существующий - логиним
+        await login(username, password);
+    }
+}
+
+function onLoginSuccess(data) {
+    localStorage.setItem('userId', data.user_id);
+    localStorage.setItem('username', data.username);
+    localStorage.setItem('session_token', data.session_token);
+
+    if (data.need_tutorial) {
+        localStorage.setItem('isReturningUser', 'false');
+        showNotification(`Добро пожаловать, ${data.username}! 🌱`, false);
+        setTimeout(() => {
+            window.location.href = '/welcome.html';
+        }, 1000);
+    } else {
+        localStorage.setItem('isReturningUser', 'true');
+        showNotification(`С возвращением, ${data.username}! 🌿`, false);
+        setTimeout(() => {
+            window.location.href = '/room.html';
+        }, 1000);
+    }
+}
+
+function resetPassword() {
+    passwordInput.value = '';
+    validation.password = false;
+    updateBtn();
+}
+
+function clearForm() {
+    usernameInput.value = '';
+    passwordInput.value = '';
+    validation.username = false;
+    validation.password = false;
+    updateBtn();
+}
+
+// Обработка отправки формы
+form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (submitBtn.disabled) return;
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!username || !password) {
+        showNotification('Заполните все поля', true);
+        return;
+    }
+
+    if (!validation.username || !validation.password) {
+        showNotification('Проверьте правильность заполнения полей', true);
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+
+    await handleAuth(username, password);
+
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '';
 });
 
+// Инициализация
+clearForm();
 usernameInput.focus();
+
+// Обработчик выхода
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'exitBtn' || e.target.closest('#exitBtn')) {
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        localStorage.removeItem('session_token');
+        localStorage.removeItem('isReturningUser');
+        clearForm();
+    }
+});

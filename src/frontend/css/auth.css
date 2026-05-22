@@ -11,7 +11,6 @@ body {
     font-family: 'Segoe UI', 'Arial', sans-serif;
 }
 
-/* Фон - комната */
 .room-bg {
     position: fixed;
     top: 0;
@@ -24,92 +23,110 @@ body {
     z-index: 0;
 }
 
-/* Название игры сверху - ЕЩЕ БОЛЬШЕ! */
 .game-title {
     position: absolute;
-    top: 30px;
-    left: 0;
-    right: 0;
-    text-align: center;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
+    text-align: center;
 }
 
 .game-title img {
-    /* Увеличиваем с 140px до 180px */
-    height: 180px;
+    height: 350px;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
 
-/* Адаптив для названия на маленьких экранах */
 @media (max-width: 550px) {
     .game-title img {
         height: 100px;
     }
 }
 
-/* Окно регистрации */
 .register-window {
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 450px;
-    min-height: 400px; /* Уменьшили с 450px */
-    background-size: 100% 100%;
+    width: 600px;
+    height: 500px;
+    background-size: auto 100%;
     background-repeat: no-repeat;
     background-position: center;
     z-index: 20;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: transparent;
 }
 
 .window-content {
-    width: 70%;
-    margin-top: 60px;
-    margin-bottom: 50px;
+    width: 65%;
+    margin: 40px 0 30px 0;
+    padding: 0;
+    background: transparent;
+    text-align: center;
 }
 
-/* Поля ввода */
-.input-field {
-    margin-bottom: 20px;
+.username-field {
     position: relative;
+    left: 30px;
+    top: 86px;
 }
 
-.input-field input {
+.password-field {
+    position: relative;
+    left: 30px;
+    top: 85px;
+}
+
+#username, #password {
     width: 100%;
-    padding: 12px 15px;
-    font-size: 16px;
+    padding: 12px 20px;
+    font-size: 14px;
     border: none;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 25px;
+    background-image: url('../images/auth/валидация.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
     outline: none;
     font-family: inherit;
-    transition: all 0.3s ease;
+    text-align: left;
+    color: #4a4a4a;
+    font-weight: 500;
+    height: 37px;
+    width: 240px
 }
 
-.input-field input:focus {
-    background: rgba(255, 255, 255, 1);
-    box-shadow: 0 0 10px rgba(100, 150, 100, 0.5);
+#username::placeholder, #password::placeholder {
+    color: #999;
+    font-weight: normal;
+}
+
+#username:focus, #password:focus {
+    filter: drop-shadow(0 0 5px rgba(100, 150, 100, 0.3));
 }
 
 .error-message {
-    font-size: 12px;
+    font-size: 11px;
     color: #ff6b6b;
     margin-top: 5px;
     padding-left: 15px;
-    min-height: 18px;
+    min-height: 16px;
+    background: transparent;
+    text-align: left;
+    font-weight: bold;
 }
 
-/* КНОПКА - ИСПРАВЛЕНА - теперь не растягивается */
 #submitBtn {
     display: block;
     width: auto;
-    min-width: 200px; /* Увеличили минимальную ширину */
+    min-width: 300px;
     max-width: 100%;
-    margin: 25px auto 0 auto;
+    margin: 60px auto 0 auto;
     border: none;
     background-size: 100% 100%;
     background-repeat: no-repeat;
@@ -117,20 +134,16 @@ body {
     background-color: transparent;
     cursor: pointer;
     padding: 0;
-    height: 70px; /* Увеличили высоту */
+    height: 100px;
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-#submitBtn span {
-    display: none;
-}
-
-#submitBtn:hover {
+#submitBtn:hover:not(:disabled) {
     transform: scale(1.05);
     filter: brightness(1.02);
 }
 
-#submitBtn:active {
+#submitBtn:active:not(:disabled) {
     transform: scale(0.97);
 }
 
@@ -140,15 +153,13 @@ body {
     transform: none;
 }
 
-/* Адаптив для кнопки на мобильных */
 @media (max-width: 550px) {
     #submitBtn {
-        height: 55px;
-        min-width: 170px;
+        height: 45px;
+        min-width: 130px;
     }
 }
 
-/* Уведомление */
 .notification {
     position: fixed;
     bottom: 30px;
@@ -165,6 +176,7 @@ body {
     z-index: 100;
     transition: transform 0.3s ease;
     font-size: 14px;
+    white-space: nowrap;
 }
 
 .notification.show {
@@ -175,21 +187,20 @@ body {
     font-size: 20px;
 }
 
-/* Адаптив для окна регистрации */
 @media (max-width: 550px) {
     .register-window {
         width: 90%;
-        min-height: auto;
+        height: auto;
+        background-size: contain;
     }
 
     .window-content {
-        width: 75%;
-        margin-top: 80px;
-        margin-bottom: 60px;
+        width: 80%;
+        margin: 30px 0 25px 0;
     }
 
-    .input-field input {
-        padding: 10px 12px;
-        font-size: 14px;
+    #username, #password {
+        padding: 8px 15px;
+        font-size: 12px;
     }
 }

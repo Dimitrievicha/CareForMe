@@ -33,7 +33,6 @@ class PlantRepository(BaseRepository):
                 {
                     "species_id": 1,
                     "species_name": "Спатифиллюм",
-                    "nickname": "Женское счастье",
                     "water_interval_min": 3,
                     "water_interval_max": 7,
                     ...
@@ -41,10 +40,9 @@ class PlantRepository(BaseRepository):
             ]
         """
         return self.db.execute_query("""
-            SELECT species_id, species_name, nickname, description, character_trait,
+            SELECT species_id, species_name, disease, why_disease,
                    water_interval_min, water_interval_max, light_requirement, humidity_preference,
-                   watering_advice, light_advice, flowering_conditions, temp_advice,
-                   tips, symptoms, sort_order
+                   sort_order
             FROM plant_templates 
             ORDER BY sort_order
         """)
@@ -130,15 +128,9 @@ class PlantRepository(BaseRepository):
         return self.db.execute_query(f"""
             SELECT up.*, 
                    pt.species_name, 
-                   pt.nickname as plant_nickname, 
-                   pt.character_trait,
                    pt.water_interval_min, 
                    pt.water_interval_max, 
                    pt.light_requirement,
-                   pt.watering_advice, 
-                   pt.light_advice, 
-                   pt.tips, 
-                   pt.symptoms
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.user_id = ? {alive_filter}
@@ -158,15 +150,9 @@ class PlantRepository(BaseRepository):
         result = self.db.execute_query("""
             SELECT up.*, 
                    pt.species_name, 
-                   pt.nickname as plant_nickname, 
-                   pt.character_trait,
                    pt.water_interval_min, 
                    pt.water_interval_max, 
                    pt.light_requirement,
-                   pt.watering_advice, 
-                   pt.light_advice, 
-                   pt.tips, 
-                   pt.symptoms
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.id = ?
@@ -344,7 +330,7 @@ class PlantRepository(BaseRepository):
             Список мертвых растений с причиной смерти, отсортированные по дате смерти
         """
         return self.db.execute_query("""
-            SELECT up.*, pt.species_name, pt.nickname as plant_nickname, up.death_cause
+            SELECT up.*, pt.species_name, up.death_cause
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.user_id = ? AND up.is_alive = 0

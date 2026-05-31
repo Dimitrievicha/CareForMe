@@ -195,7 +195,7 @@ body {
 
 .slot-placed-pot {
     position: absolute;
-    bottom: 5px;
+    bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
     width: 85px;
@@ -216,7 +216,7 @@ body {
 
 .slot-hint {
     position: absolute;
-    bottom: -25px;
+    bottom: 35px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0,0,0,0.6);
@@ -224,17 +224,19 @@ body {
     font-size: 10px;
     padding: 2px 8px;
     border-radius: 20px;
-    white-space: nowrap;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
     pointer-events: none;
     z-index: 3;
 }
 
-.slot-windowsill-1 { left: 280px; top: 320px; }
-.slot-windowsill-2 { left: 410px; top: 320px; }
-.slot-windowsill-3 { left: 540px; top: 320px; }
-.slot-desk-left { left: 720px; top: 380px; }
-.slot-desk-right-1 { left: 880px; top: 420px; }
-.slot-desk-right-2 { left: 1010px; top: 420px; }
+.slot-windowsill-1 { left: 75px; top: 554px; }
+.slot-windowsill-2 { left: 250px; top: 554px; }
+.slot-windowsill-3 { left: 410px; top: 554px; }
+.slot-desk-left { left: 720px; top: 515px; }
+.slot-desk-right-1 { left: 1100px; top: 515px; }
+.slot-desk-right-2 { left: 1180px; top: 515px; }
 
 /* МОДАЛЬНЫЕ ОКНА */
 .modal-overlay {
@@ -1033,17 +1035,15 @@ body {
     background: #b8894f;
 }
 
-/*  
-   АДАПТИВНОСТЬ
-     */
+/* АДАПТИВНОСТЬ */
 @media (max-width: 1200px) {
     .pot-slot { transform: scale(0.9); }
-    .slot-windowsill-1 { left: 260px; top: 310px; }
-    .slot-windowsill-2 { left: 380px; top: 310px; }
-    .slot-windowsill-3 { left: 500px; top: 310px; }
-    .slot-desk-left { left: 650px; top: 360px; }
-    .slot-desk-right-1 { left: 790px; top: 400px; }
-    .slot-desk-right-2 { left: 910px; top: 400px; }
+    .slot-windowsill-1 { left: 75px; top: 554px; }
+    .slot-windowsill-2 { left: 250px; top: 554px; }
+    .slot-windowsill-3 { left: 410px; top: 554px; }
+    .slot-desk-left { left: 720px; top: 515px; }
+    .slot-desk-right-1 { left: 1100px; top: 515px; }
+    .slot-desk-right-2 { left: 1180px; top: 515px; }
 }
 
 @media (max-width: 1000px) {

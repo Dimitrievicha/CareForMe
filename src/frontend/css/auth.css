@@ -119,6 +119,8 @@ body {
     background: transparent;
     text-align: left;
     font-weight: bold;
+    position: relative;
+    top: -7px;
 }
 
 #submitBtn {

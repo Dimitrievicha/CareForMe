@@ -81,6 +81,27 @@ function getPlantOffsets(plantId, stage, diseaseText = null) {
     return plantConfig.default;
 }
 
+/** Дополнительный подъём растения в слоте комнаты (зависит от горшка и стадии). */
+function getSlotPlantExtraLift(potNum, stage, hasDisease) {
+    const pot = parseInt(potNum, 10) || 1;
+    const isSprout = stage === 1 && !hasDisease;
+    const isSick = !!hasDisease;
+    const isHealthyBloom = stage >= 2 && !hasDisease;
+
+    if (pot === 2) {
+        if (isSprout) return -3;
+        if (isSick) return 13;
+        if (isHealthyBloom) return 5;
+        return 0;
+    }
+
+    // Горшок 1 (обычный)
+    if (isSprout) return 0;
+    if (isSick) return 17;
+    if (isHealthyBloom) return 10;
+    return 0;
+}
+
 
 // КОНФИГУРАЦИЯ ДОСТИЖЕНИЙ
 
@@ -1498,7 +1519,10 @@ function renderSlot(slotEl, data) {
 
         const offsets = getPlantOffsets(plantId, data.stage, data.hasDisease ? data.disease : null);
         if (offsets) {
-            plantImg.style.bottom = offsets.bottom;
+            const baseLiftPx = 50;
+            const extraLiftPx = getSlotPlantExtraLift(data.pot, data.stage, data.hasDisease);
+
+            plantImg.style.bottom = `calc(${offsets.bottom} + ${baseLiftPx + extraLiftPx}px)`;
             plantImg.style.width = offsets.width;
             plantImg.style.left = offsets.left;
             plantImg.style.transform = 'translateX(-50%)';
@@ -1517,7 +1541,7 @@ function renderSlot(slotEl, data) {
     const hint = slotEl.querySelector('.slot-hint');
     if (hint) {
         if (!data.plant) {
-            hint.textContent = 'Посадить цветок';
+            hint.innerHTML = 'Посадить<br>цветок';
         } else if (data.stage === 0) {
             hint.textContent = '🌱 Прорастает...';
         } else if (data.stage === 1) {
@@ -1528,7 +1552,7 @@ function renderSlot(slotEl, data) {
             }
         } else if (data.stage === 2) {
             if (data.hasDisease) {
-                hint.textContent = '🤒 Цветёт, но болеет';
+                hint.innerHTML = 'Цветёт,<br>но болеет';
             } else {
                 hint.textContent = '🌸 Цветёт!';
             }

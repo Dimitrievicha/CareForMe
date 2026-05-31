@@ -10,54 +10,59 @@ const passwordError = document.getElementById('passwordError');
 
 let validation = { username: false, password: false };
 
+function setValidState(input, errorElement) {
+    errorElement.textContent = '✓';
+    errorElement.style.color = '#4caf50';
+    removeErr(input);
+}
+
+function setInvalidState(input, errorElement, message = '') {
+    errorElement.textContent = message;
+    errorElement.style.color = '';
+    if (message) {
+        addErr(input);
+    } else {
+        removeErr(input);
+    }
+}
+
 // Валидация
 function validateUsername(value) {
     value = value.trim();
     if (!value) {
-        usernameError.textContent = '';
-        removeErr(usernameInput);
+        setInvalidState(usernameInput, usernameError);
         return false;
     }
     if (value.length < 3) {
-        usernameError.textContent = '❌ Минимум 3 символа';
-        addErr(usernameInput);
+        setInvalidState(usernameInput, usernameError, '❌ Минимум 3 символа');
         return false;
     }
     if (value.length > 50) {
-        usernameError.textContent = '❌ Максимум 50 символов';
-        addErr(usernameInput);
+        setInvalidState(usernameInput, usernameError, '❌ Максимум 50 символов');
         return false;
     }
     if (!/^[a-zA-Z0-9а-яА-Я_-]+$/.test(value)) {
-        usernameError.textContent = '❌ Только буквы, цифры, _ и -';
-        addErr(usernameInput);
+        setInvalidState(usernameInput, usernameError, '❌ Только буквы, цифры, _ и -');
         return false;
     }
-    usernameError.textContent = '✓';
-    usernameError.style.color = '#4caf50';
-    removeErr(usernameInput);
+    setValidState(usernameInput, usernameError);
     return true;
 }
 
 function validatePassword(value) {
     if (!value) {
-        passwordError.textContent = '';
-        removeErr(passwordInput);
+        setInvalidState(passwordInput, passwordError);
         return false;
     }
     if (value.length < 4) {
-        passwordError.textContent = '❌ Минимум 4 символа';
-        addErr(passwordInput);
+        setInvalidState(passwordInput, passwordError, '❌ Минимум 4 символа');
         return false;
     }
-    if (value.length > 100) {
-        passwordError.textContent = '❌ Слишком длинный';
-        addErr(passwordInput);
+    if (value.length > 50) {
+        setInvalidState(passwordInput, passwordError, '❌ Максимум 50 символов');
         return false;
     }
-    passwordError.textContent = '✓';
-    passwordError.style.color = '#4caf50';
-    removeErr(passwordInput);
+    setValidState(passwordInput, passwordError);
     return true;
 }
 

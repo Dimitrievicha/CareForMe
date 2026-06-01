@@ -1,6 +1,126 @@
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
+function getAuthToken() {
+    return localStorage.getItem('session_token');
+}
+
+function getAuthHeaders() {
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    const token = getAuthToken();
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
+// Добавь эти функции в начало room.js
+
+// Сохранить состояние на сервер
+async function saveStateToServer() {
+    if (!currentUser) return;
+
+    const stateToSave = {
+        slotData: slotData,
+        currentLevel: currentLevel,
+        achievements: {}
+    };
+
+    // Собираем достижения
+    const achievements = ['caring_parent', 'collector', 'flora_guard', 'patient_gardener', 'oops_error', 'all_lost'];
+    achievements.forEach(id => {
+        stateToSave.achievements[id] = localStorage.getItem(`achievement_unlocked_${currentUser}_${id}`) === 'true';
+    });
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/game/save`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            credentials: 'include',
+            body: JSON.stringify(stateToSave)
+        });
+        const data = await response.json();
+        if (!data.success) {
+            console.warn('Не удалось сохранить состояние на сервер');
+        }
+    } catch (error) {
+        console.error('Ошибка сохранения на сервер:', error);
+    }
+}
+
+// Загрузить состояние с сервера
+async function loadStateFromServer() {
+    if (!currentUser) return false;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/game/load`, {
+            method: 'GET',
+            headers: getAuthHeaders(),
+            credentials: 'include'
+        });
+        const data = await response.json();
+
+        if (data.success && Object.keys(data.slotData).length > 0) {
+            // Загружаем состояние сада
+            Object.assign(slotData, data.slotData);
+
+            // Загружаем уровень
+            if (data.currentLevel) {
+                currentLevel = data.currentLevel;
+                localStorage.setItem(`currentLevel_${currentUser}`, String(currentLevel));
+                updateLevelCircle(currentLevel);
+            }
+
+            // Загружаем достижения
+            if (data.achievements) {
+                for (const [id, unlocked] of Object.entries(data.achievements)) {
+                    if (unlocked) {
+                        localStorage.setItem(`achievement_unlocked_${currentUser}_${id}`, 'true');
+                    }
+                }
+            }
+
+            // Перерисовываем все слоты
+            slots.forEach(slot => {
+                const name = slot.dataset.slot;
+                if (slotData[name]) {
+                    renderSlot(slot, slotData[name]);
+                    if (slotData[name].plant && slotData[name].stage < 2) {
+                        scheduleGrowth(name);
+                    }
+                    if (slotData[name].plant) {
+                        scheduleLocationCheck(name);
+                    }
+                }
+            });
+
+            updateAchievementsDisplay();
+            renderQuests();
+
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Ошибка загрузки с сервера:', error);
+        return false;
+    }
+}
+
+// ИСПРАВЛЕННАЯ saveState (локальная + серверная)
+function saveState() {
+    // Сохраняем локально
+    localStorage.setItem(`garden_${currentUser}`, JSON.stringify(slotData));
+
+    // Сохраняем на сервер (асинхронно, не блокируем)
+    saveStateToServer().catch(console.error);
+}
+
+// ИСПРАВЛЕННАЯ функция входа/инициализации
+// Найди в конце room.js функцию (async function init() и замени загрузку состояния)
+
+
 let PLANTS = {};
 let POT_CONFIG = {};
 let WATERING_CAN_CONFIG = {};
@@ -210,10 +330,8 @@ async function checkAuth() {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/verify`, {
             method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            credentials: 'include',  // Для cookie
+            headers: getAuthHeaders()  // И для токена
         });
 
         if (!response.ok) {
@@ -244,7 +362,8 @@ async function checkAuth() {
 async function loadPlantsCatalog() {
     try {
         const response = await fetch(`${API_BASE_URL}/plants/catalog`, {
-            credentials: 'include'
+            credentials: 'include',
+            headers: getAuthHeaders()
         });
         const data = await response.json();
 
@@ -310,10 +429,12 @@ async function loadPlantsCatalog() {
     }
 }
 
+
 async function loadPots() {
     try {
         const response = await fetch(`${API_BASE_URL}/user/designs`, {
-            credentials: 'include'
+            credentials: 'include',
+            headers: getAuthHeaders()
         });
         const data = await response.json();
 
@@ -346,7 +467,8 @@ async function loadPots() {
 async function loadWateringCans() {
     try {
         const response = await fetch(`${API_BASE_URL}/user/designs`, {
-            credentials: 'include'
+            credentials: 'include',
+            headers: getAuthHeaders()
         });
         const data = await response.json();
 
@@ -1194,7 +1316,7 @@ async function changeWateringCan(canId, canConfig) {
     try {
         const response = await fetch(`${API_BASE_URL}/user/settings/design`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             credentials: 'include',
             body: JSON.stringify({
                 type: 'watering_can',
@@ -2163,8 +2285,13 @@ if (exitBtn) {
             saveState();
             localStorage.removeItem('username');
             localStorage.removeItem('userId');
+            localStorage.removeItem('session_token');  // ← очищаем токен
             localStorage.removeItem('isReturningUser');
-            fetch('http://localhost:5000/api/auth/logout', { method: 'POST', credentials: 'include' })
+            fetch('http://localhost:5000/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: getAuthHeaders()
+            })
                 .finally(() => { window.location.href = 'register.html'; });
         }
     });
@@ -2192,10 +2319,6 @@ document.addEventListener('keydown', e => {
         [modalPlacePot, modalPickFlower, zoomOverlay, modalAchievements, modalWaterCan, modalRepot, modalMovePlant].forEach(closeModal);
     }
 });
-
-function saveState() {
-    localStorage.setItem(`garden_${currentUser}`, JSON.stringify(slotData));
-}
 
 function loadState() {
     try {
@@ -2404,6 +2527,7 @@ if (tutorialOverlay) {
 }
 
 (async function init() {
+
     const loadingOverlay = document.createElement('div');
     loadingOverlay.id = 'loadingOverlay';
     loadingOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;justify-content:center;align-items:center;flex-direction:column;';
@@ -2441,7 +2565,7 @@ if (tutorialOverlay) {
     loadLevel();
     checkAndUnlockPots();
     checkAndUnlockWateringCans();
-    loadState();
+    const loadedFromServer = await loadStateFromServer();
     renderQuests();
     renderPotChoices();
     renderFlowerChoices();

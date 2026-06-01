@@ -3,28 +3,47 @@
 """
 
 from functools import wraps
-from flask import jsonify, session, request
+from flask import jsonify, session, request, g
+from database_full.repository.user_repository import UserRepository
 
 
 def login_required_api(f):
     """
     Декоратор для проверки авторизации в API маршрутах
 
-    Проверяет наличие user_id в сессии.
-    Если пользователь не авторизован - возвращает 401.
+    Проверяет:
+    1. Наличие user_id в сессии (cookie)
+    2. ИЛИ наличие session_token в заголовке Authorization
     """
-
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user_id = session.get('user_id')
 
-        if not user_id:
-            return jsonify({
-                'success': False,
-                'error': 'Необходима авторизация'
-            }), 401
+        # Если есть в сессии — используем
+        if user_id:
+            g.user_id = user_id
+            return f(*args, **kwargs)
 
-        return f(*args, **kwargs)
+        # Если нет — проверяем заголовок Authorization
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            session_token = auth_header[7:]  # Убираем 'Bearer '
+
+            if session_token:
+                repo = UserRepository()
+                result = repo.db.execute_query(
+                    "SELECT user_id FROM user_sessions WHERE session_token = ? AND expires_at > datetime('now')",
+                    (session_token,)
+                )
+                if result and len(result) > 0:
+                    user_id = result[0]['user_id']
+                    g.user_id = user_id
+                    return f(*args, **kwargs)
+
+        return jsonify({
+            'success': False,
+            'error': 'Необходима авторизация'
+        }), 401
 
     return decorated_function
 
@@ -39,11 +58,9 @@ def validate_json(required_fields=None):
     Returns:
         Если валидация не пройдена - возвращает ошибку 400
     """
-
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            # Проверяем, что тело запроса - JSON
             if not request.is_json:
                 return jsonify({
                     'success': False,
@@ -52,7 +69,6 @@ def validate_json(required_fields=None):
 
             data = request.get_json()
 
-            # Проверяем обязательные поля
             if required_fields:
                 missing_fields = [field for field in required_fields if field not in data]
                 if missing_fields:
@@ -61,22 +77,15 @@ def validate_json(required_fields=None):
                         'error': f'Отсутствуют обязательные поля: {", ".join(missing_fields)}'
                     }), 400
 
-            # Добавляем данные в request для использования в функции
             request.validated_json = data
-
             return f(*args, **kwargs)
-
         return decorated_function
-
     return decorator
 
 
 def rate_limit(limit_per_minute=60):
     """
-    Декоратор для ограничения частоты запросов (опционально)
-
-    Args:
-        limit_per_minute: максимальное количество запросов в минуту
+    Декоратор для ограничения частоты запросов
     """
     from time import time
     from collections import defaultdict
@@ -86,26 +95,19 @@ def rate_limit(limit_per_minute=60):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            # Простая реализация rate limiting
             now = time()
             minute_ago = now - 60
             user_id = session.get('user_id', request.remote_addr)
 
-            # Очищаем старые записи
             requests_log[user_id] = [t for t in requests_log[user_id] if t > minute_ago]
 
-            # Проверяем лимит
             if len(requests_log[user_id]) >= limit_per_minute:
                 return jsonify({
                     'success': False,
                     'error': 'Слишком много запросов. Подождите немного.'
                 }), 429
 
-            # Добавляем текущий запрос
             requests_log[user_id].append(now)
-
             return f(*args, **kwargs)
-
         return decorated_function
-
     return decorator

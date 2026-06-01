@@ -22,6 +22,7 @@ from web.user import user_bp
 from web.quests import quests_bp
 from web.achievements import achievements_bp
 from web.tips import tips_bp
+from web.game_state import game_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -51,6 +52,7 @@ app.register_blueprint(user_bp, url_prefix='/api/user')
 app.register_blueprint(quests_bp, url_prefix='/api/quests')
 app.register_blueprint(achievements_bp, url_prefix='/api/achievements')
 app.register_blueprint(tips_bp, url_prefix='/api/tips')
+app.register_blueprint(game_bp, url_prefix='/api/game')
 
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), '..', 'frontend')
 

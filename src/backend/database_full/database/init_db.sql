@@ -66,6 +66,14 @@ CREATE TABLE IF NOT EXISTS plant_templates (
     sort_order INTEGER DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS game_states (
+    user_id VARCHAR(36) PRIMARY KEY,
+    slot_data TEXT,
+    current_level INTEGER DEFAULT 1,
+    achievements TEXT,
+    updated_at TIMESTAMP
+);
+
 -- -----------------------------------------------------
 -- Таблица растений пользователя
 -- -----------------------------------------------------

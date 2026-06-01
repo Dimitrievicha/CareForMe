@@ -11,30 +11,59 @@
     if (!localStorage.getItem('username')) { window.location.href = 'unauthorized.html'; }
 </script>
 
-<img src="images/room/комната.png" class="room-bg" alt="Фон комнаты">
-
-<!-- КРУЖОК УРОВНЯ -->
-<div class="level-circle light-level-circle" id="levelCircle">
-    <span class="level-label">Ур.</span>
-    <span class="level-num" id="levelNum">1</span>
+<div class="room-letterbox room-letterbox--top" aria-hidden="true">
+    <img src="images/auth/логотип.png" alt="Care For Me" class="room-letterbox-logo">
 </div>
+<div class="room-letterbox room-letterbox--bottom" aria-hidden="true"></div>
+<div class="room-letterbox room-letterbox--left" aria-hidden="true"></div>
+<div class="room-letterbox room-letterbox--right" aria-hidden="true"></div>
 
-<!-- ПАНЕЛЬ ЗАДАНИЙ -->
-<div class="quests-panel light-quests-panel" id="questsPanel">
-    <div class="quests-title light-quests-title">📋 Задания</div>
-    <div class="quests-list light-quests-list" id="questsList">
-        <div class="quest-item light-quest-item loading">Загрузка...</div>
+<div class="room-viewport" id="roomViewport" aria-hidden="true">
+    <div class="room-stage" id="roomStage">
+        <img src="images/room/комната.png" class="room-bg" alt="Фон комнаты">
+
+        <div class="quests-panel light-quests-panel" id="questsPanel">
+            <div class="quests-title light-quests-title">📋 Задания</div>
+            <div class="quests-list light-quests-list" id="questsList">
+                <div class="quest-item light-quest-item loading">Загрузка...</div>
+            </div>
+        </div>
+
+        <!-- Слоты горшков (координаты относительно сцены 1280×720) -->
+        <div class="pot-slot slot-windowsill-1" data-slot="windowsill-1"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+            <div class="slot-hint">Поставить горшок</div>
+        </div>
+        <div class="pot-slot slot-windowsill-2" data-slot="windowsill-2"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+            <div class="slot-hint">Поставить горшок</div>
+        </div>
+        <div class="pot-slot slot-windowsill-3" data-slot="windowsill-3"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+            <div class="slot-hint">Поставить горшок</div>
+        </div>
+        <div class="pot-slot slot-desk-left" data-slot="desk-left"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+            <div class="slot-hint">Поставить горшок</div>
+        </div>
+        <div class="pot-slot slot-desk-right-1" data-slot="desk-right-1"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+            <div class="slot-hint">Поставить горшок</div>
+        </div>
+        <div class="pot-slot slot-desk-right-2" data-slot="desk-right-2"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+            <div class="slot-hint">Поставить горшок</div>
+        </div>
+
+        <div class="room-hud-top">
+            <div class="control-buttons">
+                <button type="button" id="devBtn" class="ctrl-btn-dev" title="DEV LEVEL UP: +1 уровень (на 6-м — сброс до 1)">DEV LEVEL UP</button>
+                <button type="button" class="ctrl-btn light-ctrl-btn" id="musicBtn" title="Музыка">🔇</button>
+                <button type="button" class="ctrl-btn light-ctrl-btn" id="helpBtn" title="Обучение">❓</button>
+                <button type="button" class="ctrl-btn light-ctrl-btn" id="waterCanBtn" title="Сменить лейку">💧</button>
+                <button type="button" class="ctrl-btn light-ctrl-btn" id="achievementsBtn" title="Достижения">🏆</button>
+                <button type="button" class="ctrl-btn light-ctrl-btn exit-btn" id="exitBtn" title="Выход">🚪</button>
+            </div>
+            <div class="level-circle light-level-circle" id="levelCircle">
+                <span class="level-label">Ур.</span>
+                <span class="level-num" id="levelNum">1</span>
+            </div>
+        </div>
     </div>
-</div>
-
-<!-- Кнопки управления -->
-<div class="control-buttons">
-    <button id="devBtn" title="DEV: разблокировать всё" style="background:#e53935;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-weight:bold;cursor:pointer;font-size:13px;">DEV</button>
-    <button class="ctrl-btn light-ctrl-btn" id="musicBtn" title="Музыка">🔇</button>
-    <button class="ctrl-btn light-ctrl-btn" id="helpBtn" title="Обучение">❓</button>
-    <button class="ctrl-btn light-ctrl-btn" id="waterCanBtn" title="Сменить лейку">💧</button>
-    <button class="ctrl-btn light-ctrl-btn" id="achievementsBtn" title="Достижения">🏆</button>
-    <button class="ctrl-btn light-ctrl-btn exit-btn" id="exitBtn" title="Выход">🚪</button>
 </div>
 
 <!-- DEV: панель переключения состояний -->
@@ -47,26 +76,6 @@
         <option value="dead">💀 Смерть</option>
     </select>
     <button id="devApplyState" style="width:100%;background:#e53935;color:#fff;border:none;border-radius:4px;padding:5px;cursor:pointer;font-weight:bold;">Применить</button>
-</div>
-
-<!-- Слоты горшков -->
-<div class="pot-slot slot-windowsill-1" data-slot="windowsill-1"><img src="images/room/пунктир.png" class="slot-img" alt="место">
-    <div class="slot-hint">Поставить горшок</div>
-</div>
-<div class="pot-slot slot-windowsill-2" data-slot="windowsill-2"><img src="images/room/пунктир.png" class="slot-img" alt="место">
-    <div class="slot-hint">Поставить горшок</div>
-</div>
-<div class="pot-slot slot-windowsill-3" data-slot="windowsill-3"><img src="images/room/пунктир.png" class="slot-img" alt="место">
-    <div class="slot-hint">Поставить горшок</div>
-</div>
-<div class="pot-slot slot-desk-left" data-slot="desk-left"><img src="images/room/пунктир.png" class="slot-img" alt="место">
-    <div class="slot-hint">Поставить горшок</div>
-</div>
-<div class="pot-slot slot-desk-right-1" data-slot="desk-right-1"><img src="images/room/пунктир.png" class="slot-img" alt="место">
-    <div class="slot-hint">Поставить горшок</div>
-</div>
-<div class="pot-slot slot-desk-right-2" data-slot="desk-right-2"><img src="images/room/пунктир.png" class="slot-img" alt="место">
-    <div class="slot-hint">Поставить горшок</div>
 </div>
 
 <!-- МОДАЛКА: ВЫБОР ГОРШКА -->
@@ -107,7 +116,8 @@
 
 <!-- ЗУМ ГОРШКА -->
 <div class="zoom-overlay" id="zoomOverlay">
-    <div class="zoom-panel">
+    <div class="zoom-viewport">
+    <div class="zoom-panel" id="zoomStage">
         <button class="zoom-close-btn" id="zoomClose">✕</button>
         <img src="images/room/стол.png" class="zoom-table-bg" alt="стол">
         <div class="zoom-content-wrapper">
@@ -144,6 +154,7 @@
             <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img" id="wateringCanImg">
             <div class="water-drops" id="waterDrops"></div>
         </div>
+    </div>
     </div>
 </div>
 

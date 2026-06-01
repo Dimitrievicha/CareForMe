@@ -10,50 +10,216 @@ body {
     height: 100vh;
     overflow: hidden;
     font-family: 'Segoe UI', 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
-    background: #2a1f14;
+    background: var(--room-letterbox-bg);
 }
 
 /* ===== ПЕРЕМЕННЫЕ ДЛЯ НАСТРОЙКИ ОКНА ЗУМА ===== */
 :root {
-    --zoom-width: 1000px;        /* ширина окна зума */
-    --zoom-height: 500px;       /* высота окна зума */
-    --zoom-bg-color: #f5e6d3;   /* цвет фона */
-    --zoom-border-radius: 30px; /* скругление углов */
-    --zoom-pot-offset: 60px;
+    --room-design-width: 1280px;
+    --room-design-height: 720px;
+    --room-scale: 1;
+    --ui-scale: 1;
+    --letterbox-x: 0px;
+    --letterbox-y: 0px;
+    --room-letterbox-bg: #eed1b1;
+    --zoom-design-width: 1000px;
+    --zoom-design-height: 500px;
+    --zoom-scale: 1;
+    --zoom-bg-color: #f5e6d3;
 }
 
-/* ФОН КОМНАТЫ*/
-.room-bg {
+/* Полосы по краям (другой aspect ratio) */
+.room-letterbox {
     position: fixed;
+    z-index: 1;
+    background: var(--room-letterbox-bg);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.room-letterbox--top {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--letterbox-y);
+    overflow: hidden;
+}
+
+.room-letterbox--bottom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--letterbox-y);
+}
+
+.room-letterbox--left {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--letterbox-x);
+}
+
+.room-letterbox--right {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: var(--letterbox-x);
+}
+
+.room-letterbox--top .room-letterbox-logo {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: -15px;
+    transform: translateX(-50%);
+    width: min(1100px, 110vw);
+    height: auto;
+    max-height: min(520px, calc(var(--letterbox-y) - 4px));
+    object-fit: contain;
+    opacity: 0.95;
+}
+
+body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
+    display: block;
+}
+
+/* Комната: фон + слоты в одной сцене, равномерный масштаб под экран */
+.room-viewport {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.room-stage {
+    /* Эталон сцены 1280×720; cqw/cqh — % размеров от сцены (как прежние px) */
+    --room-w: 1280;
+    --room-h: 720;
+    container-type: size;
+    container-name: room;
+    position: relative;
+    width: var(--room-design-width);
+    height: var(--room-design-height);
+    flex-shrink: 0;
+    transform: scale(var(--room-scale));
+    transform-origin: center center;
+    pointer-events: auto;
+}
+
+.room-bg {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    object-fit: fill;
+    display: block;
     z-index: 0;
+    pointer-events: none;
+}
+
+/* UI внутри .room-stage: позиция — % сцены; размеры — cqw/cqh (эталон 1280×720) */
+/*  ПАНЕЛЬ ЗАДАНИЙ */
+.quests-panel {
+    position: absolute;
+    left: calc(20 / var(--room-w) * 100%);
+    top: calc(20 / var(--room-h) * 100%);
+    width: calc(260 / 1280 * 100cqw);
+    border-radius: calc(20 / 1280 * 100cqw);
+    padding: calc(15 / 720 * 100cqh) calc(15 / 1280 * 100cqw);
+    z-index: 30;
+    font-size: calc(14 / 720 * 100cqh);
+}
+
+.light-quests-panel {
+    background: rgba(255, 248, 235, 0.95);
+    backdrop-filter: blur(8px);
+    border: calc(1 / 1280 * 100cqw) solid #d4a373;
+    color: #5d3a1a;
+}
+
+.quests-title {
+    font-size: calc(18 / 720 * 100cqh);
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: calc(10 / 720 * 100cqh);
+    border-bottom: calc(1 / 1280 * 100cqw) solid #d4a373;
+    margin-bottom: calc(10 / 720 * 100cqh);
+}
+
+.light-quests-title {
+    color: #d4a373;
+}
+
+.quests-list {
+    max-height: calc(300 / 720 * 100cqh);
+    overflow-y: auto;
+}
+
+.quest-item {
+    display: flex;
+    align-items: center;
+    gap: calc(10 / 1280 * 100cqw);
+    padding: calc(8 / 720 * 100cqh) 0;
+    border-bottom: calc(1 / 1280 * 100cqw) solid rgba(0,0,0,0.1);
+}
+
+.light-quest-item {
+    color: #5d3a1a;
+}
+
+.quest-check {
+    font-size: calc(18 / 720 * 100cqh);
+    width: calc(24 / 1280 * 100cqw);
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Верхняя панель: кнопки + кружок уровня в один ряд (без наложения) */
+.room-hud-top {
+    position: absolute;
+    top: calc(20 / var(--room-h) * 100%);
+    right: calc(20 / var(--room-w) * 100%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: calc(12 / 1280 * 100cqw);
+    z-index: 30;
+    pointer-events: none;
+    max-width: calc(100% - 40 / var(--room-w) * 100%);
+}
+
+.room-hud-top .control-buttons,
+.room-hud-top .level-circle {
+    pointer-events: auto;
 }
 
 /* КРУЖОК УРОВНЯ */
 .level-circle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 70px;
-    height: 70px;
+    position: relative;
+    flex-shrink: 0;
+    width: calc(70 / 1280 * 100cqw);
+    height: calc(70 / 720 * 100cqh);
     border-radius: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    z-index: 20;
+    box-shadow: 0 calc(4 / 720 * 100cqh) calc(15 / 1280 * 100cqw) rgba(0,0,0,0.2);
     cursor: pointer;
     transition: transform 0.2s;
 }
 
 .light-level-circle {
     background: linear-gradient(135deg, #fff9f0, #fff0e0);
-    border: 2px solid #d4a373;
+    border: calc(2 / 1280 * 100cqw) solid #d4a373;
     color: #5d3a1a;
 }
 
@@ -62,68 +228,13 @@ body {
 }
 
 .level-label {
-    font-size: 12px;
+    font-size: calc(12 / 720 * 100cqh);
     letter-spacing: 1px;
 }
 
 .level-num {
-    font-size: 28px;
+    font-size: calc(28 / 720 * 100cqh);
     line-height: 1;
-}
-
-/*  ПАНЕЛЬ ЗАДАНИЙ */
-.quests-panel {
-    position: fixed;
-    left: 20px;
-    top: 20px;
-    width: 260px;
-    border-radius: 20px;
-    padding: 15px;
-    z-index: 20;
-    font-size: 14px;
-}
-
-.light-quests-panel {
-    background: rgba(255, 248, 235, 0.95);
-    backdrop-filter: blur(8px);
-    border: 1px solid #d4a373;
-    color: #5d3a1a;
-}
-
-.quests-title {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #d4a373;
-    margin-bottom: 10px;
-}
-
-.light-quests-title {
-    color: #d4a373;
-}
-
-.quests-list {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.quest-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-}
-
-.light-quest-item {
-    color: #5d3a1a;
-}
-
-.quest-check {
-    font-size: 18px;
-    width: 24px;
-    text-align: center;
 }
 
 .quest-desc {
@@ -141,29 +252,43 @@ body {
 
 /*  КНОПКИ УПРАВЛЕНИЯ */
 .control-buttons {
-    position: fixed;
-    top: 20px;
-    right: 110px;
+    position: relative;
     display: flex;
-    gap: 10px;
-    z-index: 20;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: calc(10 / 1280 * 100cqw);
 }
 
 .ctrl-btn {
-    width: 45px;
-    height: 45px;
+    width: calc(45 / 1280 * 100cqw);
+    height: calc(45 / 720 * 100cqh);
     border-radius: 50%;
-    font-size: 22px;
+    font-size: calc(22 / 720 * 100cqh);
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+}
+
+.ctrl-btn-dev {
+    background: #e53935;
+    color: #fff;
+    border: none;
+    border-radius: calc(8 / 1280 * 100cqw);
+    padding: calc(6 / 720 * 100cqh) calc(12 / 1280 * 100cqw);
+    font-weight: bold;
+    font-size: calc(13 / 720 * 100cqh);
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1.2;
 }
 
 .light-ctrl-btn {
     background: rgba(255, 248, 235, 0.95);
-    border: 2px solid #d4a373;
+    border: calc(2 / 1280 * 100cqw) solid #d4a373;
     color: #5d3a1a;
 }
 
@@ -178,11 +303,10 @@ body {
     color: white;
 }
 
-/* СЛОТЫ ГОРШКОВ */
 .pot-slot {
     position: absolute;
-    width: 100px;
-    height: 110px;
+    width: calc(100 / var(--room-w) * 100%);
+    height: calc(110 / var(--room-h) * 100%);
     cursor: pointer;
     transition: transform 0.2s;
     z-index: 10;
@@ -242,12 +366,12 @@ body {
     z-index: 3;
 }
 
-.slot-windowsill-1 { left: 75px; top: 560px; }
-.slot-windowsill-2 { left: 250px; top: 560px; }
-.slot-windowsill-3 { left: 410px; top: 560px; }
-.slot-desk-left { left: 720px; top: 525px; }
-.slot-desk-right-1 { left: 1100px; top: 525px; }
-.slot-desk-right-2 { left: 1180px; top: 525px; }
+.slot-windowsill-1 { left: calc(55 / var(--room-w) * 100%); top: calc(520 / var(--room-h) * 100%); }
+.slot-windowsill-2 { left: calc(230 / var(--room-w) * 100%); top: calc(520 / var(--room-h) * 100%); }
+.slot-windowsill-3 { left: calc(390 / var(--room-w) * 100%); top: calc(520 / var(--room-h) * 100%); }
+.slot-desk-left { left: calc(700 / var(--room-w) * 100%); top: calc(485 / var(--room-h) * 100%); }
+.slot-desk-right-1 { left: calc(1050 / var(--room-w) * 100%); top: calc(485 / var(--room-h) * 100%); }
+.slot-desk-right-2 { left: calc(1130 / var(--room-w) * 100%); top: calc(485 / var(--room-h) * 100%); }
 
 /* МОДАЛЬНЫЕ ОКНА */
 .modal-overlay {
@@ -381,40 +505,48 @@ body {
     transform: scale(1.05);
 }
 
-/* ЗУМ ОКНО */
+/* ЗУМ: эталон 1000×500, масштаб --zoom-scale, размеры cqw/cqh */
 .zoom-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(8px);
     display: none;
-    justify-content: center;
-    align-items: center;
     z-index: 200;
 }
 
 .zoom-overlay.active {
+    display: block;
+}
+
+.zoom-viewport {
+    width: 100%;
+    height: 100%;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .zoom-panel {
+    --zoom-w: 1000;
+    --zoom-h: 500;
+    container-type: size;
+    container-name: zoom;
     position: relative;
-    width: var(--zoom-width, 900px);
-    max-width: 90vw;
-    height: var(--zoom-height, 600px);
+    width: var(--zoom-design-width);
+    height: var(--zoom-design-height);
+    flex-shrink: 0;
+    transform: scale(var(--zoom-scale, 1));
+    transform-origin: center center;
     background: var(--zoom-bg-color, #f5e6d3);
-    border-radius: var(--zoom-border-radius, 30px);
+    border-radius: calc(30 / 1000 * 100cqw);
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 calc(20 / 500 * 100cqh) calc(40 / 1000 * 100cqw) rgba(0, 0, 0, 0.3);
 }
 
 .zoom-table-bg {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -425,8 +557,8 @@ body {
     position: relative;
     z-index: 1;
     display: flex;
-    gap: 20px;
-    padding: 20px 30px;
+    gap: calc(20 / 1000 * 100cqw);
+    padding: calc(20 / 500 * 100cqh) calc(30 / 1000 * 100cqw);
     justify-content: center;
     align-items: flex-start;
     height: 100%;
@@ -435,6 +567,7 @@ body {
 
 .zoom-left {
     flex: 1;
+    min-width: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -442,16 +575,16 @@ body {
 
 .zoom-pot-container {
     position: relative;
-    width: 280px;
-    height: 280px;
+    width: calc(280 / 1000 * 100cqw);
+    height: calc(280 / 500 * 100cqh);
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    transform: translateY(var(--zoom-pot-offset));
+    transform: translateY(calc(60 / 500 * 100cqh));
 }
 
 .zoom-pot-img {
-    width: 200px;
+    width: calc(200 / 1000 * 100cqw);
     height: auto;
     position: absolute;
     bottom: 0;
@@ -459,40 +592,43 @@ body {
 }
 
 .zoom-plant-img {
-    width: 180px;
+    width: calc(180 / 1000 * 100cqw);
     height: auto;
     position: absolute;
-    bottom: 35px;
+    bottom: calc(35 / 500 * 100cqh);
     z-index: 3;
 }
 
-.zoom-left-panel {
-    width: 200px;
+.zoom-left-panel,
+.zoom-right-panel {
     background: rgba(255, 248, 235, 0.95);
-    border-radius: 15px;
-    padding: 15px;
-    border: 1px solid #d4a373;
+    border-radius: calc(15 / 1000 * 100cqw);
+    padding: calc(15 / 500 * 100cqh) calc(15 / 1000 * 100cqw);
+    border: calc(1 / 1000 * 100cqw) solid #d4a373;
+    box-sizing: border-box;
+}
+
+.zoom-left-panel {
+    width: calc(200 / 1000 * 100cqw);
+    flex-shrink: 0;
 }
 
 .zoom-right-panel {
-    width: 260px;
-    background: rgba(255, 248, 235, 0.95);
-    border-radius: 15px;
-    padding: 15px;
-    border: 1px solid #d4a373;
+    width: calc(260 / 1000 * 100cqw);
+    flex-shrink: 0;
 }
 
 .zoom-close-btn {
     position: absolute;
-    top: 15px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
+    top: calc(15 / 500 * 100cqh);
+    right: calc(20 / 1000 * 100cqw);
+    width: calc(40 / 1000 * 100cqw);
+    height: calc(40 / 500 * 100cqh);
     border-radius: 50%;
     background: rgba(255, 248, 235, 0.9);
-    border: 2px solid #d4a373;
+    border: calc(2 / 1000 * 100cqw) solid #d4a373;
     color: #5d3a1a;
-    font-size: 24px;
+    font-size: calc(24 / 500 * 100cqh);
     cursor: pointer;
     z-index: 10;
     display: flex;
@@ -506,99 +642,88 @@ body {
     background: rgba(255, 200, 150, 0.9);
 }
 
-.repot-btn-left {
+.zoom-panel .repot-btn-left,
+.zoom-panel .remove-btn-left,
+.zoom-panel .plant-btn-left,
+.zoom-panel .water-btn-left,
+.zoom-panel .move-btn-left,
+.zoom-panel .desc-btn-right {
     width: 100%;
+    border: none;
+    border-radius: calc(25 / 1000 * 100cqw);
+    padding: calc(10 / 500 * 100cqh) calc(10 / 1000 * 100cqw);
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: calc(15 / 500 * 100cqh);
+    box-sizing: border-box;
+}
+
+.zoom-panel .repot-btn-left {
     background: #ff9800;
     color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 15px;
+    font-size: calc(14 / 500 * 100cqh);
 }
 
-.repot-btn-left:hover {
-    opacity: 0.9;
-}
-
-.remove-btn-left {
-    width: 100%;
+.zoom-panel .remove-btn-left {
     background: #dc3545;
     color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 15px;
+    font-size: calc(14 / 500 * 100cqh);
 }
 
-.remove-btn-left:hover {
-    opacity: 0.9;
-}
-
-.plant-btn-left {
-    width: 100%;
+.zoom-panel .plant-btn-left {
     background: #4caf50;
     color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 15px;
+    font-size: calc(14 / 500 * 100cqh);
 }
 
+.zoom-panel .water-btn-left {
+    background: #2196f3;
+    color: white;
+    font-size: calc(16 / 500 * 100cqh);
+}
+
+.zoom-panel .move-btn-left,
+.zoom-panel .desc-btn-right {
+    background: #9c27b0;
+    color: white;
+    font-size: calc(14 / 500 * 100cqh);
+}
+
+.repot-btn-left:hover,
+.remove-btn-left:hover,
 .plant-btn-left:hover {
     opacity: 0.9;
 }
 
-.disease-box {
+.zoom-panel .disease-box {
     background: rgba(200, 100, 100, 0.9);
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 15px;
+    border-radius: calc(10 / 1000 * 100cqw);
+    padding: calc(10 / 500 * 100cqh) calc(10 / 1000 * 100cqw);
+    margin-bottom: calc(15 / 500 * 100cqh);
     text-align: center;
 }
 
-.disease-title {
+.zoom-panel .disease-title {
     font-weight: bold;
     color: #fff;
-    font-size: 13px;
-    margin-bottom: 5px;
+    font-size: calc(13 / 500 * 100cqh);
+    margin-bottom: calc(5 / 500 * 100cqh);
 }
 
-.disease-text {
+.zoom-panel .disease-text {
     color: #fff;
-    font-size: 11px;
+    font-size: calc(11 / 500 * 100cqh);
 }
 
-.timer-box {
+.zoom-panel .timer-box {
     background: rgba(255, 235, 205, 0.9);
-    border-radius: 10px;
-    padding: 8px;
-    margin-bottom: 10px;
+    border-radius: calc(10 / 1000 * 100cqw);
+    padding: calc(8 / 500 * 100cqh) calc(8 / 1000 * 100cqw);
+    margin-bottom: calc(10 / 500 * 100cqh);
     text-align: center;
-    font-size: 12px;
+    font-size: calc(12 / 500 * 100cqh);
     color: #5d3a1a;
-    border: 1px solid #d4a373;
-}
-
-.water-btn-left {
-    width: 100%;
-    background: #2196f3;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 15px;
+    border: calc(1 / 1000 * 100cqw) solid #d4a373;
 }
 
 .water-btn-left:disabled {
@@ -606,27 +731,27 @@ body {
     cursor: not-allowed;
 }
 
-.plant-name-zoom {
-    font-size: 18px;
+.zoom-panel .plant-name-zoom {
+    font-size: calc(18 / 500 * 100cqh);
     font-weight: bold;
     color: #5d3a1a;
     text-align: center;
-    margin-bottom: 5px;
+    margin-bottom: calc(5 / 500 * 100cqh);
 }
 
-.plant-stage {
-    font-size: 12px;
+.zoom-panel .plant-stage {
+    font-size: calc(12 / 500 * 100cqh);
     color: #8b6914;
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: calc(15 / 500 * 100cqh);
 }
 
-.watering-info {
-    font-size: 12px;
-    margin-bottom: 15px;
-    padding: 8px;
+.zoom-panel .watering-info {
+    font-size: calc(12 / 500 * 100cqh);
+    margin-bottom: calc(15 / 500 * 100cqh);
+    padding: calc(8 / 500 * 100cqh) calc(8 / 1000 * 100cqw);
     background: rgba(255, 235, 205, 0.9);
-    border-radius: 10px;
+    border-radius: calc(10 / 1000 * 100cqw);
     color: #5d3a1a;
 }
 
@@ -645,69 +770,66 @@ body {
     font-style: italic;
 }
 
-.description-box {
+.zoom-panel .description-box {
     background: rgba(255, 235, 205, 0.9);
-    border-radius: 10px;
-    padding: 10px;
-    max-height: 200px;
+    border-radius: calc(10 / 1000 * 100cqw);
+    padding: calc(10 / 500 * 100cqh) calc(10 / 1000 * 100cqw);
+    max-height: calc(200 / 500 * 100cqh);
     overflow-y: auto;
-    border: 1px solid #d4a373;
+    border: calc(1 / 1000 * 100cqw) solid #d4a373;
 }
 
-.desc-text {
-    font-size: 12px;
+.zoom-panel .desc-text {
+    font-size: calc(12 / 500 * 100cqh);
     color: #3d2b1a;
     line-height: 1.4;
 }
 
-.desc-text h4 {
+.zoom-panel .desc-text h4 {
     color: #d4a373;
-    margin: 8px 0 4px 0;
-    font-size: 13px;
+    margin: calc(8 / 500 * 100cqh) 0 calc(4 / 500 * 100cqh) 0;
+    font-size: calc(13 / 500 * 100cqh);
 }
 
-.desc-text p {
-    margin-bottom: 8px;
+.zoom-panel .desc-text p {
+    margin-bottom: calc(8 / 500 * 100cqh);
     color: #3d2b1a;
 }
 
-.watering-anim {
+.zoom-panel .watering-anim {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     pointer-events: none;
     z-index: 20;
     display: none;
 }
 
-.watering-anim.active {
+.zoom-panel .watering-anim.active {
     display: block;
 }
 
-.watering-can-img {
+.zoom-panel .watering-can-img {
     position: absolute;
     top: 20%;
     left: 45%;
-    width: 70px;
+    width: calc(70 / 1000 * 100cqw);
     animation: waterCanShake 0.5s ease-in-out infinite;
 }
 
-.water-drops {
+.zoom-panel .water-drops {
     position: absolute;
     top: 28%;
     left: 48%;
-    width: 100px;
-    height: 120px;
+    width: calc(100 / 1000 * 100cqw);
+    height: calc(120 / 500 * 100cqh);
 }
 
-.drop {
+.zoom-panel .drop {
     position: absolute;
-    width: 4px;
-    height: 12px;
+    width: calc(4 / 1000 * 100cqw);
+    height: calc(12 / 500 * 100cqh);
     background: #4fc3f7;
-    border-radius: 2px;
+    border-radius: calc(2 / 1000 * 100cqw);
     animation: dropFall 0.5s linear infinite;
 }
 
@@ -719,7 +841,7 @@ body {
 
 @keyframes dropFall {
     0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(60px); opacity: 0; }
+    100% { transform: translateY(calc(60 / 500 * 100cqh)); opacity: 0; }
 }
 
 /* ОКНО ДОСТИЖЕНИЙ - КАСТОМНЫЙ ДИЗАЙН */
@@ -1051,70 +1173,15 @@ body {
     background: #b8894f;
 }
 
-/* АДАПТИВНОСТЬ */
-@media (max-width: 1200px) {
-    .pot-slot { transform: scale(0.9); }
-    .slot-windowsill-1 { left: 75px; top: 554px; }
-    .slot-windowsill-2 { left: 250px; top: 554px; }
-    .slot-windowsill-3 { left: 410px; top: 554px; }
-    .slot-desk-left { left: 720px; top: 515px; }
-    .slot-desk-right-1 { left: 1100px; top: 515px; }
-    .slot-desk-right-2 { left: 1180px; top: 515px; }
-}
-
+/* АДАПТИВНОСТЬ (сцена комнаты масштабируется в JS; здесь только UI) */
 @media (max-width: 1000px) {
-    .zoom-content-wrapper { flex-direction: column; align-items: center; }
-    .zoom-right-panel { width: 100%; }
-    .quests-panel { width: 220px; font-size: 12px; }
-    .quests-title { font-size: 16px; }
+    .room-stage .quests-panel { width: calc(220 / 1280 * 100cqw); font-size: calc(12 / 720 * 100cqh); }
+    .room-stage .quests-title { font-size: calc(16 / 720 * 100cqh); }
 }
 
-@media (max-width: 800px) {
-    .quests-panel { display: none; }
-    .control-buttons { right: 20px; }
-    .level-circle { right: 20px; }
-}
-
-.desc-btn-right {
-    width: 100%;
-    background: #9c27b0;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 15px;
-}
-
-.desc-btn-right:hover {
+.zoom-panel .desc-btn-right:hover,
+.zoom-panel .move-btn-left:hover {
     opacity: 0.9;
-}
-
-.light-desc-btn {
-    background: #9c27b0;
-}
-
-.move-btn-left {
-    width: 100%;
-    background: #9c27b0;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 15px;
-}
-
-.move-btn-left:hover {
-    opacity: 0.9;
-}
-
-.light-move-btn {
-    background: #9c27b0;
 }
 
 #fixAdviceBox {

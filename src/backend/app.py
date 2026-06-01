@@ -125,6 +125,7 @@ def catch_all(path):
     if os.path.exists(full_path) and os.path.isfile(full_path):
         return send_from_directory(FRONTEND_DIR, path)
     return CUSTOM_404_HTML, 404
+
 if __name__ == '__main__':
     print(f"Сервер запущен на http://localhost:5000")
     print("Доступные страницы:")

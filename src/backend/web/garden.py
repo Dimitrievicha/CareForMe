@@ -367,60 +367,6 @@ def get_available_plants():
     return jsonify({'success': True, 'plants': plants})
 
 
-@garden_bp.route('/designs', methods=['GET'])
-def get_designs():
-    """
-    Получить дизайны пользователя (горшки, лейки)
-
-    GET /api/garden/designs
-
-    Returns: {
-        "success": bool,
-        "current": {
-            "pot": str,
-            "watering_can": str
-        },
-        "unlocked_pots": [str],
-        "unlocked_cans": [str],
-        "all_pots": [{"id": str, "name": str, "image": str}],
-        "all_cans": [{"id": str, "name": str, "image": str}]
-    }
-    """
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({'success': False, 'error': 'Не авторизован'}), 401
-
-    designs = user_interface.get_current_designs(user_id)
-    unlocked_pots = user_interface.get_unlocked_pots(user_id)
-    unlocked_cans = user_interface.get_unlocked_watering_cans(user_id)
-
-    # Список всех доступных дизайнов (для магазина/настроек)
-    all_pots = [
-        {'id': 'standard', 'name': 'Стандартный', 'image': '/assets/images/pots/standard.png'},
-        {'id': 'ceramic', 'name': 'Керамический', 'image': '/assets/images/pots/ceramic.png'},
-        {'id': 'wooden', 'name': 'Деревянный', 'image': '/assets/images/pots/wooden.png'},
-        {'id': 'golden', 'name': 'Золотой', 'image': '/assets/images/pots/golden.png'},
-        {'id': 'design_pot_1', 'name': 'Дизайнерский #1', 'image': '/assets/images/pots/design_pot_1.png'},
-        {'id': 'design_pot_2', 'name': 'Дизайнерский #2', 'image': '/assets/images/pots/design_pot_2.png'}
-    ]
-
-    all_cans = [
-        {'id': 'standard', 'name': 'Стандартная', 'image': '/assets/images/watering_cans/standard.png'},
-        {'id': 'wooden', 'name': 'Деревянная', 'image': '/assets/images/watering_cans/wooden.png'},
-        {'id': 'golden', 'name': 'Золотая', 'image': '/assets/images/watering_cans/golden.png'},
-        {'id': 'design_can_1', 'name': 'Дизайнерская', 'image': '/assets/images/watering_cans/design_can_1.png'}
-    ]
-
-    return jsonify({
-        'success': True,
-        'current': designs,
-        'unlocked_pots': unlocked_pots,
-        'unlocked_cans': unlocked_cans,
-        'all_pots': all_pots,
-        'all_cans': all_cans
-    })
-
-
 @garden_bp.route('/change_pot', methods=['POST'])
 def change_pot():
     """

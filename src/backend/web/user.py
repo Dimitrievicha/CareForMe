@@ -214,14 +214,14 @@ def get_designs():
     # Горшок 2 разблокируется на 2 уровне, Горшок 3 на 5 уровне
     all_pots = [
         {'id': '1', 'name': 'Горшок 1', 'image': '/images/pot/горшок1.png', 'unlock_level': 1},
-        {'id': '2', 'name': 'Горшок 2', 'image': '/images/pot/горшок2.png', 'unlock_level': 2},
-        {'id': '3', 'name': 'Горшок 3', 'image': '/images/pot/горшок3.png', 'unlock_level': 5},
+        {'id': '2', 'name': 'Горшок 2', 'image': '/images/pot/горшок2.png', 'unlock_level': 3},
+        {'id': '3', 'name': 'Горшок 3', 'image': '/images/pot/горшок3.png', 'unlock_level': 6},
     ]
 
     # Кактус должен разблокироваться на 2 уровне
     all_cans = [
         {'id': '1', 'name': 'Лейка', 'image': '/images/water can/лейка.png', 'unlock_level': 1},
-        {'id': '2', 'name': 'Лейка 2', 'image': '/images/water can/лейка2.png', 'unlock_level': 3},
+        {'id': '2', 'name': 'Лейка 2', 'image': '/images/water can/лейка2.png', 'unlock_level': 4},
     ]
 
     return jsonify({

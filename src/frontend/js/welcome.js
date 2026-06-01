@@ -31,7 +31,6 @@ async function checkAuth() {
     }
 }
 
-// Запускаем проверку сразу
 checkAuth().then(isAuth => {
     if (!isAuth) return;
 
@@ -44,7 +43,6 @@ checkAuth().then(isAuth => {
     createConfetti();
 });
 
-// Создаем конфетти
 function createConfetti() {
     const confettiContainer = document.querySelector('.confetti');
     if (!confettiContainer) return;
@@ -74,7 +72,6 @@ function createConfetti() {
     }
 }
 
-// Обработчик кнопки «Войти в сад»
 const continueBtn = document.getElementById('continueBtn');
 if (continueBtn) {
     continueBtn.addEventListener('click', () => {

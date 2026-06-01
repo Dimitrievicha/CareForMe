@@ -13,6 +13,15 @@ body {
     background: #2a1f14;
 }
 
+/* ===== ПЕРЕМЕННЫЕ ДЛЯ НАСТРОЙКИ ОКНА ЗУМА ===== */
+:root {
+    --zoom-width: 1000px;        /* ширина окна зума */
+    --zoom-height: 500px;       /* высота окна зума */
+    --zoom-bg-color: #f5e6d3;   /* цвет фона */
+    --zoom-border-radius: 30px; /* скругление углов */
+    --zoom-pot-offset: 60px;
+}
+
 /* ФОН КОМНАТЫ*/
 .room-bg {
     position: fixed;
@@ -197,7 +206,8 @@ body {
     position: absolute;
     bottom: 60px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) scale(1.50);
+    transform-origin: bottom center;
     width: 85px;
     height: auto;
     z-index: 1;
@@ -207,7 +217,8 @@ body {
     position: absolute;
     bottom: 45px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) scale(1.15);
+    transform-origin: bottom center;
     width: 70px;
     height: auto;
     z-index: 2;
@@ -231,12 +242,12 @@ body {
     z-index: 3;
 }
 
-.slot-windowsill-1 { left: 75px; top: 554px; }
-.slot-windowsill-2 { left: 250px; top: 554px; }
-.slot-windowsill-3 { left: 410px; top: 554px; }
-.slot-desk-left { left: 720px; top: 515px; }
-.slot-desk-right-1 { left: 1100px; top: 515px; }
-.slot-desk-right-2 { left: 1180px; top: 515px; }
+.slot-windowsill-1 { left: 75px; top: 560px; }
+.slot-windowsill-2 { left: 250px; top: 560px; }
+.slot-windowsill-3 { left: 410px; top: 560px; }
+.slot-desk-left { left: 720px; top: 525px; }
+.slot-desk-right-1 { left: 1100px; top: 525px; }
+.slot-desk-right-2 { left: 1180px; top: 525px; }
 
 /* МОДАЛЬНЫЕ ОКНА */
 .modal-overlay {
@@ -391,11 +402,13 @@ body {
 
 .zoom-panel {
     position: relative;
-    width: 90vw;
-    max-width: 1100px;
-    background: transparent;
-    border-radius: 30px;
+    width: var(--zoom-width, 900px);
+    max-width: 90vw;
+    height: var(--zoom-height, 600px);
+    background: var(--zoom-bg-color, #f5e6d3);
+    border-radius: var(--zoom-border-radius, 30px);
     overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
 
 .zoom-table-bg {
@@ -413,9 +426,11 @@ body {
     z-index: 1;
     display: flex;
     gap: 20px;
-    padding: 30px;
+    padding: 20px 30px;
     justify-content: center;
     align-items: flex-start;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .zoom-left {
@@ -432,6 +447,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-end;
+    transform: translateY(var(--zoom-pot-offset));
 }
 
 .zoom-pot-img {
@@ -572,7 +588,7 @@ body {
     border: 1px solid #d4a373;
 }
 
-.water-btn-right {
+.water-btn-left {
     width: 100%;
     background: #2196f3;
     color: white;
@@ -585,7 +601,7 @@ body {
     margin-bottom: 15px;
 }
 
-.water-btn-right:disabled {
+.water-btn-left:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }

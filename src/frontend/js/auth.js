@@ -1,6 +1,5 @@
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// DOM элементы
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
 const submitBtn = document.getElementById('submitBtn');
@@ -26,7 +25,6 @@ function setInvalidState(input, errorElement, message = '') {
     }
 }
 
-// Валидация
 function validateUsername(value) {
     value = value.trim();
     if (!value) {
@@ -85,7 +83,6 @@ passwordInput.addEventListener('input', e => {
     updateBtn();
 });
 
-// Уведомления
 function showNotification(message, isError = true) {
     const n = document.getElementById('notification');
     n.querySelector('.notif-icon').textContent = isError ? '❌' : '✅';
@@ -94,7 +91,6 @@ function showNotification(message, isError = true) {
     setTimeout(() => n.classList.remove('show'), 3000);
 }
 
-// HTTP helper
 async function post(url, body) {
     const res = await fetch(url, {
         method: 'POST',
@@ -126,7 +122,6 @@ async function get(url) {
     return { ok: res.ok, status: res.status, data };
 }
 
-// Проверка существования пользователя
 async function checkUserExists(username) {
     try {
         const result = await post(`${API_BASE_URL}/auth/check_user`, { username });
@@ -137,7 +132,6 @@ async function checkUserExists(username) {
     }
 }
 
-// Регистрация
 async function register(username, password) {
     try {
         const result = await post(`${API_BASE_URL}/auth/register`, { username, password });
@@ -158,7 +152,6 @@ async function register(username, password) {
     }
 }
 
-// Логин
 async function login(username, password) {
     try {
         const result = await post(`${API_BASE_URL}/auth/login`, {
@@ -187,16 +180,12 @@ async function login(username, password) {
     }
 }
 
-// Основная логика
 async function handleAuth(username, password) {
-    // Проверяем, существует ли пользователь
     const exists = await checkUserExists(username);
 
     if (!exists) {
-        // Новый пользователь - регистрируем
         await register(username, password);
     } else {
-        // Существующий - логиним
         await login(username, password);
     }
 }
@@ -235,7 +224,6 @@ function clearForm() {
     updateBtn();
 }
 
-// Обработка отправки формы
 form.addEventListener('submit', async e => {
     e.preventDefault();
     if (submitBtn.disabled) return;
@@ -262,11 +250,9 @@ form.addEventListener('submit', async e => {
     submitBtn.style.opacity = '';
 });
 
-// Инициализация
 clearForm();
 usernameInput.focus();
 
-// Обработчик выхода
 document.addEventListener('click', (e) => {
     if (e.target.id === 'exitBtn' || e.target.closest('#exitBtn')) {
         localStorage.removeItem('userId');

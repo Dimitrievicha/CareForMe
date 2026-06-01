@@ -1,10 +1,6 @@
 
-// ЗАЩИТА - проверка через сервер
-
-
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Глобальные данные с сервера
 let PLANTS = {};
 let POT_CONFIG = {};
 let WATERING_CAN_CONFIG = {};
@@ -12,26 +8,21 @@ let currentLevel = 1;
 let currentUser = null;
 let currentZoomedPlantId = null;
 
-
-// КОНСТАНТЫ ВРЕМЕНИ РОСТА - ТЕСТОВЫЙ РЕЖИМ (ИЗМЕНИТЬ ИХ НА ДНИ)
-
-const SEEDLING_MS = 10 * 1000;   // 10 секунд до ростка
-const BLOOM_MS = 30 * 1000;      // 30 секунд до цветения
-
-
-// НАСТРОЙКИ ПОЛОЖЕНИЯ РАСТЕНИЙ В ГОРШКЕ
+// Тестовые значения — заменить на дни перед релизом
+const SEEDLING_MS = 10 * 1000;
+const BLOOM_MS = 30 * 1000;
 
 const PLANT_OFFSETS = {
     1: { // Спатифиллум
         default: { bottom: '35px', width: '100px', left: '50%' },
         stages: {
-            1: { bottom: '35px', width: '100px', left: '50%' },
+            1: { bottom: '35px', width: '90px', left: '50%' },
             2: { bottom: '20px', width: '120px', left: '50%' }
         },
         diseases: {
             'желтение': { bottom: '35px', width: '90px', left: '50%' },
             'не цветет': { bottom: '35px', width: '95px', left: '50%' },
-            'сохнут кончики': { bottom: '35px', width: '90px', left: '50%' }
+            'сохнут кончики': { bottom: '35px', width: '100px', left: '50%' }
         }
     },
     2: { // Кактус
@@ -41,33 +32,33 @@ const PLANT_OFFSETS = {
             2: { bottom: '40px', width: '70px', left: '50%' }
         },
         diseases: {
-            'вытягивание': { bottom: '50px', width: '55px', left: '50%' },
-            'не цветет': { bottom: '45px', width: '60px', left: '50%' },
-            'сморщенный стебель': { bottom: '45px', width: '55px', left: '50%' }
+            'вытягивание': { bottom: '50px', width: '30px', left: '50%' },
+            'не цветет': { bottom: '45px', width: '35px', left: '50%' },
+            'сморщенный стебель': { bottom: '38px', width: '34px', left: '50%' }
         }
     },
     3: { // Фикус
         default: { bottom: '40px', width: '75px', left: '50%' },
         stages: {
             1: { bottom: '40px', width: '75px', left: '50%' },
-            2: { bottom: '35px', width: '90px', left: '50%' }
+            2: { bottom: '35px', width: '125px', left: '50%' }
         },
         diseases: {
-            'желтение': { bottom: '40px', width: '70px', left: '50%' },
-            'пятна': { bottom: '40px', width: '70px', left: '50%' },
-            'увядание': { bottom: '40px', width: '65px', left: '50%' }
+            'желтение': { bottom: '40px', width: '90px', left: '50%' },
+            'пятна': { bottom: '40px', width: '100px', left: '50%' },
+            'увядание': { bottom: '40px', width: '75px', left: '50%' }
         }
     }
 };
 
-// Функция получения смещений
 function getPlantOffsets(plantId, stage, diseaseText = null) {
     const plantConfig = PLANT_OFFSETS[plantId];
     if (!plantConfig) return { bottom: '40px', width: '70px', left: '50%' };
 
     if (diseaseText) {
+        const norm = s => s.toLowerCase().replace(/ё/g, 'е');
         for (const [key, offsets] of Object.entries(plantConfig.diseases || {})) {
-            if (diseaseText.toLowerCase().includes(key.toLowerCase())) {
+            if (norm(diseaseText).includes(norm(key))) {
                 return offsets;
             }
         }
@@ -81,29 +72,80 @@ function getPlantOffsets(plantId, stage, diseaseText = null) {
     return plantConfig.default;
 }
 
-/** Дополнительный подъём растения в слоте комнаты (зависит от горшка и стадии). */
-function getSlotPlantExtraLift(potNum, stage, hasDisease) {
-    const pot = parseInt(potNum, 10) || 1;
-    const isSprout = stage === 1 && !hasDisease;
-    const isSick = !!hasDisease;
-    const isHealthyBloom = stage >= 2 && !hasDisease;
-
-    if (pot === 2) {
-        if (isSprout) return -3;
-        if (isSick) return 13;
-        if (isHealthyBloom) return 5;
-        return 0;
+const PLANT_LIFT_CONFIG = {
+    1: { // Спатифиллум
+        1: {
+            slot: { sprout: 18, healthy: 19, 'желтение': 40, 'не цветет': 51, 'сохнут кончики': 44, dead: -42, sick: 24 },
+            zoom: { sprout: 40, healthy: 37, 'желтение': 70, 'не цветет': 84, 'сохнут кончики': 75, dead: -39, sick: 70 }
+        },
+        2: {
+            slot: { sprout: 12, healthy: 12, 'желтение': 34, 'не цветет': 45, 'сохнут кончики': 38, dead: -48, sick: 19 },
+            zoom: { sprout: 30, healthy: 27, 'желтение': 62, 'не цветет': 76, 'сохнут кончики': 68, dead: -48, sick: 62 }
+        },
+        3: {
+            slot: { sprout: 36, healthy: 37, 'желтение': 58, 'не цветет': 69, 'сохнут кончики': 63, dead: -24, sick: 37 },
+            zoom: { sprout: 57, healthy: 53, 'желтение': 87, 'не цветет': 102, 'сохнут кончики': 94, dead: -21, sick: 87 }
+        }
+    },
+    2: { // Кактус
+        1: {
+            slot: { sprout: 10, healthy: -28, 'вытягивание': 36, 'не цветет': 40, 'сморщенный стебель': 42, dead: -28, sick: 0 },
+            zoom: { sprout: 33, healthy: -20, 'вытягивание': 70, 'не цветет': 73, 'сморщенный стебель': 74, dead: -18, sick: 50 }
+        },
+        2: {
+            slot: { sprout: 4, healthy: -34, 'вытягивание': 30, 'не цветет': 34, 'сморщенный стебель': 36, dead: -34, sick: 0 },
+            zoom: { sprout: 24, healthy: -28, 'вытягивание': 60, 'не цветет': 64, 'сморщенный стебель': 65, dead: -2, sick: 50 }
+        },
+        3: {
+            slot: { sprout: 28, healthy: -9, 'вытягивание': 54, 'не цветет': 58, 'сморщенный стебель': 60, dead: -10, sick: 0 },
+            zoom: { sprout: 52, healthy: -2, 'вытягивание': 87, 'не цветет': 90, 'сморщенный стебель': 92, dead: 0, sick: 50 }
+        }
+    },
+    3: { // Фикус
+        1: {
+            slot: { sprout: -33, healthy: -19, 'желтение': 40, 'пятна': 30, 'увядание': 43, dead: -28, sick: 0 },
+            zoom: { sprout: -23, healthy: -10, 'желтение': 73, 'пятна': 60, 'увядание': 77, dead: -18, sick: 50 }
+        },
+        2: {
+            slot: { sprout: -38, healthy: -25, 'желтение': 35, 'пятна': 25, 'увядание': 38, dead: -33, sick: 0 },
+            zoom: { sprout: -32, healthy: -18, 'желтение': 62, 'пятна': 50, 'увядание': 67, dead: -27, sick: 50 }
+        },
+        3: {
+            slot: { sprout: -13, healthy: 0, 'желтение': 60, 'пятна': 50, 'увядание': 62, dead: -8, sick: 0 },
+            zoom: { sprout: -4, healthy: 8, 'желтение': 92, 'пятна': 75, 'увядание': 97, dead: 0, sick: 50 }
+        }
     }
+};
 
-    // Горшок 1 (обычный)
-    if (isSprout) return 0;
-    if (isSick) return 17;
-    if (isHealthyBloom) return 10;
-    return 0;
+function getPotLift(type, plantId, potNum, stage, hasDisease, disease) {
+    const plant = parseInt(plantId, 10) || 1;
+    const pot   = parseInt(potNum,  10) || 1;
+    const plantCfg = PLANT_LIFT_CONFIG[plant] || PLANT_LIFT_CONFIG[1];
+    const lifts = (plantCfg[pot] || plantCfg[1])[type];
+
+    if (!hasDisease && stage === 1)  return lifts.sprout ?? 0;
+    if (!hasDisease && stage >= 2)   return lifts.healthy ?? 0;
+
+    if (disease === '__dead__') return lifts.dead ?? lifts.sick ?? 0;
+
+    if (disease) {
+        for (const key of Object.keys(lifts)) {
+            if (key !== 'sick' && key !== 'dead' && key !== 'sprout' && key !== 'healthy') {
+                const norm = s => s.toLowerCase().replace(/ё/g, 'е');
+                if (norm(disease).includes(norm(key))) return lifts[key];
+            }
+        }
+    }
+    return lifts.sick ?? 0;
 }
 
+function getSlotPlantExtraLift(plantId, potNum, stage, hasDisease, disease) {
+    return getPotLift('slot', plantId, potNum, stage, hasDisease, disease);
+}
 
-// КОНФИГУРАЦИЯ ДОСТИЖЕНИЙ
+function getZoomPlantLift(plantId, potNum, stage, hasDisease, disease) {
+    return getPotLift('zoom', plantId, potNum, stage, hasDisease, disease);
+}
 
 const ACHIEVEMENTS_CONFIG = {
     caring_parent: {
@@ -156,7 +198,6 @@ const ACHIEVEMENTS_CONFIG = {
     }
 };
 
-// Конфигурация наград за уровни
 const REWARD_IMAGES = {
     1: 'images/reward/1.png',
     2: 'images/reward/2.png',
@@ -199,10 +240,6 @@ async function checkAuth() {
         return false;
     }
 }
-
-
-// ЗАГРУЗКА ДАННЫХ С СЕРВЕРА
-
 
 async function loadPlantsCatalog() {
     try {
@@ -264,7 +301,6 @@ async function loadPlantsCatalog() {
                 };
             });
             PLANTS = plants;
-            console.log('Загружены растения из БД:', Object.keys(PLANTS).length);
             return true;
         }
         return false;
@@ -298,7 +334,6 @@ async function loadPots() {
                 };
             });
             POT_CONFIG = pots;
-            console.log('Загружены горшки:', Object.keys(POT_CONFIG).length);
             return true;
         }
         return false;
@@ -333,7 +368,6 @@ async function loadWateringCans() {
                 };
             });
             WATERING_CAN_CONFIG = cans;
-            console.log('Загружены лейки:', Object.keys(WATERING_CAN_CONFIG).length);
             return true;
         }
         return false;
@@ -342,10 +376,6 @@ async function loadWateringCans() {
         return false;
     }
 }
-
-
-// ДАННЫЕ ПО УМОЛЧАНИЮ
-
 
 function setDefaultPlants() {
     PLANTS = {
@@ -446,18 +476,12 @@ const LEVEL_REWARDS = {
     6: '🏆 Получен легендарный Горшок 3 и ачивка "Страж флоры"!'
 };
 
-
-// СОСТОЯНИЕ
-
 const slotData = {};
 let activeSlot = null;
 let zoomedSlot = null;
 
 const popupQueue = [];
 let popupShowing = false;
-
-
-// DOM
 
 const slots = document.querySelectorAll('.pot-slot');
 const modalPlacePot    = document.getElementById('modalPlacePot');
@@ -470,9 +494,6 @@ const modalWaterCan = document.getElementById('modalWaterCan');
 const modalRepot = document.getElementById('modalRepot');
 const modalMovePlant = document.getElementById('modalMovePlant');
 
-
-// УТИЛИТЫ
-
 function showNotification(message, isError = false) {
     const n = document.getElementById('notification');
     if (!n) return;
@@ -484,10 +505,6 @@ function showNotification(message, isError = false) {
 
 function openModal(el) { if (el) el.classList.add('active'); }
 function closeModal(el) { if (el) el.classList.remove('active'); }
-
-
-// ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ
-
 
 function showAchievementReasonToast(achievementId) {
     const config = ACHIEVEMENTS_CONFIG[achievementId];
@@ -563,10 +580,6 @@ function getAchievementIdByName(name) {
     }
     return null;
 }
-
-
-// АЧИВКИ
-
 
 function updateAchievementsDisplay() {
     const achievements = document.querySelectorAll('.achievement-card');
@@ -723,10 +736,6 @@ function checkAllAchievementsOnBloom(slotName, data) {
     checkAchievement_collector();
 }
 
-
-// СИСТЕМА БОЛЕЗНЕЙ
-
-
 const SLOT_LIGHT = {
     'windowsill-1': 'high',
     'windowsill-2': 'high',
@@ -744,13 +753,13 @@ const PLANT_LIGHT_REQ = {
 
 const PLANT_DISEASES = {
     1: {
-        too_light: '🍃 Листья желтеют — солнечный ожог',
-        big_pot: '🍃 Не цветёт — слишком большой горшок',
-        overwatered: '🍃 Сохнут кончики листьев — перелив'
+        too_light: '🍃 желтение — листья желтеют от солнечного ожога',
+        big_pot: '🍃 не цветет — слишком большой горшок',
+        overwatered: '🍃 сохнут кончики листьев — перелив'
     },
     2: {
         too_dark: '🌵 Вытягивание и бледность стебля — не хватает света',
-        no_flower: '🌵 Нет цветения — причина в нехватке света',
+        no_flower: '🌵 не цветет — нехватка света',
         overwatered: '🌵 Сморщенный стебель — перелив или застой воды'
     },
     3: {
@@ -763,8 +772,9 @@ const PLANT_DISEASES = {
 function getDiseaseImage(plant, diseaseText) {
     if (!plant || !plant.diseaseImages || !diseaseText) return null;
 
+    const norm = s => s.toLowerCase().replace(/ё/g, 'е');
     for (const [key, imagePath] of Object.entries(plant.diseaseImages)) {
-        if (diseaseText.toLowerCase().includes(key.toLowerCase())) {
+        if (norm(diseaseText).includes(norm(key))) {
             return imagePath;
         }
     }
@@ -894,9 +904,6 @@ function scheduleOverwateringCheck() {
     }, 60000);
 }
 
-
-// ОЧЕРЕДЬ ПОПАПОВ
-
 function enqueuePopup(type, data) {
     popupQueue.push({ type, data });
     if (!popupShowing) processPopupQueue();
@@ -927,17 +934,11 @@ function showAchievementPopup({ name, id }) {
     setTimeout(processPopupQueue, 3000);
 }
 
-
-// УРОВЕНЬ
-
 function updateLevelCircle(lvl) {
     currentLevel = lvl;
     const levelNum = document.getElementById('levelNum');
     if (levelNum) levelNum.textContent = lvl;
 }
-
-
-// ЗАДАНИЯ
 
 const QUESTS_BY_LEVEL = {
     1: [
@@ -1036,10 +1037,6 @@ function markHealedPlant() {
         showNotification('💚 Растение выздоровело! Задание выполнено!', false);
     }
 }
-
-
-// РАЗБЛОКИРОВКИ
-
 
 function checkAndUnlockPots() {
     const userLevel = currentLevel;
@@ -1180,7 +1177,6 @@ function renderWateringCanChoices() {
         div.dataset.can = id;
         div.innerHTML = `<img src="${cfg.img}" alt="${cfg.name}"${locked ? ' style="filter:grayscale(1) opacity(0.5)"' : ''}>
             <span>${cfg.name}</span>
-            ${isCurrent ? '<span class="current-label">Сейчас</span>' : ''}
             ${locked ? `<span class="unlock-hint">🔒 ур.${cfg.unlockLevel}</span>` : ''}`;
 
         if (!locked && !isCurrent) {
@@ -1234,9 +1230,6 @@ function updateWateringCanDisplay(canId) {
         wateringCanImg.src = WATERING_CAN_CONFIG[canId].img;
     }
 }
-
-
-// ПЕРЕСТАНОВКА ГОРШКОВ
 
 let moveFromSlot = null;
 
@@ -1396,9 +1389,6 @@ function swapPlants(slotA, slotB) {
     }
 }
 
-
-// СЛОТЫ — КЛИК
-
 slots.forEach(slot => {
     slot.addEventListener('click', () => {
         const name = slot.dataset.slot;
@@ -1415,6 +1405,14 @@ slots.forEach(slot => {
 
 const cancelPlacePot = document.getElementById('cancelPlacePot');
 if (cancelPlacePot) cancelPlacePot.addEventListener('click', () => closeModal(modalPlacePot));
+const cancelPickFlower = document.getElementById('cancelPickFlower');
+if (cancelPickFlower) {
+    cancelPickFlower.addEventListener('click', () => {
+        closeModal(modalPickFlower);
+        activeSlot = null;
+        showNotification('Выбери цветок позже 🌱', false);
+    });
+}
 if (modalPlacePot) modalPlacePot.addEventListener('click', e => { if (e.target === modalPlacePot) closeModal(modalPlacePot); });
 
 function placePot(slotEl, potNum) {
@@ -1424,9 +1422,6 @@ function placePot(slotEl, potNum) {
     showNotification('Горшок поставлен! Теперь посади цветок 🌱', false);
     saveState();
 }
-
-
-// УДАЛЕНИЕ РАСТЕНИЯ
 
 function removePlantFromSlot(slotName) {
     if (!slotData[slotName]) return;
@@ -1459,8 +1454,26 @@ function removePlantFromSlot(slotName) {
     checkQuestsAfterAction();
 }
 
+function removePotFromSlot(slotName) {
+    if (!slotData[slotName]) return;
 
-// ОТРИСОВКА СЛОТА
+    const data = slotData[slotName];
+    if (data.plant && data.stage < 2) {
+        checkAchievement_death();
+    }
+
+    slotData[slotName] = { pot: null, plant: null, stage: -1, lastWateredAt: null, totalWaterings: 0, wateringsToNextStage: 3 };
+
+    const slotEl = document.querySelector(`[data-slot="${slotName}"]`);
+    if (slotEl) renderSlot(slotEl, slotData[slotName]);
+
+    closeModal(zoomOverlay);
+    zoomedSlot = null;
+
+    showNotification(`🪣 Горшок убран!`, false);
+    saveState();
+    checkQuestsAfterAction();
+}
 
 function renderSlot(slotEl, data) {
     if (!slotEl) return;
@@ -1506,7 +1519,9 @@ function renderSlot(slotEl, data) {
 
         let imageUrl;
 
-        if (data.hasDisease && data.stage >= 1 && data.disease) {
+        if (data.disease === '__dead__') {
+            imageUrl = plant.deadImage || plant.stages[data.stage] || plant.stages[1];
+        } else if (data.hasDisease && data.stage >= 1 && data.disease) {
             const diseaseImg = getDiseaseImage(plant, data.disease);
             imageUrl = diseaseImg || plant.stages[data.stage] || plant.stages[1];
         } else {
@@ -1520,12 +1535,13 @@ function renderSlot(slotEl, data) {
         const offsets = getPlantOffsets(plantId, data.stage, data.hasDisease ? data.disease : null);
         if (offsets) {
             const baseLiftPx = 50;
-            const extraLiftPx = getSlotPlantExtraLift(data.pot, data.stage, data.hasDisease);
+            const extraLiftPx = getSlotPlantExtraLift(data.plant, data.pot, data.stage, data.hasDisease, data.disease);
 
             plantImg.style.bottom = `calc(${offsets.bottom} + ${baseLiftPx + extraLiftPx}px)`;
             plantImg.style.width = offsets.width;
             plantImg.style.left = offsets.left;
-            plantImg.style.transform = 'translateX(-50%)';
+            plantImg.style.transform = 'translateX(-50%) scale(1.50)';
+            plantImg.style.transformOrigin = 'bottom center';
         }
 
         slotEl.appendChild(plantImg);
@@ -1543,25 +1559,22 @@ function renderSlot(slotEl, data) {
         if (!data.plant) {
             hint.innerHTML = 'Посадить<br>цветок';
         } else if (data.stage === 0) {
-            hint.textContent = '🌱 Прорастает...';
+            hint.textContent = 'Прорастает...';
         } else if (data.stage === 1) {
             if (data.hasDisease) {
-                hint.textContent = '🤒 Болеет...';
+                hint.textContent = 'Болеет...';
             } else {
-                hint.textContent = '🌱 Росток';
+                hint.textContent = 'Росток';
             }
         } else if (data.stage === 2) {
             if (data.hasDisease) {
                 hint.innerHTML = 'Цветёт,<br>но болеет';
             } else {
-                hint.textContent = '🌸 Цветёт!';
+                hint.textContent = 'Цветёт!';
             }
         }
     }
 }
-
-
-// ЗУМ ГОРШКА
 
 function updateGrowthTimer(data) {
     if (!data || !data.plant || data.stage >= 2) {
@@ -1692,17 +1705,49 @@ function showDescription(plantKey) {
     }
 }
 
+function populateDevPanel(plant) {
+    const sel = document.getElementById('devStateSelect');
+    if (!sel) return;
+
+    const currentVal = sel.value;
+
+    // Убираем старые disease-опции (все кроме sprout, healthy, dead)
+    Array.from(sel.options).filter(o => !['sprout', 'healthy', 'dead'].includes(o.value))
+        .forEach(o => sel.removeChild(o));
+
+    const deadOption = Array.from(sel.options).find(o => o.value === 'dead');
+    const emojiMap = {
+        'желтение': '🍃', 'не цветет': '🌿', 'сохнут кончики': '🍃',
+        'вытягивание': '🌵', 'сморщенный стебель': '🌵',
+        'пятна': '🍂', 'увядание': '🍂'
+    };
+
+    if (plant?.diseaseImages) {
+        for (const key of Object.keys(plant.diseaseImages)) {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = (emojiMap[key] || '🤒') + ' Болезнь: ' + key;
+            sel.insertBefore(opt, deadOption);
+        }
+    }
+
+    if (Array.from(sel.options).some(o => o.value === currentVal)) sel.value = currentVal;
+    else sel.value = 'healthy';
+}
+
 function openZoom(slotEl, name, data) {
     zoomedSlot = { slotEl, name };
     currentZoomedPlantId = name;
+    if (devStatePanel) devStatePanel.style.display = 'block';
 
     const zoomPotImg = document.getElementById('zoomPotImg');
     if (zoomPotImg && POT_CONFIG[data.pot]) {
         zoomPotImg.src = POT_CONFIG[data.pot].img;
+        zoomPotImg.style.width = data.pot === 3 ? '185px' : '200px';
     }
 
     const plantImg = document.getElementById('zoomPlantImg');
-    const waterBtn = document.getElementById('waterBtnRight');
+    const waterBtn = document.getElementById('waterBtnLeft');
     const descBtn = document.getElementById('descBtnRight');
     const repotBtn = document.getElementById('repotBtnLeft');
     const moveBtn = document.getElementById('moveBtnLeft');
@@ -1715,11 +1760,14 @@ function openZoom(slotEl, name, data) {
     if (hasPlant) {
         const plant = PLANTS[data.plant];
         const plantId = parseInt(data.plant);
+        populateDevPanel(plant);
 
         if (plantImg) {
             if (data.stage >= 1) {
                 let imageUrl;
-                if (data.hasDisease && data.disease) {
+                if (data.disease === '__dead__') {
+                    imageUrl = plant.deadImage || plant.stages[data.stage] || plant.stages[1];
+                } else if (data.hasDisease && data.disease) {
                     const diseaseImg = getDiseaseImage(plant, data.disease);
                     imageUrl = diseaseImg || plant.stages[data.stage] || plant.stages[1];
                 } else {
@@ -1730,11 +1778,13 @@ function openZoom(slotEl, name, data) {
                 plantImg.style.display = 'block';
 
                 const offsets = getPlantOffsets(plantId, data.stage, data.hasDisease ? data.disease : null);
+                const zoomLift = getZoomPlantLift(data.plant, data.pot, data.stage, data.hasDisease, data.disease);
+                const zoomScale = 2.0;
                 if (offsets) {
-                    plantImg.style.bottom = offsets.bottom;
-                    plantImg.style.width = offsets.width;
+                    plantImg.style.bottom = `calc(${offsets.bottom} + ${zoomLift}px)`;
+                    plantImg.style.width = `${Math.round(parseInt(offsets.width) * zoomScale)}px`;
                 } else {
-                    plantImg.style.bottom = '35px';
+                    plantImg.style.bottom = `calc(35px + ${zoomLift}px)`;
                     plantImg.style.width = '180px';
                 }
             } else {
@@ -1748,25 +1798,27 @@ function openZoom(slotEl, name, data) {
         const zoomStageLabel = document.getElementById('zoomStageLabel');
         if (zoomStageLabel) {
             if (data.stage === 0) {
-                zoomStageLabel.textContent = '🌰 Семечко посажено';
+                zoomStageLabel.textContent = 'Семечко посажено';
             } else if (data.stage === 1) {
                 if (data.hasDisease) {
-                    zoomStageLabel.textContent = '🤒 Росток болеет';
+                    zoomStageLabel.textContent = 'Росток болеет';
                 } else {
-                    zoomStageLabel.textContent = '🌱 Росток';
+                    zoomStageLabel.textContent = 'Росток';
                 }
             } else if (data.stage === 2) {
                 if (data.hasDisease) {
-                    zoomStageLabel.textContent = '🤒 Цветёт, но болеет';
+                    zoomStageLabel.textContent = 'Цветёт, но болеет';
                 } else {
-                    zoomStageLabel.textContent = '🌸 Расцвёл';
+                    zoomStageLabel.textContent = 'Расцвёл';
                 }
             } else {
                 zoomStageLabel.textContent = STAGE_NAMES[data.stage] || STAGE_NAMES[0];
             }
         }
 
-        if (waterBtn) waterBtn.disabled = data.stage >= 2;
+        if (waterBtn) {
+            waterBtn.disabled = false;
+            waterBtn.style.display = 'block'; }
         if (descBtn) descBtn.style.display = 'block';
         if (repotBtn) repotBtn.style.display = 'block';
         if (moveBtn) moveBtn.style.display = 'block';
@@ -1789,11 +1841,13 @@ function openZoom(slotEl, name, data) {
         const zoomStageLabel = document.getElementById('zoomStageLabel');
         if (zoomStageLabel) zoomStageLabel.textContent = 'Посади цветок!';
 
-        if (waterBtn) waterBtn.disabled = true;
+        if (waterBtn) {
+            waterBtn.disabled = true;
+            waterBtn.style.display = 'none'; }
         if (descBtn) descBtn.style.display = 'none';
         if (repotBtn) repotBtn.style.display = 'none';
         if (moveBtn) moveBtn.style.display = 'none';
-        if (removeBtn) removeBtn.style.display = 'none';
+        if (removeBtn) removeBtn.style.display = 'block';
         if (plantBtn) plantBtn.style.display = 'block';
         if (descriptionBox) descriptionBox.style.display = 'none';
 
@@ -1851,12 +1905,10 @@ function updateWateringInfo(data) {
 }
 
 const zoomClose = document.getElementById('zoomClose');
-if (zoomClose) zoomClose.addEventListener('click', () => closeModal(zoomOverlay));
-if (zoomOverlay) zoomOverlay.addEventListener('click', e => { if (e.target === zoomOverlay) closeModal(zoomOverlay); });
-
+if (zoomClose) zoomClose.addEventListener('click', () => { closeModal(zoomOverlay); if (devStatePanel) devStatePanel.style.display = 'none'; });
+if (zoomOverlay) zoomOverlay.addEventListener('click', e => { if (e.target === zoomOverlay) { closeModal(zoomOverlay); if (devStatePanel) devStatePanel.style.display = 'none'; } });
 
 // ПЕРЕСАДКА (смена дизайна горшка)
-
 const cancelRepot = document.getElementById('cancelRepot');
 if (cancelRepot) cancelRepot.addEventListener('click', () => closeModal(modalRepot));
 if (modalRepot) modalRepot.addEventListener('click', e => { if (e.target === modalRepot) closeModal(modalRepot); });
@@ -1877,7 +1929,6 @@ function renderRepotChoices() {
         div.dataset.pot = num;
         div.innerHTML = `<img src="${cfg.img}" alt="${cfg.name}"${locked ? ' style="filter:grayscale(1) opacity(0.5)"' : ''}>
             <span>${cfg.name}</span>
-            ${isCurrent ? '<span class="current-label">Сейчас</span>' : ''}
             ${locked ? `<span class="unlock-hint">🔒 ур.${cfg.unlockLevel}</span>` : ''}`;
         if (!locked && !isCurrent) {
             div.addEventListener('click', () => {
@@ -1898,10 +1949,6 @@ function renderRepotChoices() {
         row.appendChild(div);
     });
 }
-
-
-// КНОПКИ В ЗУМЕ
-
 
 const descBtnRight = document.getElementById('descBtnRight');
 if (descBtnRight) {
@@ -1929,9 +1976,19 @@ const removeBtnLeft = document.getElementById('removeBtnLeft');
 if (removeBtnLeft) {
     removeBtnLeft.addEventListener('click', () => {
         if (!zoomedSlot) return;
-        if (confirm('Вы уверены, что хотите выбросить растение? Горшок освободится.')) {
-            removePlantFromSlot(zoomedSlot.name);
+        if (confirm('Вы уверены, что хотите выбросить растение вместе с горшком?')) {
+            removePotFromSlot(zoomedSlot.name);
             closeModal(zoomOverlay);
+        }
+    });
+}
+
+const removePotBtn = document.getElementById('removePotBtn');
+if (removePotBtn) {
+    removePotBtn.addEventListener('click', () => {
+        if (!zoomedSlot) return;
+        if (confirm('Убрать горшок вместе с растением?')) {
+            removePotFromSlot(zoomedSlot.name);
         }
     });
 }
@@ -1960,13 +2017,13 @@ if (moveBtnLeft) {
     });
 }
 
-const waterBtnRight = document.getElementById('waterBtnRight');
-if (waterBtnRight) {
-    waterBtnRight.addEventListener('click', () => {
+const waterBtnLeft = document.getElementById('waterBtnLeft');
+if (waterBtnLeft) {
+    waterBtnLeft.addEventListener('click', () => {
         if (!zoomedSlot) return;
         const { slotEl, name } = zoomedSlot;
         const data = slotData[name];
-        if (!data?.plant || data.stage >= 2 || !PLANTS[data.plant]) return;
+        if (!data?.plant || !PLANTS[data.plant]) return;
 
         const plant = PLANTS[data.plant];
         const now = Date.now();
@@ -2027,29 +2084,26 @@ function startWateringAnimation() {
         dropsContainer?.appendChild(drop);
     }
     if (anim) anim.classList.add('active');
-    if (waterBtnRight) waterBtnRight.disabled = true;
+    if (waterBtnLeft) waterBtnLeft.disabled = true;
 }
 
 function stopWateringAnimation() {
     const anim = document.getElementById('wateringAnim');
     if (anim) anim.classList.remove('active');
-    if (waterBtnRight) waterBtnRight.disabled = false;
+    if (waterBtnLeft) waterBtnLeft.disabled = false;
 }
-
-
-// МУЗЫКА
 
 let musicPlaying = false;
 const musicBtnEl = document.getElementById('musicBtn');
 const bgMusic = document.getElementById('bgMusic');
 
-if (bgMusic) bgMusic.src = 'music/модный поп.mp3';
+if (bgMusic) bgMusic.src = 'music/song.mp3';
 
 function tryAutoplay() {
     if (!bgMusic) return;
     bgMusic.play().then(() => {
         musicPlaying = true;
-        if (musicBtnEl) musicBtnEl.textContent = '🔇';
+        if (musicBtnEl) musicBtnEl.textContent = '🎵';
     }).catch(() => {});
 }
 
@@ -2060,18 +2114,15 @@ if (musicBtnEl) {
         if (!bgMusic) return;
         if (musicPlaying) {
             bgMusic.pause();
-            musicBtnEl.textContent = '🎵';
+            musicBtnEl.textContent = '🔇';
             musicPlaying = false;
         } else {
             bgMusic.play().catch(() => showNotification('Не удалось воспроизвести музыку', true));
-            musicBtnEl.textContent = '🔇';
+            musicBtnEl.textContent = '🎵';
             musicPlaying = true;
         }
     });
 }
-
-
-// КНОПКИ УПРАВЛЕНИЯ
 
 const achievementsBtn = document.getElementById('achievementsBtn');
 if (achievementsBtn) achievementsBtn.addEventListener('click', () => openModal(modalAchievements));
@@ -2113,7 +2164,7 @@ if (exitBtn) {
             localStorage.removeItem('username');
             localStorage.removeItem('userId');
             localStorage.removeItem('isReturningUser');
-            fetch('http://localhost:5000/api/auth/logout', {method:'POST', credentials:'include'})
+            fetch('http://localhost:5000/api/auth/logout', { method: 'POST', credentials: 'include' })
                 .finally(() => { window.location.href = 'register.html'; });
         }
     });
@@ -2141,9 +2192,6 @@ document.addEventListener('keydown', e => {
         [modalPlacePot, modalPickFlower, zoomOverlay, modalAchievements, modalWaterCan, modalRepot, modalMovePlant].forEach(closeModal);
     }
 });
-
-
-// СОХРАНЕНИЕ / ЗАГРУЗКА
 
 function saveState() {
     localStorage.setItem(`garden_${currentUser}`, JSON.stringify(slotData));
@@ -2268,9 +2316,6 @@ function loadLevel() {
     updateLevelCircle(lvl);
 }
 
-
-// ОБУЧАЛКА
-
 const TOTAL_STEPS = 4;
 let tutStep = 0;
 
@@ -2358,9 +2403,6 @@ if (tutorialOverlay) {
     });
 }
 
-
-// ИНИЦИАЛИЗАЦИЯ
-
 (async function init() {
     const loadingOverlay = document.createElement('div');
     loadingOverlay.id = 'loadingOverlay';
@@ -2422,6 +2464,7 @@ if (tutorialOverlay) {
                 const streak = getLoginStreak() + 1;
                 localStorage.setItem(`loginStreak_${currentUser}`, String(streak));
                 checkAchievement_streak(streak);
+                checkQuestsAfterAction();
             } else {
                 localStorage.setItem(`loginStreak_${currentUser}`, '1');
             }
@@ -2439,3 +2482,88 @@ if (tutorialOverlay) {
 
     loadingOverlay.remove();
 })();
+
+// ===== DEV КНОПКА (временная) =====
+const devBtn = document.getElementById('devBtn');
+if (devBtn) {
+    devBtn.addEventListener('click', () => {
+        if (!currentUser) return;
+
+        const allQuestIds = [
+            'plant_first', 'water_once', 'read_tip',
+            'grow_stage2', 'login_3days', 'heal_plant',
+            'grow_2species', 'water_3times', 'login_5days',
+            'water_6times', 'login_7days', 'grow_3rd_plant',
+            'no_mistakes_7days', 'login_10days', 'get_achievements'
+        ];
+
+        localStorage.setItem(`questsDone_${currentUser}`, JSON.stringify(allQuestIds));
+        localStorage.setItem(`loginStreak_${currentUser}`, '10');
+        localStorage.setItem(`totalWaterings_${currentUser}`, '10');
+        localStorage.setItem(`readDescriptionDone_${currentUser}`, 'true');
+        localStorage.setItem(`healedPlant_${currentUser}`, 'true');
+        localStorage.setItem(`noMistakes7_${currentUser}`, '1');
+        for (let lvl = 1; lvl <= 5; lvl++) {
+            localStorage.setItem(`levelUp_${lvl}_done_${currentUser}`, '1');
+        }
+        localStorage.setItem(`currentLevel_${currentUser}`, '6');
+        currentLevel = 6;
+
+        const levelNum = document.getElementById('levelNum');
+        if (levelNum) levelNum.textContent = '6';
+
+        POT_CONFIG[2].isUnlocked = true;
+        POT_CONFIG[3].isUnlocked = true;
+        if (WATERING_CAN_CONFIG[2]) WATERING_CAN_CONFIG[2].isUnlocked = true;
+
+        showNotification('🛠️ DEV: все уровни разблокированы!', false);
+    });
+}
+
+// ===== DEV: панель переключения состояний =====
+const devStatePanel = document.getElementById('devStatePanel');
+
+document.getElementById('zoomOverlay')?.addEventListener('transitionend', () => {
+    if (devStatePanel) {
+        devStatePanel.style.display = zoomedSlot ? 'block' : 'none';
+    }
+});
+
+const devApplyState = document.getElementById('devApplyState');
+if (devApplyState) {
+    devApplyState.addEventListener('click', () => {
+        if (!zoomedSlot) { alert('Сначала открой слот (кликни на горшок)'); return; }
+        const name = zoomedSlot.name;
+        const data = slotData[name];
+        if (!data || !data.plant) { alert('В слоте нет растения'); return; }
+
+        const state = document.getElementById('devStateSelect').value;
+        const plant = PLANTS[data.plant];
+
+        data.hasDisease = false;
+        data.disease = null;
+        data.diseaseStartTime = null;
+
+        if (state === 'sprout') {
+            data.stage = 1;
+        } else if (state === 'healthy') {
+            data.stage = 2;
+        } else if (state === 'dead') {
+            data.stage = 2;
+            data.hasDisease = true;
+            data.disease = '__dead__';
+        } else {
+            // значение = ключ болезни напрямую (желтение / вытягивание / не цветет / ...)
+            data.stage = 2;
+            data.hasDisease = true;
+            data.disease = state;
+        }
+
+        saveState();
+        const slotEl = zoomedSlot.slotEl;
+        renderSlot(slotEl, data);
+        openZoom(slotEl, name, data);
+        if (devStatePanel) devStatePanel.style.display = 'block';
+        console.log('[DEV] state:', state, '| disease:', data.disease, '| plant:', data.plant, '| pot:', data.pot);
+    });
+}

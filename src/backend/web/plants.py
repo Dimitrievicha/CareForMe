@@ -123,18 +123,7 @@ def get_catalog():
 
 @plants_bp.route('/<plant_id>/light', methods=['POST'])
 def set_light(plant_id):
-    """
-    Сменить уровень освещения для растения.
-
-    POST /api/plants/{plant_id}/light
-    Body: { "light_level": "low" | "medium" | "high" }
-
-    Returns: {
-        "success": bool,
-        "health_status": str,   # новый статус после смены света
-        "warning": str          # совет, если свет неподходящий
-    }
-    """
+    """Сменить уровень освещения для растения."""
     user_id = _get_user_id()
     if not user_id:
         return jsonify({'success': False, 'error': 'Не авторизован'}), 401
@@ -150,13 +139,10 @@ def set_light(plant_id):
     if not plant:
         return jsonify({'success': False, 'error': 'Растение не найдено'}), 404
 
-    # Обновляем уровень света через БД напрямую (нет отдельного метода в интерфейсе)
-    from database_full.database.db_manager import get_db_manager
-    db = get_db_manager()
-    db.execute_update(
-        "UPDATE user_plants SET current_light_level = ? WHERE id = ? AND user_id = ?",
-        (light_level, plant_id, user_id)
-    )
+    # Обновляем уровень света через интерфейс
+    success = flower_interface.set_light_level(plant_id, user_id, light_level)
+    if not success:
+        return jsonify({'success': False, 'error': 'Ошибка обновления'}), 500
 
     # Перепроверяем здоровье с новым светом
     health = flower_interface.check_health(plant_id, user_id)
@@ -168,21 +154,9 @@ def set_light(plant_id):
     })
 
 
-# ── Смена локации ─────────────────────────────────────────────────────────────
-
 @plants_bp.route('/<plant_id>/location', methods=['POST'])
 def set_location(plant_id):
-    """
-    Переставить растение в другое место (вызывает стресс у фикуса).
-
-    POST /api/plants/{plant_id}/location
-    Body: { "location": str }   # например "windowsill", "balcony", "room", "bathroom"
-
-    Returns: {
-        "success": bool,
-        "stress_warning": str | null   # предупреждение о стрессе (ficus)
-    }
-    """
+    """Переставить растение в другое место."""
     user_id = _get_user_id()
     if not user_id:
         return jsonify({'success': False, 'error': 'Не авторизован'}), 401
@@ -197,23 +171,20 @@ def set_location(plant_id):
     if not plant:
         return jsonify({'success': False, 'error': 'Растение не найдено'}), 404
 
-    from database_full.database.db_manager import get_db_manager
-    db = get_db_manager()
-    db.execute_update(
-        "UPDATE user_plants SET location = ? WHERE id = ? AND user_id = ?",
-        (location, plant_id, user_id)
-    )
+    old_location = plant.get('location')
+    success = flower_interface.set_location(plant_id, user_id, location)
+    if not success:
+        return jsonify({'success': False, 'error': 'Ошибка обновления'}), 500
 
     # Фикус (species_id=3) реагирует на переезд стрессом
     stress_warning = None
-    if plant.get('species_id') == 3 and plant.get('location') != location:
+    if plant.get('species_id') == 3 and old_location != location:
         stress_warning = (
             "Фикус не любит переезды. Ближайшие 1-2 дня он может сбрасывать "
             "листья — это нормально, просто не трогай его больше."
         )
 
     return jsonify({'success': True, 'stress_warning': stress_warning})
-
 
 # ── Возрождение (посадить новый после гибели) ─────────────────────────────────
 

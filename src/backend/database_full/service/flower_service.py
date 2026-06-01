@@ -160,6 +160,20 @@ class FlowerService:
 
         return result
 
+    def set_light_level(self, plant_id: str, user_id: str, light_level: str) -> bool:
+        """Сменить уровень освещения растения."""
+        plant = self.plant_repo.get_user_plant_by_id(plant_id)
+        if not plant or plant['user_id'] != user_id:
+            return False
+        return self.plant_repo.update_light_level(plant_id, light_level)
+
+    def set_location(self, plant_id: str, user_id: str, location: str) -> bool:
+        """Сменить локацию растения."""
+        plant = self.plant_repo.get_user_plant_by_id(plant_id)
+        if not plant or plant['user_id'] != user_id:
+            return False
+        return self.plant_repo.update_location(plant_id, location)
+
 
     def check_health(self, plant_id: str, user_id: str) -> Dict[str, Any]:
         """

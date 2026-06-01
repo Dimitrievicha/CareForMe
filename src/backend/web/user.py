@@ -79,24 +79,13 @@ def get_profile():
 
 @user_bp.route('/tutorial_done', methods=['POST'])
 def tutorial_done():
-    """
-    Отметить, что пользователь прошёл обучение (шаги 1–5).
-
-    POST /api/user/tutorial_done
-
-    Returns: { "success": bool }
-    """
+    """Отметить, что пользователь прошёл обучение."""
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'success': False, 'error': 'Не авторизован'}), 401
 
-    repo = UserRepository()
-    success = repo.db.execute_update(
-        "UPDATE player_profiles SET tutorial_completed = 1 WHERE user_id = ?",
-        (user_id,)
-    )
-    return jsonify({'success': bool(success)})
-
+    success = user_interface.complete_tutorial(user_id)
+    return jsonify({'success': success})
 
 # ── Серия дней ────────────────────────────────────────────────────────────────
 

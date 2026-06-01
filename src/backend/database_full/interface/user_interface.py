@@ -39,6 +39,12 @@ class UserInterface:
         self._quest_service = level_quest_service
         self.db = get_db_manager()
 
+    # В user_interface.py добавить:
+
+    def complete_tutorial(self, user_id: str) -> bool:
+        """Отметить обучение пройденным."""
+        return self._user_service.complete_tutorial(user_id)
+
     def register(self, username: str, password: str) -> Dict[str, Any]:
         """
         Регистрация нового пользователя.

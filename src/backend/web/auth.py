@@ -224,19 +224,10 @@ def verify():
 @auth_bp.route('/complete_tutorial', methods=['POST'])
 @login_required_api
 def complete_tutorial():
-    """
-    Отметить обучение пройденным
-
-    POST /api/auth/complete_tutorial
-    """
+    """Отметить обучение пройденным."""
     user_id = g.user_id
-
-    repo = UserRepository()
-    success = repo.db.execute_update(
-        "UPDATE player_profiles SET tutorial_completed = 1 WHERE user_id = ?",
-        (user_id,)
-    )
-    return jsonify({'success': bool(success)})
+    success = user_interface.complete_tutorial(user_id)
+    return jsonify({'success': success})
 
 
 @auth_bp.route('/check_streak', methods=['GET'])

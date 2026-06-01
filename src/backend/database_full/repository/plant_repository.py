@@ -355,6 +355,20 @@ class PlantRepository(BaseRepository):
             WHERE up.user_id = ? AND up.growth_stage = ? AND up.is_alive = 1
         """, (user_id, stage))
 
+    def update_light_level(self, plant_id: str, light_level: str) -> bool:
+        """Обновить уровень освещения растения."""
+        return self.db.execute_update(
+            "UPDATE user_plants SET current_light_level = ? WHERE id = ?",
+            (light_level, plant_id)
+        )
+
+    def update_location(self, plant_id: str, location: str) -> bool:
+        """Обновить локацию растения."""
+        return self.db.execute_update(
+            "UPDATE user_plants SET location = ? WHERE id = ?",
+            (location, plant_id)
+        )
+
     def get_plants_by_species(self, user_id: str, species_id: int) -> List[Dict[str, Any]]:
         """
         Получает растения пользователя по виду.

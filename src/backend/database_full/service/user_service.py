@@ -35,6 +35,13 @@ class UserService:
         self.user_repo = UserRepository()
         self.db = get_db_manager()
 
+    def complete_tutorial(self, user_id: str) -> bool:
+        """Отметить обучение пройденным."""
+        return self.user_repo.db.execute_update(
+            "UPDATE player_profiles SET tutorial_completed = 1 WHERE user_id = ?",
+            (user_id,)
+        )
+
     def get_profile(self, user_id: str) -> Optional[Dict[str, Any]]:
         """
         Получает игровой профиль пользователя.

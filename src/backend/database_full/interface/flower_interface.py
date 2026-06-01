@@ -29,6 +29,14 @@ class FlowerInterface:
         """
         self._service = FlowerService()
 
+    def set_light_level(self, plant_id: str, user_id: str, light_level: str) -> bool:
+        """Сменить уровень освещения растения."""
+        return self._service.set_light_level(plant_id, user_id, light_level)
+
+    def set_location(self, plant_id: str, user_id: str, location: str) -> bool:
+        """Сменить локацию растения."""
+        return self._service.set_location(plant_id, user_id, location)
+
 
     def get_my_garden(self, user_id: str, only_alive: bool = True) -> List[Dict[str, Any]]:
         """

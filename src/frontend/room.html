@@ -125,6 +125,10 @@
                 <div class="zoom-pot-container">
                     <img id="zoomPotImg" src="" alt="горшок" class="zoom-pot-img">
                     <img id="zoomPlantImg" src="" alt="растение" class="zoom-plant-img">
+                    <div class="watering-anim" id="wateringAnim" data-can="1">
+                        <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img" id="wateringCanImg">
+                        <div class="water-drops" id="waterDrops"></div>
+                    </div>
                 </div>
             </div>
             <div class="zoom-left-panel light-panel">
@@ -149,10 +153,6 @@
                     <div class="disease-text" id="diseaseText"></div>
                 </div>
             </div>
-        </div>
-        <div class="watering-anim" id="wateringAnim">
-            <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img" id="wateringCanImg">
-            <div class="water-drops" id="waterDrops"></div>
         </div>
     </div>
     </div>
@@ -257,11 +257,8 @@
     </div>
 </div>
 
-<!-- Уведомление -->
-<div class="notification light-notification" id="notification">
-    <span class="notif-icon"></span>
-    <span class="notif-text"></span>
-</div>
+<!-- Стек уведомлений (room.js) -->
+<div class="notification-stack" id="notificationStack" aria-live="polite"></div>
 
 <audio id="bgMusic" loop></audio>
 

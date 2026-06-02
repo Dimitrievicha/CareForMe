@@ -563,6 +563,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     align-items: flex-start;
     height: 100%;
     box-sizing: border-box;
+    overflow: visible;
 }
 
 .zoom-left {
@@ -571,6 +572,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: visible;
 }
 
 .zoom-pot-container {
@@ -581,6 +583,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     justify-content: center;
     align-items: flex-end;
     transform: translateY(calc(60 / 500 * 100cqh));
+    overflow: visible;
 }
 
 .zoom-pot-img {
@@ -726,9 +729,12 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     border: calc(1 / 1000 * 100cqw) solid #d4a373;
 }
 
-.water-btn-left:disabled {
-    opacity: 0.5;
+.water-btn-left:disabled,
+.zoom-left-panel button:disabled,
+.zoom-right-panel .desc-btn-right:disabled {
+    opacity: 0.45;
     cursor: not-allowed;
+    pointer-events: none;
 }
 
 .zoom-panel .plant-name-zoom {
@@ -796,52 +802,134 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     color: #3d2b1a;
 }
 
-.zoom-panel .watering-anim {
+/* Полив: лейка и капли привязаны к горшку в зуме */
+.zoom-pot-container .watering-anim {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 20;
+    z-index: 8;
     display: none;
+    overflow: visible;
 }
 
-.zoom-panel .watering-anim.active {
+.zoom-pot-container .watering-anim.active {
     display: block;
 }
 
-.zoom-panel .watering-can-img {
+/* Общее для всех леек */
+.zoom-pot-container .watering-can-img {
     position: absolute;
-    top: 20%;
-    left: 45%;
-    width: calc(70 / 1000 * 100cqw);
-    animation: waterCanShake 0.5s ease-in-out infinite;
+    height: auto;
+    z-index: 5;
+    animation: waterCanShake1 0.45s ease-in-out infinite;
+    filter: drop-shadow(0 calc(4 / 500 * 100cqh) calc(8 / 1000 * 100cqw) rgba(0, 0, 0, 0.2));
 }
 
-.zoom-panel .water-drops {
+.zoom-pot-container .water-drops {
     position: absolute;
-    top: 28%;
-    left: 48%;
-    width: calc(100 / 1000 * 100cqw);
-    height: calc(120 / 500 * 100cqh);
+    left: 50%;
+    width: calc(56 / 1000 * 100cqw);
+    height: calc(150 / 500 * 100cqh);
+    z-index: 6;
+    overflow: visible;
+    pointer-events: none;
 }
 
-.zoom-panel .drop {
+.zoom-pot-container .drop {
     position: absolute;
-    width: calc(4 / 1000 * 100cqw);
-    height: calc(12 / 500 * 100cqh);
-    background: #4fc3f7;
-    border-radius: calc(2 / 1000 * 100cqw);
-    animation: dropFall 0.5s linear infinite;
+    top: 0;
+    width: calc(7 / 1000 * 100cqw);
+    height: calc(16 / 500 * 100cqh);
+    background: linear-gradient(180deg, #b3e5fc 0%, #4fc3f7 55%, #29b6f6 100%);
+    border-radius: 50% 50% 50% 50% / 55% 55% 45% 45%;
+    opacity: 0.95;
+    animation: dropFall 0.6s linear infinite;
 }
 
-@keyframes waterCanShake {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-10deg); }
-    75% { transform: rotate(10deg); }
+/* ——— Лейка 1 (images/water can/лейка.png) ——— */
+.zoom-pot-container .watering-anim[data-can="1"] .watering-can-img {
+    top: calc(-155 / 500 * 100cqh);
+    left: 100%;
+    width: calc(195 / 1000 * 100cqw);
+    max-width: 93%;
+    transform: translateX(-58%) rotate(-24deg);
+    transform-origin: 72% 88%;
+    animation-name: waterCanShake1;
 }
 
-@keyframes dropFall {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(calc(60 / 500 * 100cqh)); opacity: 0; }
+.zoom-pot-container .watering-anim[data-can="1"] .water-drops {
+    top: calc(-2 / 500 * 100cqh);
+    transform: translateX(-18%);
+}
+
+.zoom-pot-container .watering-anim[data-can="1"] .drop {
+    animation-name: dropFall1;
+}
+
+/* ——— Лейка 2 (images/water can/лейка2.png) — настрой отдельно ——— */
+.zoom-pot-container .watering-anim[data-can="2"] .watering-can-img {
+    top: calc(-95 / 500 * 100cqh);
+    left: 98%;
+    width: calc(188 / 1000 * 100cqw);
+    max-width: 88%;
+    transform: translateX(-52%) rotate(-22deg);
+    transform-origin: 68% 90%;
+    animation-name: waterCanShake2;
+}
+
+.zoom-pot-container .watering-anim[data-can="2"] .water-drops {
+    top: calc(8 / 500 * 100cqh);
+    transform: translateX(-12%);
+}
+
+.zoom-pot-container .watering-anim[data-can="2"] .drop {
+    animation-name: dropFall2;
+}
+
+@keyframes waterCanShake1 {
+    0%, 100% {
+        transform: translateX(-58%) rotate(-26deg);
+    }
+    50% {
+        transform: translateX(-58%) rotate(-16deg);
+    }
+}
+
+@keyframes waterCanShake2 {
+    0%, 100% {
+        transform: translateX(-52%) rotate(-24deg);
+    }
+    50% {
+        transform: translateX(-52%) rotate(-14deg);
+    }
+}
+
+@keyframes dropFall1 {
+    0% {
+        transform: translateY(0) scale(0.85);
+        opacity: 1;
+    }
+    85% {
+        opacity: 0.85;
+    }
+    100% {
+        transform: translateY(calc(130 / 500 * 100cqh)) scale(1.05);
+        opacity: 0;
+    }
+}
+
+@keyframes dropFall2 {
+    0% {
+        transform: translateY(0) scale(0.85);
+        opacity: 1;
+    }
+    85% {
+        opacity: 0.85;
+    }
+    100% {
+        transform: translateY(calc(125 / 500 * 100cqh)) scale(1.05);
+        opacity: 0;
+    }
 }
 
 /* ОКНО ДОСТИЖЕНИЙ - КАСТОМНЫЙ ДИЗАЙН */
@@ -1123,35 +1211,89 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 /* УВЕДОМЛЕНИЯ */
-.notification {
+.notification-stack {
     position: fixed;
     bottom: 30px;
     left: 50%;
-    transform: translateX(-50%) translateY(100px);
+    transform: translateX(-50%);
+    width: min(92vw, 520px);
+    min-height: 1px;
+    z-index: 400;
+    pointer-events: none;
+}
+
+.notification-item {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
     border-radius: 12px;
-    padding: 12px 25px;
+    padding: 12px 44px 12px 20px;
     display: flex;
     align-items: center;
     gap: 12px;
     font-size: 16px;
-    z-index: 400;
-    transition: transform 0.3s ease;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-    pointer-events: none;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
+    transform: translateY(calc(100% + 16px));
+    opacity: 0;
+    transition:
+        transform 0.35s ease,
+        opacity 0.35s ease,
+        filter 0.35s ease;
 }
 
-.light-notification {
+.notification-item.light-notification {
     background: linear-gradient(135deg, #fff9f0, #fff0e0);
     border-left: 5px solid #d4a373;
     color: #5d3a1a;
 }
 
-.notification.show {
-    transform: translateX(-50%) translateY(0);
+.notification-item.is-error {
+    border-left-color: #c45c5c;
 }
 
-.notif-icon {
+.notification-item.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.notification-item.is-covered {
+    filter: blur(4px);
+    opacity: 0.55;
+    pointer-events: auto;
+}
+
+.notification-item .notif-icon {
     font-size: 20px;
+    flex-shrink: 0;
+}
+
+.notification-item .notif-text {
+    flex: 1;
+    line-height: 1.35;
+}
+
+.notification-item .notif-close {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(93, 58, 26, 0.12);
+    color: #5d3a1a;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.notification-item .notif-close:hover {
+    background: rgba(93, 58, 26, 0.22);
 }
 
 /* СКРОЛЛБАР */

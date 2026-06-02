@@ -347,6 +347,24 @@ class UserService:
         )
         return {"success": success}
 
+    _WATERING_CAN_UNLOCK_LEVELS = {"1": 1, "2": 4, "standard": 1}
+
+    def _watering_can_allowed(self, user_id: str, can_id: str) -> bool:
+        can_key = str(can_id)
+        profile = self.user_repo.get_profile(user_id)
+        level = int(profile.get('current_level', 1)) if profile else 1
+        need_level = self._WATERING_CAN_UNLOCK_LEVELS.get(can_key, 99)
+        if level >= need_level:
+            return True
+        unlocked = [str(u) for u in self.get_unlocked_watering_cans(user_id)]
+        if can_key in unlocked:
+            return True
+        if can_key == "1" and "standard" in unlocked:
+            return True
+        if can_key == "standard" and "1" in unlocked:
+            return True
+        return False
+
     def change_watering_can(self, user_id: str, can_id: str) -> Dict[str, Any]:
         """
         Сменить текущую лейку.
@@ -358,13 +376,18 @@ class UserService:
         Returns:
             Результат смены лейки
         """
-        unlocked = self.get_unlocked_watering_cans(user_id)
-        if can_id not in unlocked:
+        can_key = str(can_id)
+        if not self._watering_can_allowed(user_id, can_key):
             return {"success": False, "error": "Лейка не открыта"}
 
+        unlocked = [str(u) for u in self.get_unlocked_watering_cans(user_id)]
+        if can_key not in unlocked and not (can_key == "1" and "standard" in unlocked):
+            self.unlock_watering_can(user_id, can_key)
+
+        store_id = "1" if can_key == "standard" else can_key
         success = self.db.execute_update(
             "UPDATE player_profiles SET current_watering_can = ? WHERE user_id = ?",
-            (can_id, user_id)
+            (store_id, user_id)
         )
         return {"success": success}
 

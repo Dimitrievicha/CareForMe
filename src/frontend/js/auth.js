@@ -83,12 +83,66 @@ passwordInput.addEventListener('input', e => {
     updateBtn();
 });
 
+const NOTIFICATION_DURATION_MS = 30 * 1000;
+let notificationIdSeq = 0;
+const activeNotifications = [];
+
+function refreshNotificationLayers() {
+    activeNotifications.forEach((entry, index) => {
+        const isTop = index === activeNotifications.length - 1;
+        entry.element.classList.toggle('is-covered', !isTop);
+        entry.element.style.zIndex = String(100 + index);
+    });
+}
+
+function dismissNotification(id) {
+    const index = activeNotifications.findIndex((n) => n.id === id);
+    if (index === -1) return;
+
+    const [entry] = activeNotifications.splice(index, 1);
+    clearTimeout(entry.timer);
+
+    const removeEl = () => {
+        entry.element.remove();
+        refreshNotificationLayers();
+    };
+
+    entry.element.classList.remove('show');
+    const onEnd = (e) => {
+        if (e.propertyName !== 'transform') return;
+        entry.element.removeEventListener('transitionend', onEnd);
+        removeEl();
+    };
+    entry.element.addEventListener('transitionend', onEnd);
+    setTimeout(() => {
+        if (entry.element.isConnected) removeEl();
+    }, 400);
+}
+
 function showNotification(message, isError = true) {
-    const n = document.getElementById('notification');
-    n.querySelector('.notif-icon').textContent = isError ? '❌' : '✅';
-    n.querySelector('.notif-text').textContent = message;
-    n.classList.add('show');
-    setTimeout(() => n.classList.remove('show'), 3000);
+    const stack = document.getElementById('notificationStack');
+    if (!stack) return;
+
+    const id = ++notificationIdSeq;
+    const el = document.createElement('div');
+    el.className = 'notification-item';
+    el.dataset.notifId = String(id);
+    el.innerHTML = `
+        <span class="notif-icon">${isError ? '❌' : '✅'}</span>
+        <span class="notif-text"></span>
+        <button type="button" class="notif-close" aria-label="Закрыть уведомление">×</button>
+    `;
+    el.querySelector('.notif-text').textContent = message;
+    el.querySelector('.notif-close').addEventListener('click', () => dismissNotification(id));
+
+    stack.appendChild(el);
+    requestAnimationFrame(() => {
+        refreshNotificationLayers();
+        el.classList.add('show');
+    });
+
+    const timer = setTimeout(() => dismissNotification(id), NOTIFICATION_DURATION_MS);
+    activeNotifications.push({ id, element: el, timer });
 }
 
 async function post(url, body) {

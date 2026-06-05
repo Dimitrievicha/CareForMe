@@ -69,7 +69,7 @@ def validate_plant_data(species_id, custom_name=None):
         return False, "Не указан вид растения"
 
     if species_id not in [1, 2, 3]:
-        return False, "Неверный ID вида растения. Доступны: 1 (Спатифиллюм), 2 (Кактус), 3 (Фикус)"
+        return False, "Неверный ID вида растения. Доступны: 1 (Спатифиллум), 2 (Кактус), 3 (Фикус)"
 
     # Проверка пользовательского имени
     if custom_name:

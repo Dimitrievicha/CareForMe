@@ -147,7 +147,6 @@
                 <div class="plant-name-zoom light-name" id="zoomPlantName">Пустой горшок</div>
                 <div class="plant-stage light-stage" id="zoomStageLabel"></div>
                 <button class="desc-btn-right light-desc-btn" id="descBtnRight">Описание</button>
-                <div class="watering-info light-watering-info" id="wateringInfo"></div>
                 <div class="timer-box light-timer-box" id="waterTimerBox" style="display:none;"></div>
                 <div class="timer-box light-timer-box" id="growthTimerBox" style="display:none;"></div>
                 <div class="disease-box light-disease-box" id="diseaseBox" style="display:none;">
@@ -325,27 +324,46 @@
 <div class="modal-overlay" id="modalPlantDescription">
     <div class="tutorial-window plant-desc-window">
         <img src="images/traning/окно обучения.png" alt="Описание растения">
-        <button class="plant-desc-close-btn" id="closePlantDescBtn">✕</button>
+        <button class="achievements-close-btn plant-desc-close-btn" id="closePlantDescBtn">✕</button>
         <div class="tutorial-content plant-desc-content">
             <div class="plant-desc-text-wrapper">
-                <div class="plant-desc-icon" id="plantDescIcon">🌿</div>
+                <div class="plant-desc-icon" id="plantDescIcon">🌸</div>
                 <h2 class="plant-desc-title" id="plantDescTitle">Название растения</h2>
                 <div class="plant-desc-info" id="plantDescInfo">
                     <div class="desc-section">
-                        <h3>📖 Описание</h3>
+                        <h3>Описание:</h3>
                         <p id="plantDescDescription">Загрузка...</p>
                     </div>
-                    <div class="desc-section">
-                        <h3>💧 Полив</h3>
-                        <p id="plantDescWater">Загрузка...</p>
+                    <div class="desc-section" id="plantDescCharacterSection">
+                        <h3 id="plantDescCharacterTitle">Характер:</h3>
+                        <div id="plantDescCharacter"></div>
                     </div>
-                    <div class="desc-section">
-                        <h3>☀️ Свет</h3>
-                        <p id="plantDescLight">Загрузка...</p>
+                    <div class="desc-section" id="plantDescNeedsSection">
+                        <h3>Потребности:</h3>
+                        <div class="desc-subsection">
+                            <p class="desc-point-title">Полив:</p>
+                            <p class="desc-point-text" id="plantDescWater">Загрузка...</p>
+                        </div>
+                        <div class="desc-subsection">
+                            <p class="desc-point-title">Свет:</p>
+                            <p class="desc-point-text" id="plantDescLight">Загрузка...</p>
+                        </div>
                     </div>
-                    <div class="desc-section">
-                        <h3>💡 Советы</h3>
-                        <p id="plantDescTips">Загрузка...</p>
+                    <div class="desc-section" id="plantDescFeaturesSection">
+                        <h3>Особенности:</h3>
+                        <div class="desc-subsection" id="plantDescSymptomsBlock">
+                            <p class="desc-point-title">Симптомы неправильного ухода:</p>
+                            <ul class="plant-desc-list plant-desc-symptoms" id="plantDescSymptoms"></ul>
+                        </div>
+                        <div class="desc-subsection" id="plantDescExtraFeatures"></div>
+                        <div class="desc-subsection" id="plantDescFloweringBlock">
+                            <p class="desc-point-title">Цветение:</p>
+                            <div class="desc-point-text" id="plantDescFlowering"></div>
+                        </div>
+                    </div>
+                    <div class="desc-section" id="plantDescAdviceSection">
+                        <h3>Советы:</h3>
+                        <ul class="plant-desc-list plant-desc-advice" id="plantDescAdvice"></ul>
                     </div>
                 </div>
             </div>

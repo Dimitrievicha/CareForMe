@@ -156,6 +156,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 .quests-list {
     max-height: calc(300 / 720 * 100cqh);
     overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 .quest-item {
@@ -1089,6 +1090,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     gap: clamp(10px, 3vw, 30px);
     overflow-y: auto;
     padding: clamp(6px, 1.5vw, 15px);
+    scroll-behavior: smooth;
 }
 
 .achievements-grid-custom::-webkit-scrollbar {
@@ -1256,6 +1258,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     padding: 12% 12% 8% 12%;
     box-sizing: border-box;
     overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 /* Контейнер для текста и точек */
@@ -1649,29 +1652,11 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     overflow: visible;
 }
 
-.plant-desc-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(255, 248, 235, 0.95);
-    border: 2px solid #d4a373;
-    color: #5d3a1a;
-    font-size: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.plant-desc-close-btn:hover {
-    transform: scale(1.1);
-    background: rgba(255, 200, 150, 0.95);
+.plant-desc-window .plant-desc-close-btn {
+    top: -2%;
+    right: -5%;
+    z-index: 30;
+    pointer-events: auto;
 }
 
 .plant-desc-content {
@@ -1686,17 +1671,20 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     align-items: center;
     padding: 15% 12% 10% 12%;
     box-sizing: border-box;
-    /* Убираем overflow-y: auto отсюда */
-    overflow-y: visible;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .plant-desc-text-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
     width: 100%;
     text-align: center;
-    /* Добавляем сюда скролл */
-    max-height: 100%;
     overflow-y: auto;
     padding-right: 5px;
+    pointer-events: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .plant-desc-icon {
@@ -1705,8 +1693,8 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .plant-desc-title {
-    color: #5d3a1a;
-    font-size: 24px;
+    color: #3a1f0a;
+    font-size: 26px;
     font-weight: bold;
     margin-bottom: 20px;
     border-bottom: 2px solid #d4a373;
@@ -1730,16 +1718,129 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     margin-bottom: 18px;
 }
 
-.plant-desc-info .desc-section h3 {
-    color: #d4a373;
-    font-size: 16px;
-    margin-bottom: 6px;
+.plant-desc-info .desc-section h3,
+.plant-desc-info .desc-point-title {
+    color: #3a1f0a;
     font-weight: bold;
 }
 
-.plant-desc-info .desc-section p {
+.plant-desc-info .desc-section h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+}
+
+.plant-desc-info .desc-point-title {
+    font-size: 16px;
+}
+
+.plant-desc-info .desc-point-text,
+.plant-desc-info .desc-section p:not(.desc-point-title),
+.plant-desc-info #plantDescCharacter {
     color: #3d2b1a;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.45;
+    font-weight: normal;
+}
+
+.plant-desc-info .desc-subsection {
+    margin-bottom: 12px;
+}
+
+.plant-desc-info #plantDescExtraFeatures .plant-desc-feature-block {
+    margin-bottom: 12px;
+}
+
+.plant-desc-info #plantDescExtraFeatures .plant-desc-feature-block:last-child {
+    margin-bottom: 0;
+}
+
+.plant-desc-info .desc-subsection:last-child {
+    margin-bottom: 0;
+}
+
+.plant-desc-info .desc-section p:not(.desc-point-title) {
     margin: 0;
+}
+
+.plant-desc-info .desc-point-title {
+    margin: 0 0 6px;
+}
+
+.plant-desc-info #plantDescCharacter {
+    margin: 0;
+}
+
+.plant-desc-info #plantDescFlowering {
+    margin: 0;
+}
+
+.plant-desc-flowering-prefix,
+.plant-desc-flowering-intro,
+.plant-desc-flowering-footer,
+.plant-desc-flowering-plain {
+    margin: 0;
+    color: #3d2b1a;
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.plant-desc-flowering-prefix,
+.plant-desc-flowering-intro {
+    margin-bottom: 8px;
+}
+
+.plant-desc-flowering-footer {
+    margin-top: 8px;
+}
+
+.plant-desc-numbered-list {
+    margin: 0 0 0 18px;
+    padding: 0;
+    text-align: left;
+    list-style: decimal;
+}
+
+.plant-desc-numbered-list li {
+    color: #3d2b1a;
+    font-size: 15px;
+    line-height: 1.45;
+    margin-bottom: 6px;
+    padding-left: 4px;
+}
+
+.plant-desc-numbered-list li:last-child {
+    margin-bottom: 0;
+}
+
+.plant-desc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.plant-desc-list li {
+    color: #3d2b1a;
+    font-size: 15px;
+    line-height: 1.45;
+    margin-bottom: 8px;
+    padding-left: 14px;
+    position: relative;
+}
+
+.plant-desc-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #3a1f0a;
+}
+
+.plant-desc-list li:last-child {
+    margin-bottom: 0;
+}
+
+.plant-desc-symptom-title {
+    color: #3a1f0a;
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }

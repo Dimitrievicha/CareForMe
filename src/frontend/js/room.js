@@ -472,6 +472,48 @@ async function checkAuth() {
     }
 }
 
+const PLANT_CATALOG_EXTRAS = {
+    1: {
+        description: 'Нежный тропический гость с темно-зелеными листьями и изящными белыми цветами, напоминающими флаги. Говорят, он приносит в дом гармонию.',
+        character_description: 'Спатифиллум очень чувствителен к переменам. Он не прощает грубых ошибок (сквозняков, пересыхания корней), но при этом "кричит" о своих проблемах громче всех. Будь внимательным, ухаживать за ним проще всего.',
+        why_disease: 'Сохнут кончики листьев: Слишком сухой воздух или недостаточный полив.|Листья желтеют: Перелив или солнечный ожог.|Листья чернеют: Перелив, холод или неправильно подобранный грунт.|Не цветет: Слишком темное место, большой горшок или нехватка питательных веществ.'
+    },
+    2: {
+        description: 'Пухлый зеленый шар с выраженными ребрами и крепкими колючками. В дикой природе выживает в самых суровых условиях пустыни. В награду за правильный уход дарит ослепительно красивые цветы.',
+        character_description: 'Кактус может простить вашу забывчивость. Лучшее, что вы можете сделать для кактуса - иногда оставить его в покое. Он не требует ежедневного внимания, но обожает солнце.',
+        why_disease: 'Мягкий и сморщенный стебель: Признак обезвоживания или, чаще, гниения корней из-за перелива.|Желтые или коричневые пятна: Свидетельствуют о солнечном ожоге или грибковом заболевании из-за высокой влажности.|Черные сухие пятна и потеря колючек: Признак черной гнили, поражающей растение при неправильном поливе или инфекции.|Вытягивание и бледность стебля: Растению не хватает света.|Отсутствие роста и цветения: Причина в нарушении периода покоя (зимовки) или нехватке света, полива и питательных веществ.',
+        flowering_conditions: 'Цветок появляется на макушке и живет недолго, что создает элемент коллекционирования.|Кактус цветет только при соблюдении трех условий:|Яркий свет|Период "зимней спячки" (снижение полива до минимума)|Достижение зрелого возраста'
+    },
+    3: {
+        description: 'Величественное дерево в миниатюре с плотными, блестящими листьями. Символ стабильности и уюта. В правильных условиях растет очень быстро, радуя глаз новой зеленью. Будет требовать последовательности и предсказуемости.',
+        character_description: 'Фикус растет медленно, но верно. Он не любит, когда его тревожат (переставляют с места на место). Если создать ему стабильные условия, он будет расти большим и красивым.',
+        why_disease: 'Опадание листьев (листопад): Резкая смена места, сквозняк, перепад температур, недостаток света или стресс.|Желтеют листья: Перелив (корни загнивают) или, наоборот, пересушивание земляного кома.|Пятна на листьях: Коричневые/ржавые пятна: Часто свидетельствуют о солнечном ожоге или избытке удобрений.|Сухие кончики: Недостаточная влажность воздуха, слишком сухо в помещении.|Увядание и поникшие листья: Корневая гниль из-за перелива — корни не дышат и не впитывают воду.|Появление вредителей: Белый рыхлый налет (мучнистый червец) или темный налет.|Новые листья не появляются или мелкие: Недостаток питания.',
+        flowering_conditions: 'FEATURES||Стресс от перемещения::Если игрок меняет локацию для фикуса, он впадает в шок на 1-2 игровых дня: начинает сбрасывать листья, даже если полив идеален. Это учит игрока планировать расположение сада.||Рост::Фикус дает новые листья из верхушки. Визуально это выглядит как разворачивающийся красноватый "чехольчик", что создает приятный эффект прогресса.'
+    }
+};
+
+function mergePlantCatalogExtras(plants) {
+    Object.entries(PLANT_CATALOG_EXTRAS).forEach(([id, extras]) => {
+        const numericId = Number(id);
+        const plant = plants[id] || plants[numericId]
+            || Object.values(plants).find((entry) => Number(entry.id) === numericId);
+        if (!plant) return;
+        if (extras.description) {
+            plant.description = extras.description;
+            plant.fullDescription = extras.description;
+        }
+        if (extras.character_description) {
+            plant.character_description = extras.character_description;
+        }
+        if (extras.flowering_conditions) {
+            plant.flowering_conditions = extras.flowering_conditions;
+        }
+        if (extras.why_disease) {
+            plant.why_disease = extras.why_disease;
+        }
+    });
+}
+
 async function loadPlantsCatalog() {
     try {
         const response = await fetch(`${API_BASE_URL}/plants/catalog`, {
@@ -499,9 +541,10 @@ async function loadPlantsCatalog() {
                     nickname: plant.nickname || '',
                     description: plant.description || 'Описание отсутствует',
                     character_trait: plant.character_trait || '',
+                    character_description: plant.character_description || '',
                     waterAdvice: plant.watering_advice || 'Поливай по графику',
                     lightAdvice: plant.light_advice || 'Обеспечь правильное освещение',
-                    tips: Array.isArray(plant.tips) ? plant.tips.join(' ') : (plant.tips || 'Бережный уход - залог здоровья'),
+                    tips: Array.isArray(plant.tips) ? plant.tips.join('|') : (plant.tips || 'Бережный уход - залог здоровья'),
                     waterIntervalMin: plant.water_interval_min || 24,
                     waterIntervalMax: plant.water_interval_max || 48,
                     unlockLevel: plant.unlock_level || 1,  // ← ДОБАВИТЬ ЭТУ СТРОКУ
@@ -516,12 +559,15 @@ async function loadPlantsCatalog() {
                     light_advice: plant.light_advice || '',
                     fullDescription: plant.description || '',
                     tips_array: plant.tips || [],
+                    advice_list: normalizeTipsLines(plant.tips || []),
                     symptoms: plant.symptoms || [],
+                    why_disease: plant.why_disease || '',
                     flowering_conditions: plant.flowering_conditions || ''
                 };
                 ensurePlantDiseaseAssets(plants[plantId], sid);
             });
             PLANTS = plants;
+            mergePlantCatalogExtras(PLANTS);
             console.log('✅ Растения загружены:', PLANTS);
             return true;
         }
@@ -652,16 +698,35 @@ function setDefaultPlants() {
             deadImage: 'images/plant/spathiphyllum/stage/спатифиллум умер.png',
             waterIntervalMin: 24,
             waterIntervalMax: 48,
-            description: 'Нежный тропический гость с темно-зелеными листьями.',
-            waterAdvice: 'Поливай раз в 1–2 дня, поддерживая почву слегка влажной.',
-            lightAdvice: 'Не ставь под прямые солнечные лучи — будет ожог.',
-            tips: 'Листья опустились? Срочно полей.',
+            description: 'Нежный тропический гость с темно-зелеными листьями и изящными белыми цветами, напоминающими флаги. Говорят, он приносит в дом гармонию.',
+            fullDescription: 'Нежный тропический гость с темно-зелеными листьями и изящными белыми цветами, напоминающими флаги. Говорят, он приносит в дом гармонию.',
+            character_trait: 'Чуткий перфекционист',
+            character_description: 'Спатифиллум очень чувствителен к переменам. Он не прощает грубых ошибок (сквозняков, пересыхания корней), но при этом "кричит" о своих проблемах громче всех. Будь внимательным, ухаживать за ним проще всего.',
+            waterAdvice: 'Частый, но умеренный. Любит, чтобы земля всегда была слегка влажной. Поливай раз в 1-2 дня, но будь осторожен, перелив для него опаснее, чем кратковременная засуха.',
+            watering_advice: 'Частый, но умеренный. Любит, чтобы земля всегда была слегка влажной. Поливай раз в 1-2 дня, но будь осторожен, перелив для него опаснее, чем кратковременная засуха.',
+            lightAdvice: 'Не переносит прямые солнечные лучи, предпочитает рассеянный свет или полутень.',
+            light_advice: 'Не переносит прямые солнечные лучи, предпочитает рассеянный свет или полутень.',
+            tips: 'Листья опустились? Срочно полей - через час снова будет бодр.|Прямые солнечные лучи вызывают ожоги. Поставь горшок дальше от окна или притени.|Кончики листьев сохнут? Опрыскивай из пульверизатора - он любит влажность.|Листья почернели? Переставь в более тёплое место. Возможно, ты его перелил',
+            tips_array: [
+                'Листья опустились? Срочно полей - через час снова будет бодр.',
+                'Прямые солнечные лучи вызывают ожоги. Поставь горшок дальше от окна или притени.',
+                'Кончики листьев сохнут? Опрыскивай из пульверизатора - он любит влажность.',
+                'Листья почернели? Переставь в более тёплое место. Возможно, ты его перелил'
+            ],
+            advice_list: [
+                'Листья опустились? Срочно полей - через час снова будет бодр.',
+                'Прямые солнечные лучи вызывают ожоги. Поставь горшок дальше от окна или притени.',
+                'Кончики листьев сохнут? Опрыскивай из пульверизатора - он любит влажность.',
+                'Листья почернели? Переставь в более тёплое место. Возможно, ты его перелил'
+            ],
+            why_disease: 'Сохнут кончики листьев: Слишком сухой воздух или недостаточный полив.|Листья желтеют: Перелив или солнечный ожог.|Листья чернеют: Перелив, холод или неправильно подобранный грунт.|Не цветет: Слишком темное место, большой горшок или нехватка питательных веществ.',
+            flowering_conditions: 'Выпускает белый "парус" цветка только тогда, когда освещение идеальное (не темно и не ярко), а полив стабилен.',
             unlockLevel: 1,
             plantFolder: 'spathiphyllum'
         },
         2: {
             id: 2,
-            name: 'Кактус',
+            name: 'Кактус Корифанта',
             nickname: 'Колючий стоик',
             stages: {
                 1: 'images/plant/cactus/stage/росток.png',
@@ -675,10 +740,31 @@ function setDefaultPlants() {
             deadImage: 'images/plant/cactus/stage/кактус умер.png',
             waterIntervalMin: 168,
             waterIntervalMax: 240,
-            description: 'Пухлый зеленый шар с выраженными ребрами и крепкими колючками.',
-            waterAdvice: 'Забудь про частые поливы! Дай земле полностью просохнуть.',
-            lightAdvice: 'Нуждается в ярком освещении 6–8 часов в день.',
-            tips: 'Тельце стало мягким и потемнело у корней? Это перелив.',
+            description: 'Пухлый зеленый шар с выраженными ребрами и крепкими колючками. В дикой природе выживает в самых суровых условиях пустыни. В награду за правильный уход дарит ослепительно красивые цветы.',
+            fullDescription: 'Пухлый зеленый шар с выраженными ребрами и крепкими колючками. В дикой природе выживает в самых суровых условиях пустыни. В награду за правильный уход дарит ослепительно красивые цветы.',
+            character_trait: 'Выносливый отшельник',
+            character_description: 'Кактус может простить вашу забывчивость. Лучшее, что вы можете сделать для кактуса - иногда оставить его в покое. Он не требует ежедневного внимания, но обожает солнце.',
+            waterAdvice: 'Очень редкий. Поливай раз в 7-10 игровых дней. Нужно проверять почву на полную сухость.',
+            watering_advice: 'Очень редкий. Поливай раз в 7-10 игровых дней. Нужно проверять почву на полную сухость.',
+            lightAdvice: 'Очень любит свет. Нуждается в ярком освещении (около 6-8 часов в день), иначе перестает расти и не цветет.',
+            light_advice: 'Очень любит свет. Нуждается в ярком освещении (около 6-8 часов в день), иначе перестает расти и не цветет.',
+            tips: 'Забудь про частые поливы! Дай земле полностью просохнуть. Зимой полив сократи до минимума.|Тельце стало мягким и потемнело у корней? Это перелив. Спасти может только пересадка в сухую почву.|Хочешь увидеть цветение? Поставь на самое солнечное окно, устрой прохладную «зимовку» с редким поливом. Цветы появятся весной.|Появились чёрные сухие пятна, а колючки исчезли? Это инфекция от перелива. Нужна пересадка.|Стал слишком бледным? Поставь на солнышко - оживёт.',
+            tips_array: [
+                'Забудь про частые поливы! Дай земле полностью просохнуть. Зимой полив сократи до минимума.',
+                'Тельце стало мягким и потемнело у корней? Это перелив. Спасти может только пересадка в сухую почву.',
+                'Хочешь увидеть цветение? Поставь на самое солнечное окно, устрой прохладную «зимовку» с редким поливом. Цветы появятся весной.',
+                'Появились чёрные сухие пятна, а колючки исчезли? Это инфекция от перелива. Нужна пересадка.',
+                'Стал слишком бледным? Поставь на солнышко - оживёт.'
+            ],
+            advice_list: [
+                'Забудь про частые поливы! Дай земле полностью просохнуть. Зимой полив сократи до минимума.',
+                'Тельце стало мягким и потемнело у корней? Это перелив. Спасти может только пересадка в сухую почву.',
+                'Хочешь увидеть цветение? Поставь на самое солнечное окно, устрой прохладную «зимовку» с редким поливом. Цветы появятся весной.',
+                'Появились чёрные сухие пятна, а колючки исчезли? Это инфекция от перелива. Нужна пересадка.',
+                'Стал слишком бледным? Поставь на солнышко - оживёт.'
+            ],
+            why_disease: 'Мягкий и сморщенный стебель: Признак обезвоживания или, чаще, гниения корней из-за перелива.|Желтые или коричневые пятна: Свидетельствуют о солнечном ожоге или грибковом заболевании из-за высокой влажности.|Черные сухие пятна и потеря колючек: Признак черной гнили, поражающей растение при неправильном поливе или инфекции.|Вытягивание и бледность стебля: Растению не хватает света.|Отсутствие роста и цветения: Причина в нарушении периода покоя (зимовки) или нехватке света, polива и питательных веществ.',
+            flowering_conditions: 'Цветок появляется на макушке и живет недолго, что создает элемент коллекционирования.|Кактус цветет только при соблюдении трех условий:|Яркий свет|Период "зимней спячки" (снижение полива до минимума)|Достижение зрелого возраста',
             unlockLevel: 3,
             plantFolder: 'cactus'
         },
@@ -698,14 +784,34 @@ function setDefaultPlants() {
             deadImage: 'images/plant/ficus/stage/фикус умер.png',
             waterIntervalMin: 72,
             waterIntervalMax: 96,
-            description: 'Величественное дерево в миниатюре с плотными листьями.',
-            waterAdvice: 'Поливай раз в 3–4 дня, по мере просыхания верхнего слоя почвы.',
-            lightAdvice: 'Не хватает света? Поставь ближе к окну.',
-            tips: 'Сбрасывает листья? Не любит сквозняков.',
+            description: 'Величественное дерево в миниатюре с плотными, блестящими листьями. Символ стабильности и уюта. В правильных условиях растет очень быстро, радуя глаз новой зеленью. Будет требовать последовательности и предсказуемости.',
+            fullDescription: 'Величественное дерево в миниатюре с плотными, блестящими листьями. Символ стабильности и уюта. В правильных условиях растет очень быстро, радуя глаз новой зеленью. Будет требовать последовательности и предсказуемости.',
+            character_trait: 'Консервативный стратег',
+            character_description: 'Фикус растет медленно, но верно. Он не любит, когда его тревожат (переставляют с места на место). Если создать ему стабильные условия, он будет расти большим и красивым.',
+            waterAdvice: 'Умеренный, по мере просыхания верхнего слоя почвы (на 2-3 см). Поливай раз в 3-4 дня. Перелив вызывает сбрасывание листьев. Пересушка тоже вызывает сбрасывание листьев.',
+            watering_advice: 'Умеренный, по мере просыхания верхнего слоя почвы (на 2-3 см). Поливай раз в 3-4 дня. Перелив вызывает сбрасывание листьев. Пересушка тоже вызывает сбрасывание листьев.',
+            lightAdvice: 'Яркий, но рассеянный. Пестролистные формы требуют больше света, иначе теряют рисунок.',
+            light_advice: 'Яркий, но рассеянный. Пестролистные формы требуют больше света, иначе теряют рисунок.',
+            tips: 'Сбрасывает листья? Подумай, что изменилось. Возможно, его переставили или поливают слишком холодной водой.|Листья теряют пёстрый узор и становятся зелёными? Не хватает света. Поставь ближе к окну (но не под прямые лучи).|Листья пожелтели? Потрогай почву: возможно, перелив или пересушка.|Кончики стали сухими? Цветку не хватает влаги.',
+            tips_array: [
+                'Сбрасывает листья? Подумай, что изменилось. Возможно, его переставили или поливают слишком холодной водой.',
+                'Листья теряют пёстрый узор и становятся зелёными? Не хватает света. Поставь ближе к окну (но не под прямые лучи).',
+                'Листья пожелтели? Потрогай почву: возможно, перелив или пересушка.',
+                'Кончики стали сухими? Цветку не хватает влаги.'
+            ],
+            advice_list: [
+                'Сбрасывает листья? Подумай, что изменилось. Возможно, его переставили или поливают слишком холодной водой.',
+                'Листья теряют пёстрый узор и становятся зелёными? Не хватает света. Поставь ближе к окну (но не под прямые лучи).',
+                'Листья пожелтели? Потрогай почву: возможно, перелив или пересушка.',
+                'Кончики стали сухими? Цветку не хватает влаги.'
+            ],
+            why_disease: 'Опадание листьев (листопад): Резкая смена места, сквозняк, перепад температур, недостаток света или стресс.|Желтеют листья: Перелив (корни загнивают) или, наоборот, пересушивание земляного кома.|Пятна на листьях: Коричневые/ржавые пятна: Часто свидетельствуют о солнечном ожоге или избытке удобрений.|Сухие кончики: Недостаточная влажность воздуха, слишком сухо в помещении.|Увядание и поникшие листья: Корневая гниль из-за перелива — корни не дышат и не впитывают воду.|Появление вредителей: Белый рыхлый налет (мучнистый червец) или темный налет.|Новые листья не появляются или мелкие: Недостаток питания.',
+            flowering_conditions: 'FEATURES||Стресс от перемещения::Если игрок меняет локацию для фикуса, он впадает в шок на 1-2 игровых дня: начинает сбрасывать листья, даже если полив идеален. Это учит игрока планировать расположение сада.||Рост::Фикус дает новые листья из верхушки. Визуально это выглядит как разворачивающийся красноватый "чехольчик", что создает приятный эффект прогресса.',
             unlockLevel: 5,
             plantFolder: 'ficus'
         }
     };
+    mergePlantCatalogExtras(PLANTS);
 }
 
 function setDefaultPots() {
@@ -824,6 +930,43 @@ function closeModal(el) {
     if (el) el.classList.remove('active');
     if (el === zoomOverlay) stopZoomTimerTick();
 }
+
+function getWheelScrollDelta(e, scrollEl) {
+    if (e.deltaMode === 1) return e.deltaY * 16;
+    if (e.deltaMode === 2) return e.deltaY * scrollEl.clientHeight;
+    return e.deltaY;
+}
+
+function wheelScrollBy(scrollEl, delta) {
+    const maxTop = Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
+    scrollEl.scrollTop = Math.max(0, Math.min(maxTop, scrollEl.scrollTop + delta));
+}
+
+const WHEEL_SCROLL_LAYERS = [
+    { overlayId: 'modalPlantDescription', scrollSelector: '.plant-desc-text-wrapper' },
+    { overlayId: 'tutorialOverlay', scrollSelector: '.tutorial-content' },
+    { overlayId: 'modalAchievements', scrollSelector: '.achievements-grid-custom' },
+];
+
+function getActiveWheelScrollTarget() {
+    for (const { overlayId, scrollSelector } of WHEEL_SCROLL_LAYERS) {
+        const overlay = document.getElementById(overlayId);
+        if (!overlay?.classList.contains('active')) continue;
+        const scrollEl = overlay.querySelector(scrollSelector);
+        if (scrollEl && scrollEl.scrollHeight > scrollEl.clientHeight) return scrollEl;
+    }
+    if (document.querySelector('.modal-overlay.active, .tutorial-overlay.active')) return null;
+    const questsList = document.querySelector('.quests-list');
+    if (questsList && questsList.scrollHeight > questsList.clientHeight) return questsList;
+    return null;
+}
+
+document.addEventListener('wheel', (e) => {
+    const scrollEl = getActiveWheelScrollTarget();
+    if (!scrollEl) return;
+    e.preventDefault();
+    wheelScrollBy(scrollEl, getWheelScrollDelta(e, scrollEl));
+}, { passive: false });
 
 function stopZoomTimerTick() {
     if (zoomTimerTickId !== null) {
@@ -2641,7 +2784,13 @@ function renderSlot(slotEl, data) {
 }
 
 function updateGrowthTimer(data) {
-    if (!data || !data.plant || isPlantDead(data) || data.stage >= 2) {
+    if (!data || !data.plant || !data.plantedAt || isPlantDead(data) || data.stage >= 2) {
+        const timerBox = document.getElementById('growthTimerBox');
+        if (timerBox) timerBox.style.display = 'none';
+        return;
+    }
+
+    if (data.hasDisease && data.stage === 1) {
         const timerBox = document.getElementById('growthTimerBox');
         if (timerBox) timerBox.style.display = 'none';
         return;
@@ -2773,8 +2922,6 @@ function showDescription(plantKey) {
             <p>${plant.waterAdvice}</p>
             <h4>☀️ Свет</h4>
             <p>${plant.lightAdvice}</p>
-            <h4>💡 Советы</h4>
-            <p>${plant.tips}</p>
         </div>
     `;
 
@@ -2930,9 +3077,10 @@ function openZoom(slotEl, name, data) {
         if (descriptionBox) descriptionBox.style.display = 'none';
 
         setZoomControlsForPlantState(data);
-        updateWateringInfo(data);
         updateDiseaseInfo(data);
         showFixAdvice(data);
+        updateGrowthTimer(data);
+        updateNextWateringTimer(data);
         if (!isPlantDead(data)) {
             startZoomTimerTick();
         } else {
@@ -2964,9 +3112,6 @@ function openZoom(slotEl, name, data) {
         }
         if (descriptionBox) descriptionBox.style.display = 'none';
 
-        const wateringInfo = document.getElementById('wateringInfo');
-        if (wateringInfo) wateringInfo.innerHTML = '';
-
         const growthTimerBox = document.getElementById('growthTimerBox');
         if (growthTimerBox) growthTimerBox.style.display = 'none';
 
@@ -2986,37 +3131,6 @@ function openZoom(slotEl, name, data) {
     if (wateringAnim) wateringAnim.classList.remove('active');
 
     openModal(zoomOverlay);
-}
-
-function updateWateringInfo(data) {
-    const infoEl = document.getElementById('wateringInfo');
-    if (!infoEl) return;
-    if (!data.plant || data.stage >= 2 || !PLANTS[data.plant]) { infoEl.innerHTML = ''; return; }
-
-    const plant = PLANTS[data.plant];
-    const minDays = plant.waterIntervalMin / 24;
-    const maxDays = plant.waterIntervalMax / 24;
-    const now = Date.now();
-    let statusHTML = '';
-
-    if (data.lastWateredAt) {
-        const hoursAgo = (now - data.lastWateredAt) / 3600000;
-        if (hoursAgo < plant.waterIntervalMin) {
-            const hoursLeft = plant.waterIntervalMin - hoursAgo;
-            statusHTML = `<span class="water-ok">💧 Следующий полив через ~${Math.ceil(hoursLeft)}ч</span>`;
-        } else if (hoursAgo <= plant.waterIntervalMax) {
-            statusHTML = `<span class="water-ready">⏰ Пора поливать!</span>`;
-        } else {
-            statusHTML = `<span class="water-danger">⚠️ Засыхает! Полей немедленно!</span>`;
-        }
-    } else {
-        statusHTML = `<span class="water-ready">🌱 Нужен первый полив!</span>`;
-    }
-    infoEl.innerHTML = `<div class="watering-schedule">
-        <div class="schedule-title">График полива: каждые ${minDays}–${maxDays} дней</div>
-        <div class="schedule-status">${statusHTML}</div>
-        <div class="schedule-advice">${plant.waterAdvice}</div>
-    </div>`;
 }
 
 const zoomClose = document.getElementById('zoomClose');
@@ -3168,8 +3282,8 @@ if (waterBtnLeft) {
             if (!data.hasDisease) showPositiveTip('idealWater');
 
             renderSlot(slotEl, data);
-            updateWateringInfo(data);
             updateNextWateringTimer(data);
+            updateGrowthTimer(data);
 
             updateZoomPlantVisual(data);
 
@@ -3928,13 +4042,328 @@ const closePlantDescBtn = document.getElementById('closePlantDescBtn');
 const plantDescIcon = document.getElementById('plantDescIcon');
 const plantDescTitle = document.getElementById('plantDescTitle');
 const plantDescDescription = document.getElementById('plantDescDescription');
+const plantDescCharacter = document.getElementById('plantDescCharacter');
+const plantDescCharacterTitle = document.getElementById('plantDescCharacterTitle');
+const plantDescCharacterSection = document.getElementById('plantDescCharacterSection');
 const plantDescWater = document.getElementById('plantDescWater');
 const plantDescLight = document.getElementById('plantDescLight');
-const plantDescTips = document.getElementById('plantDescTips');
+const plantDescSymptoms = document.getElementById('plantDescSymptoms');
+const plantDescSymptomsBlock = document.getElementById('plantDescSymptomsBlock');
+const plantDescExtraFeatures = document.getElementById('plantDescExtraFeatures');
+const plantDescFlowering = document.getElementById('plantDescFlowering');
+const plantDescFloweringBlock = document.getElementById('plantDescFloweringBlock');
+const plantDescFeaturesSection = document.getElementById('plantDescFeaturesSection');
+const plantDescAdvice = document.getElementById('plantDescAdvice');
+const plantDescAdviceSection = document.getElementById('plantDescAdviceSection');
+const plantDescNeedsSection = document.getElementById('plantDescNeedsSection');
+
+function escapePlantDescHtml(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function normalizeTipsLines(input) {
+    if (input == null || input === '') return [];
+    const rawItems = Array.isArray(input) ? input : [input];
+    return rawItems
+        .flatMap((item) => String(item).replace(/\\n/g, '\n').split(/\r?\n|\|/))
+        .map((line) => line.trim().replace(/^[•\-–—]\s*/, ''))
+        .filter(Boolean);
+}
+
+function splitCharacterAndAdvice(tipsArray) {
+    if (!Array.isArray(tipsArray) || !tipsArray.length) {
+        return { characterBody: '', advice: [] };
+    }
+    const cleaned = normalizeTipsLines(tipsArray);
+    if (cleaned.length === 1 && !cleaned[0].includes('?')) {
+        return { characterBody: cleaned[0], advice: [] };
+    }
+    if (cleaned.length > 1 && !cleaned[0].includes('?')) {
+        return { characterBody: cleaned[0], advice: cleaned.slice(1) };
+    }
+    return { characterBody: '', advice: cleaned };
+}
+
+function getPlantTipsArray(plant) {
+    if (Array.isArray(plant.advice_list) && plant.advice_list.length) {
+        return normalizeTipsLines(plant.advice_list);
+    }
+    if (Array.isArray(plant.tips_array) && plant.tips_array.length) {
+        return normalizeTipsLines(plant.tips_array);
+    }
+    if (typeof plant.tips === 'string' && plant.tips.trim()) {
+        return normalizeTipsLines(plant.tips);
+    }
+    return [];
+}
+
+function getPlantAdviceItems(plant) {
+    if (Array.isArray(plant.advice_list) && plant.advice_list.length) {
+        return normalizeTipsLines(plant.advice_list);
+    }
+    const { advice } = splitCharacterAndAdvice(getPlantTipsArray(plant));
+    return normalizeTipsLines(advice);
+}
+
+function parseSymptomEntries(text) {
+    if (!text) return [];
+    return text.split('|').map((entry) => entry.trim()).filter(Boolean);
+}
+
+function parsePlantFeatureBlocks(text) {
+    const value = String(text || '').trim();
+    if (!value.startsWith('FEATURES||')) return [];
+    return value.slice('FEATURES||'.length).split('||').map((block) => {
+        const idx = block.indexOf('::');
+        if (idx === -1) return null;
+        return {
+            title: block.slice(0, idx).trim(),
+            text: block.slice(idx + 2).trim()
+        };
+    }).filter(Boolean);
+}
+
+function renderPlantDescExtraFeatures(blocks) {
+    if (!plantDescExtraFeatures) return;
+    if (!blocks.length) {
+        plantDescExtraFeatures.innerHTML = '';
+        plantDescExtraFeatures.style.display = 'none';
+        return;
+    }
+    plantDescExtraFeatures.style.display = '';
+    plantDescExtraFeatures.innerHTML = blocks.map((block) => (
+        `<div class="desc-subsection plant-desc-feature-block">`
+        + `<p class="desc-point-title">${escapePlantDescHtml(block.title)}:</p>`
+        + `<p class="desc-point-text">${escapePlantDescHtml(block.text)}</p>`
+        + `</div>`
+    )).join('');
+}
+
+function getPlantDescriptionText(plant) {
+    const extras = PLANT_CATALOG_EXTRAS[plant.id];
+    if (extras?.description) return extras.description;
+
+    let text = (plant.description || plant.fullDescription || '').trim();
+    const charTailPatterns = [
+        /\s*Спатифилл(?:лю|)м\s+очень\s+чувствителен[\s\S]*$/i,
+        /\s*Кактус\s+может\s+простить[\s\S]*$/i
+    ];
+    for (const pattern of charTailPatterns) {
+        const match = text.match(pattern);
+        if (match) {
+            text = text.slice(0, match.index).trim();
+            break;
+        }
+    }
+
+    const charBody = (plant.character_description || '').trim();
+    if (charBody && text.includes(charBody)) {
+        text = text.replace(charBody, '').trim();
+    }
+
+    return text.replace(/\s{2,}/g, ' ').trim() || 'Описание отсутствует';
+}
+
+function renderPlantDescCharacter(plant) {
+    if (!plantDescCharacterSection) return;
+    const trait = (plant.character_trait || '').trim();
+    const { characterBody } = splitCharacterAndAdvice(getPlantTipsArray(plant));
+    const body = (plant.character_description || characterBody || '').trim();
+
+    if (plantDescCharacterTitle) {
+        plantDescCharacterTitle.textContent = trait ? `Характер — ${trait}:` : 'Характер:';
+    }
+
+    if (!trait && !body) {
+        plantDescCharacterSection.style.display = 'none';
+        if (plantDescCharacter) plantDescCharacter.textContent = '';
+        return;
+    }
+
+    plantDescCharacterSection.style.display = '';
+    if (plantDescCharacter) plantDescCharacter.textContent = body;
+}
+
+function renderPlantDescNeeds(plant) {
+    const water = plant.watering_advice || plant.waterAdvice || '';
+    const light = plant.light_advice || plant.lightAdvice || '';
+    if (plantDescWater) plantDescWater.textContent = water || '—';
+    if (plantDescLight) plantDescLight.textContent = light || '—';
+    if (plantDescNeedsSection) {
+        plantDescNeedsSection.style.display = (water || light) ? '' : 'none';
+    }
+}
+
+function renderPlantDescSymptoms(entries) {
+    if (!plantDescSymptoms || !plantDescSymptomsBlock) return;
+    if (!entries.length) {
+        plantDescSymptomsBlock.style.display = 'none';
+        plantDescSymptoms.innerHTML = '';
+        return;
+    }
+    plantDescSymptomsBlock.style.display = '';
+    plantDescSymptoms.innerHTML = entries.map((entry) => {
+        const colonIdx = entry.indexOf(':');
+        if (colonIdx === -1) return `<li>${entry}</li>`;
+        const title = entry.slice(0, colonIdx).trim();
+        const detail = entry.slice(colonIdx + 1).trim();
+        return `<li><span class="plant-desc-symptom-title">${escapePlantDescHtml(title)}:</span> ${escapePlantDescHtml(detail)}</li>`;
+    }).join('');
+}
+
+function parseInlineNumberedFlowering(value) {
+    const numberedStart = value.search(/\s1[.)]\s/i);
+    if (numberedStart === -1) return null;
+
+    const intro = value.slice(0, numberedStart).trim();
+    const body = value.slice(numberedStart).trim();
+    const segments = body.split(/\s*(?=\d+[.)]\s*)/).filter(Boolean);
+    if (segments.length < 2) return null;
+
+    const items = [];
+    let footer = '';
+
+    segments.forEach((segment, index) => {
+        let item = segment.replace(/^\d+[.)]\s*/, '').trim().replace(/,\s*$/, '');
+        if (index === segments.length - 1) {
+            const footerMatch = item.match(/^(.+?\.\s*)(.+)$/);
+            if (footerMatch && footerMatch[2].length > 20) {
+                item = footerMatch[1].trim();
+                footer = footerMatch[2].trim();
+            }
+        }
+        if (item) items.push(item);
+    });
+
+    return items.length >= 2 ? { intro, items, footer } : null;
+}
+
+function parseFloweringContent(text) {
+    const value = String(text || '').replace(/\\n/g, '\n').trim();
+    if (!value) return null;
+
+    if (value.includes('|')) {
+        const parts = value.split('|').map((part) => part.trim()).filter(Boolean);
+        if (parts.length >= 4 && !parts[0].includes(':') && parts[1].includes(':')) {
+            return {
+                prefix: parts[0],
+                intro: parts[1],
+                items: parts.slice(2),
+                footer: ''
+            };
+        }
+        if (parts.length >= 4 && parts[0].includes(':')) {
+            return {
+                intro: parts[0],
+                items: parts.slice(1, -1),
+                footer: parts[parts.length - 1]
+            };
+        }
+        if (parts.length >= 3 && parts[0].includes(':')) {
+            return { intro: parts[0], items: parts.slice(1), footer: '' };
+        }
+    }
+
+    const lines = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    if (lines.length > 1) {
+        const intro = lines[0];
+        const items = [];
+        let footer = '';
+
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i];
+            const isBullet = /^[•\-–—]/.test(line) || /^\d+[.)]\s/.test(line);
+            if (isBullet) {
+                items.push(line.replace(/^(?:•|[\-–—]|\d+[.)])\s*/, '').trim());
+                continue;
+            }
+            if (items.length) {
+                footer = footer ? `${footer} ${line}` : line;
+            }
+        }
+
+        if (items.length) {
+            return { intro, items, footer };
+        }
+    }
+
+    const inline = parseInlineNumberedFlowering(value);
+    if (inline) return inline;
+
+    return { intro: '', items: [], footer: '', plain: value };
+}
+
+function renderPlantDescFlowering(text) {
+    if (!plantDescFlowering || !plantDescFloweringBlock) return;
+    if (parsePlantFeatureBlocks(text).length) {
+        plantDescFloweringBlock.style.display = 'none';
+        plantDescFlowering.innerHTML = '';
+        return;
+    }
+    const parsed = parseFloweringContent(text);
+    if (!parsed) {
+        plantDescFloweringBlock.style.display = 'none';
+        plantDescFlowering.innerHTML = '';
+        return;
+    }
+
+    plantDescFloweringBlock.style.display = '';
+
+    if (parsed.plain) {
+        plantDescFlowering.innerHTML = `<p class="plant-desc-flowering-plain">${escapePlantDescHtml(parsed.plain)}</p>`;
+        return;
+    }
+
+    let html = '';
+    if (parsed.prefix) {
+        html += `<p class="plant-desc-flowering-prefix">${escapePlantDescHtml(parsed.prefix)}</p>`;
+    }
+    if (parsed.intro) {
+        html += `<p class="plant-desc-flowering-intro">${escapePlantDescHtml(parsed.intro)}</p>`;
+    }
+    if (parsed.items.length) {
+        html += `<ol class="plant-desc-numbered-list">${parsed.items.map((item) => `<li>${escapePlantDescHtml(item)}</li>`).join('')}</ol>`;
+    }
+    if (parsed.footer) {
+        html += `<p class="plant-desc-flowering-footer">${escapePlantDescHtml(parsed.footer)}</p>`;
+    }
+    plantDescFlowering.innerHTML = html;
+}
+
+function renderPlantDescAdvice(plant) {
+    if (!plantDescAdvice || !plantDescAdviceSection) return;
+    const items = getPlantAdviceItems(plant);
+    if (!items.length) {
+        plantDescAdviceSection.style.display = 'none';
+        plantDescAdvice.innerHTML = '';
+        return;
+    }
+    plantDescAdviceSection.style.display = '';
+    plantDescAdvice.innerHTML = items.map((item) => `<li>${escapePlantDescHtml(item)}</li>`).join('');
+}
+
+function renderPlantDescFeatures(plant) {
+    const symptoms = parseSymptomEntries(plant.why_disease);
+    const featureBlocks = parsePlantFeatureBlocks(plant.flowering_conditions);
+    renderPlantDescSymptoms(symptoms);
+    renderPlantDescExtraFeatures(featureBlocks);
+    renderPlantDescFlowering(plant.flowering_conditions);
+    if (plantDescFeaturesSection) {
+        const hasFlowering = !!(plant.flowering_conditions || '').trim() && !featureBlocks.length;
+        const hasFeatures = symptoms.length > 0 || featureBlocks.length > 0 || hasFlowering;
+        plantDescFeaturesSection.style.display = hasFeatures ? '' : 'none';
+    }
+}
+
+function getPlantDescIcon() {
+    return '🌸';
+}
 
 // Функция открытия модалки с описанием растения
-// ===== МОДАЛКА ОПИСАНИЯ РАСТЕНИЯ =====
-// ===== МОДАЛКА ОПИСАНИЯ РАСТЕНИЯ =====
 async function openPlantDescription(plantKey) {
     console.log('🔍 openPlantDescription вызвана с plantKey:', plantKey);
     const plantId = parseInt(plantKey, 10);
@@ -3951,31 +4380,16 @@ async function openPlantDescription(plantKey) {
         return;
     }
 
-    let icon = '🌿';
-    const plantName = plant.name || '';
-    if (plantName === 'Спатифиллум') icon = '🌸';
-    else if (plantName === 'Кактус Корифанта' || plantName === 'Кактус') icon = '🌵';
-    else if (plantName === 'Фикус') icon = '🌳';
-
+    let icon = getPlantDescIcon();
     if (plantDescIcon) plantDescIcon.textContent = icon;
 
     const displayName = plant.nickname ? `${plant.name} — ${plant.nickname}` : plant.name;
     if (plantDescTitle) plantDescTitle.textContent = displayName;
-    if (plantDescDescription) plantDescDescription.textContent = plant.fullDescription || plant.description || 'Описание отсутствует';
-    if (plantDescWater) plantDescWater.textContent = plant.watering_advice || plant.waterAdvice || 'Поливай по графику';
-    if (plantDescLight) plantDescLight.textContent = plant.light_advice || plant.lightAdvice || 'Обеспечь правильное освещение';
-
-    // Форматируем советы с переносами строк
-    let tipsText = '';
-    if (Array.isArray(plant.tips_array) && plant.tips_array.length > 0) {
-        tipsText = plant.tips_array.join('<br>');
-    } else if (plant.tips) {
-        // Заменяем \n и \\n на <br>
-        tipsText = plant.tips.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
-    } else {
-        tipsText = 'Бережный уход — залог здоровья';
-    }
-    if (plantDescTips) plantDescTips.innerHTML = tipsText;  // innerHTML для HTML тегов
+    if (plantDescDescription) plantDescDescription.textContent = getPlantDescriptionText(plant);
+    renderPlantDescCharacter(plant);
+    renderPlantDescNeeds(plant);
+    renderPlantDescFeatures(plant);
+    renderPlantDescAdvice(plant);
 
     if (modalPlantDescription) {
         modalPlantDescription.classList.add('active');
@@ -4018,6 +4432,10 @@ if (descBtnRight) {
     window.descBtnRight = newDescBtn;
 } else {
     console.warn('Кнопка descBtnRight не найдена в DOM');
+}
+
+if (closePlantDescBtn) {
+    closePlantDescBtn.addEventListener('click', closePlantDescription);
 }
 
 // Закрытие по клику на overlay

@@ -109,7 +109,12 @@ def get_catalog():
             "light_requirement": t["light_requirement"],
             "watering_advice": t.get("watering_advice", ""),
             "light_advice": t.get("light_advice", ""),
-            "tips": t.get("tips", "").split('\n') if t.get("tips") else [],
+            "why_disease": t.get("why_disease", ""),
+            "tips": [
+                item.strip().lstrip("•").strip()
+                for item in (t.get("tips") or "").replace("\\n", "\n").replace("|", "\n").split("\n")
+                if item.strip()
+            ],
             "symptoms": t.get("symptoms", "").split('|') if t.get("symptoms") else [],
             "flowering_conditions": t.get("flowering_conditions", ""),
             "unlock_level": t.get("unlock_level", 1)

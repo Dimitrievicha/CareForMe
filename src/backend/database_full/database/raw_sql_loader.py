@@ -384,7 +384,7 @@ def get_plant_by_id(species_id: int, db_path: str = "careforme.db") -> Optional[
     Получает шаблон растения по species_id.
 
     Args:
-        species_id: ID вида растения (1=Спатифиллюм, 2=Кактус, 3=Фикус)
+        species_id: ID вида растения (1=Спатифиллум, 2=Кактус, 3=Фикус)
         db_path: Путь к файлу БД
 
     Returns:

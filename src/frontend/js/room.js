@@ -471,25 +471,33 @@ async function loadPlantsCatalog() {
                 plants[plantId] = {
                     id: plantId,
                     name: plant.species_name || plant.name,
-                    nickname: plant.nickname || plant.species_name || 'Растение',
+                    nickname: plant.nickname || '',
                     description: plant.description || 'Описание отсутствует',
+                    character_trait: plant.character_trait || '',
                     waterAdvice: plant.watering_advice || 'Поливай по графику',
                     lightAdvice: plant.light_advice || 'Обеспечь правильное освещение',
-                    tips: Array.isArray(plant.tips) ? plant.tips.join('. ') : (plant.tips || 'Бережный уход - залог здоровья'),
+                    tips: Array.isArray(plant.tips) ? plant.tips.join(' ') : (plant.tips || 'Бережный уход - залог здоровья'),
                     waterIntervalMin: plant.water_interval_min || 24,
                     waterIntervalMax: plant.water_interval_max || 48,
-                    unlockLevel: plant.unlock_level || 1,
+                    unlockLevel: plant.unlock_level || 1,  // ← ДОБАВИТЬ ЭТУ СТРОКУ
                     plantFolder: plantFolder,
                     stages: {
                         1: `images/plant/${plantFolder}/stage/росток.png`,
                         2: `images/plant/${plantFolder}/stage/выросший.png`
                     },
                     diseaseImages: diseaseImages,
-                    deadImage: assets.deadImage
+                    deadImage: assets.deadImage,
+                    watering_advice: plant.watering_advice || '',
+                    light_advice: plant.light_advice || '',
+                    fullDescription: plant.description || '',
+                    tips_array: plant.tips || [],
+                    symptoms: plant.symptoms || [],
+                    flowering_conditions: plant.flowering_conditions || ''
                 };
                 ensurePlantDiseaseAssets(plants[plantId], sid);
             });
             PLANTS = plants;
+            console.log('✅ Растения загружены:', PLANTS);
             return true;
         }
         return false;
@@ -2940,17 +2948,6 @@ function renderRepotChoices() {
     });
 }
 
-const descBtnRight = document.getElementById('descBtnRight');
-if (descBtnRight) {
-    descBtnRight.addEventListener('click', () => {
-        if (!zoomedSlot) return;
-        const data = slotData[zoomedSlot.name];
-        if (data && data.plant && PLANTS[data.plant]) {
-            showDescription(data.plant);
-        }
-    });
-}
-
 const plantBtnLeft = document.getElementById('plantBtnLeft');
 if (plantBtnLeft) {
     plantBtnLeft.addEventListener('click', () => {
@@ -3611,3 +3608,305 @@ if (devApplyStateBtn) {
         if (devStatePanel) devStatePanel.style.display = 'block';
     });
 }
+
+// ===== ОБУЧАЛКА С ДВУМЯ РЕЖИМАМИ =====
+(function initTutorial() {
+    // Конфигурация режимов обучения
+    const TUTORIAL_CONFIG = {
+        firstTime: {
+            totalSteps: 6,
+            textWrapperId: 'firstTimeTutorial',
+            dotsId: 'firstTimeDots',
+            hasSkipButton: true
+        },
+        short: {
+            totalSteps: 4,
+            textWrapperId: 'shortTutorial',
+            dotsId: 'shortDots',
+            hasSkipButton: false
+        }
+    };
+
+    let currentMode = 'short'; // 'firstTime' или 'short'
+    let tutorialCurrentStep = 0;
+
+    const tutorialOverlay = document.getElementById('tutorialOverlay');
+    const firstTimeWrapper = document.getElementById('firstTimeTutorial');
+    const shortWrapper = document.getElementById('shortTutorial');
+    const skipWrapper = document.getElementById('tutorialSkipWrapper');
+    const tutorialBackBtn = document.getElementById('tutBackBtn');
+    const tutorialNextBtn = document.getElementById('tutNextBtn');
+    const tutorialSkipBtn = document.getElementById('tutSkipBtn');
+
+    function getCurrentWrapper() {
+        return currentMode === 'firstTime' ? firstTimeWrapper : shortWrapper;
+    }
+
+    function getCurrentDots() {
+        return currentMode === 'firstTime'
+            ? document.querySelectorAll('#firstTimeDots .tut-dot')
+            : document.querySelectorAll('#shortDots .tut-dot');
+    }
+
+    function getCurrentSteps() {
+        return currentMode === 'firstTime'
+            ? document.querySelectorAll('#firstTimeTutorial .tutorial-step')
+            : document.querySelectorAll('#shortTutorial .tutorial-step');
+    }
+
+    function showTutorialStep(step) {
+        const config = TUTORIAL_CONFIG[currentMode];
+        if (step < 0) step = 0;
+        if (step >= config.totalSteps) step = config.totalSteps - 1;
+        tutorialCurrentStep = step;
+
+        const steps = getCurrentSteps();
+        const dots = getCurrentDots();
+
+        steps.forEach((stepEl, index) => {
+            stepEl.classList.toggle('active', index === tutorialCurrentStep);
+        });
+
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === tutorialCurrentStep);
+        });
+    }
+
+    function nextTutorialStep() {
+        const config = TUTORIAL_CONFIG[currentMode];
+        if (tutorialCurrentStep < config.totalSteps - 1) {
+            showTutorialStep(tutorialCurrentStep + 1);
+        } else {
+            closeTutorial();
+        }
+    }
+
+    function prevTutorialStep() {
+        if (tutorialCurrentStep > 0) {
+            showTutorialStep(tutorialCurrentStep - 1);
+        }
+    }
+
+    function openTutorial(mode = 'short') {
+        currentMode = mode;
+        tutorialCurrentStep = 0;
+
+        // Показать нужный wrapper
+        if (firstTimeWrapper) firstTimeWrapper.style.display = mode === 'firstTime' ? 'flex' : 'none';
+        if (shortWrapper) shortWrapper.style.display = mode === 'short' ? 'flex' : 'none';
+
+        // Показать/скрыть кнопку пропуска
+        const config = TUTORIAL_CONFIG[mode];
+        if (skipWrapper) {
+            skipWrapper.style.display = config.hasSkipButton ? 'flex' : 'none';
+        }
+
+        showTutorialStep(0);
+        if (tutorialOverlay) {
+            tutorialOverlay.style.display = 'flex';
+            tutorialOverlay.classList.add('active');
+        }
+    }
+
+    function closeTutorial() {
+        if (tutorialOverlay) {
+            tutorialOverlay.style.display = 'none';
+            tutorialOverlay.classList.remove('active');
+        }
+        if (currentUser && currentMode === 'firstTime') {
+            localStorage.setItem(`tutorialDone_${currentUser}`, '1');
+        }
+        tutorialCurrentStep = 0;
+    }
+
+    function goToTutorialStep(step) {
+        showTutorialStep(parseInt(step));
+    }
+
+    // Навешиваем обработчики
+    if (tutorialBackBtn) {
+        tutorialBackBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            prevTutorialStep();
+        });
+    }
+
+    if (tutorialNextBtn) {
+        tutorialNextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            nextTutorialStep();
+        });
+    }
+
+    if (tutorialSkipBtn) {
+        tutorialSkipBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeTutorial();
+        });
+    }
+
+    // Обработчики для точек (динамические)
+    function bindDotEvents() {
+        const dots = document.querySelectorAll('.tut-dot');
+        dots.forEach(dot => {
+            dot.removeEventListener('click', dot._handler);
+            dot._handler = () => {
+                const step = dot.getAttribute('data-tut-step');
+                if (step !== null) goToTutorialStep(step);
+            };
+            dot.addEventListener('click', dot._handler);
+        });
+    }
+
+    // Наблюдатель за изменением DOM для перепривязки точек
+    const observer = new MutationObserver(() => bindDotEvents());
+    observer.observe(document.body, { childList: true, subtree: true });
+    bindDotEvents();
+
+    if (tutorialOverlay) {
+        tutorialOverlay.addEventListener('click', (e) => {
+            if (e.target === tutorialOverlay) closeTutorial();
+        });
+    }
+
+    // Переопределяем глобальные функции
+    window.openTutorial = openTutorial;
+    window.closeTutorialGlobal = closeTutorial;
+    window.nextTutorialGlobal = nextTutorialStep;
+    window.prevTutorialGlobal = prevTutorialStep;
+    window.goToTutorialStep = goToTutorialStep;
+
+    // Переопределяем кнопку helpBtn для открытия краткого обучения
+    const helpBtn = document.getElementById('helpBtn');
+    if (helpBtn) {
+        helpBtn.addEventListener('click', () => {
+            openTutorial('short');
+        });
+    }
+
+    // Автоматическое открытие при первом входе
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            const isNewUser = localStorage.getItem('isReturningUser') === 'false';
+            const tutDone = currentUser ? localStorage.getItem(`tutorialDone_${currentUser}`) : null;
+
+            if (isNewUser && !tutDone && currentUser) {
+                openTutorial('firstTime');
+            }
+        }, 500);
+    });
+})();
+
+// ===== МОДАЛКА ОПИСАНИЯ РАСТЕНИЯ =====
+const modalPlantDescription = document.getElementById('modalPlantDescription');
+const closePlantDescBtn = document.getElementById('closePlantDescBtn');
+const plantDescIcon = document.getElementById('plantDescIcon');
+const plantDescTitle = document.getElementById('plantDescTitle');
+const plantDescDescription = document.getElementById('plantDescDescription');
+const plantDescWater = document.getElementById('plantDescWater');
+const plantDescLight = document.getElementById('plantDescLight');
+const plantDescTips = document.getElementById('plantDescTips');
+
+// Функция открытия модалки с описанием растения
+// ===== МОДАЛКА ОПИСАНИЯ РАСТЕНИЯ =====
+// ===== МОДАЛКА ОПИСАНИЯ РАСТЕНИЯ =====
+async function openPlantDescription(plantKey) {
+    console.log('🔍 openPlantDescription вызвана с plantKey:', plantKey);
+    const plantId = parseInt(plantKey, 10);
+    let plant = PLANTS[plantId];
+
+    if (!plant) {
+        await loadPlantsCatalog();
+        plant = PLANTS[plantId];
+    }
+
+    if (!plant) {
+        console.warn('Растение не найдено:', plantKey);
+        showNotification('Ошибка: данные о растении не найдены', true);
+        return;
+    }
+
+    let icon = '🌿';
+    const plantName = plant.name || '';
+    if (plantName === 'Спатифиллум') icon = '🌸';
+    else if (plantName === 'Кактус Корифанта' || plantName === 'Кактус') icon = '🌵';
+    else if (plantName === 'Фикус') icon = '🌳';
+
+    if (plantDescIcon) plantDescIcon.textContent = icon;
+
+    const displayName = plant.nickname ? `${plant.name} — ${plant.nickname}` : plant.name;
+    if (plantDescTitle) plantDescTitle.textContent = displayName;
+    if (plantDescDescription) plantDescDescription.textContent = plant.fullDescription || plant.description || 'Описание отсутствует';
+    if (plantDescWater) plantDescWater.textContent = plant.watering_advice || plant.waterAdvice || 'Поливай по графику';
+    if (plantDescLight) plantDescLight.textContent = plant.light_advice || plant.lightAdvice || 'Обеспечь правильное освещение';
+
+    // Форматируем советы с переносами строк
+    let tipsText = '';
+    if (Array.isArray(plant.tips_array) && plant.tips_array.length > 0) {
+        tipsText = plant.tips_array.join('<br>');
+    } else if (plant.tips) {
+        // Заменяем \n и \\n на <br>
+        tipsText = plant.tips.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+    } else {
+        tipsText = 'Бережный уход — залог здоровья';
+    }
+    if (plantDescTips) plantDescTips.innerHTML = tipsText;  // innerHTML для HTML тегов
+
+    if (modalPlantDescription) {
+        modalPlantDescription.classList.add('active');
+    }
+
+    if (!localStorage.getItem(`readDescriptionDone_${currentUser}`)) {
+        localStorage.setItem(`readDescriptionDone_${currentUser}`, '1');
+        checkQuestsAfterAction();
+        showNotification('📖 Задание выполнено: описание прочитано!', false);
+    }
+}
+
+// Закрытие модалки описания
+function closePlantDescription() {
+    if (modalPlantDescription) {
+        modalPlantDescription.classList.remove('active');
+    }
+}
+
+/// Обработчик для кнопки описания в зуме (обновлённый)
+const descBtnRight = document.getElementById('descBtnRight');
+if (descBtnRight) {
+    // Удаляем старые обработчики
+    const newDescBtn = descBtnRight.cloneNode(true);
+    descBtnRight.parentNode.replaceChild(newDescBtn, descBtnRight);
+
+    newDescBtn.addEventListener('click', () => {
+        if (!zoomedSlot) {
+            console.log('zoomedSlot отсутствует');
+            return;
+        }
+        const data = slotData[zoomedSlot.name];
+        if (data && data.plant && PLANTS[data.plant]) {
+            openPlantDescription(data.plant);
+        } else {
+            showNotification('Сначала посади цветок! 🌱', false);
+        }
+    });
+    // Обновляем ссылку
+    window.descBtnRight = newDescBtn;
+} else {
+    console.warn('Кнопка descBtnRight не найдена в DOM');
+}
+
+// Закрытие по клику на overlay
+if (modalPlantDescription) {
+    modalPlantDescription.addEventListener('click', (e) => {
+        if (e.target === modalPlantDescription) {
+            closePlantDescription();
+        }
+    });
+}
+
+// Закрытие по Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalPlantDescription && modalPlantDescription.classList.contains('active')) {
+        closePlantDescription();
+    }
+});

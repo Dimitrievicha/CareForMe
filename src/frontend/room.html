@@ -29,23 +29,29 @@
             </div>
         </div>
 
-        <!-- Слоты горшков (координаты относительно сцены 1280×720) -->
-        <div class="pot-slot slot-windowsill-1" data-slot="windowsill-1"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+        <!-- Слоты горшков -->
+        <div class="pot-slot slot-windowsill-1" data-slot="windowsill-1">
+            <img src="images/room/пунктир.png" class="slot-img" alt="место">
             <div class="slot-hint">Поставить горшок</div>
         </div>
-        <div class="pot-slot slot-windowsill-2" data-slot="windowsill-2"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+        <div class="pot-slot slot-windowsill-2" data-slot="windowsill-2">
+            <img src="images/room/пунктир.png" class="slot-img" alt="место">
             <div class="slot-hint">Поставить горшок</div>
         </div>
-        <div class="pot-slot slot-windowsill-3" data-slot="windowsill-3"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+        <div class="pot-slot slot-windowsill-3" data-slot="windowsill-3">
+            <img src="images/room/пунктир.png" class="slot-img" alt="место">
             <div class="slot-hint">Поставить горшок</div>
         </div>
-        <div class="pot-slot slot-desk-left" data-slot="desk-left"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+        <div class="pot-slot slot-desk-left" data-slot="desk-left">
+            <img src="images/room/пунктир.png" class="slot-img" alt="место">
             <div class="slot-hint">Поставить горшок</div>
         </div>
-        <div class="pot-slot slot-desk-right-1" data-slot="desk-right-1"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+        <div class="pot-slot slot-desk-right-1" data-slot="desk-right-1">
+            <img src="images/room/пунктир.png" class="slot-img" alt="место">
             <div class="slot-hint">Поставить горшок</div>
         </div>
-        <div class="pot-slot slot-desk-right-2" data-slot="desk-right-2"><img src="images/room/пунктир.png" class="slot-img" alt="место">
+        <div class="pot-slot slot-desk-right-2" data-slot="desk-right-2">
+            <img src="images/room/пунктир.png" class="slot-img" alt="место">
             <div class="slot-hint">Поставить горшок</div>
         </div>
 
@@ -72,7 +78,6 @@
     <select id="devStateSelect" style="width:100%;padding:4px;border-radius:4px;margin-bottom:6px;font-size:13px;">
         <option value="sprout">🌱 Росток (stage 1)</option>
         <option value="healthy">✅ Вырос / Здоровый (stage 2)</option>
-        <!-- болезни подставляются динамически через populateDevPanel() -->
         <option value="dead">💀 Смерть</option>
     </select>
     <button id="devApplyState" style="width:100%;background:#e53935;color:#fff;border:none;border-radius:4px;padding:5px;cursor:pointer;font-weight:bold;">Применить</button>
@@ -117,44 +122,44 @@
 <!-- ЗУМ ГОРШКА -->
 <div class="zoom-overlay" id="zoomOverlay">
     <div class="zoom-viewport">
-    <div class="zoom-panel" id="zoomStage">
-        <button class="zoom-close-btn" id="zoomClose">✕</button>
-        <img src="images/room/стол.png" class="zoom-table-bg" alt="стол">
-        <div class="zoom-content-wrapper">
-            <div class="zoom-left">
-                <div class="zoom-pot-container">
-                    <img id="zoomPotImg" src="" alt="горшок" class="zoom-pot-img">
-                    <img id="zoomPlantImg" src="" alt="растение" class="zoom-plant-img">
-                    <div class="watering-anim" id="wateringAnim" data-can="1">
-                        <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img" id="wateringCanImg">
-                        <div class="water-drops" id="waterDrops"></div>
+        <div class="zoom-panel" id="zoomStage">
+            <button class="zoom-close-btn" id="zoomClose">✕</button>
+            <img src="images/room/стол.png" class="zoom-table-bg" alt="стол">
+            <div class="zoom-content-wrapper">
+                <div class="zoom-left">
+                    <div class="zoom-pot-container">
+                        <img id="zoomPotImg" src="" alt="горшок" class="zoom-pot-img">
+                        <img id="zoomPlantImg" src="" alt="растение" class="zoom-plant-img">
+                        <div class="watering-anim" id="wateringAnim" data-can="1">
+                            <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img" id="wateringCanImg">
+                            <div class="water-drops" id="waterDrops"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="zoom-left-panel light-panel">
+                    <button class="plant-btn-left light-plant-btn" id="plantBtnLeft">Посадить</button>
+                    <button class="water-btn-left light-water-btn" id="waterBtnLeft">Полить</button>
+                    <button class="remove-btn-left light-remove-btn" id="removeBtnLeft" style="display:none;">Выбросить</button>
+                    <button class="repot-btn-left light-repot-btn" id="repotBtnLeft">Пересадить</button>
+                    <button class="move-btn-left light-move-btn" id="moveBtnLeft">Переставить горшок</button>
+                    <div class="timer-box light-timer-box" id="growthTimerBox" style="display:none;"></div>
+                    <div class="timer-box light-timer-box" id="waterTimerBox" style="display:none;"></div>
+                </div>
+                <div class="zoom-right-panel light-panel">
+                    <div class="plant-name-zoom light-name" id="zoomPlantName">Пустой горшок</div>
+                    <div class="plant-stage light-stage" id="zoomStageLabel"></div>
+                    <button class="desc-btn-right light-desc-btn" id="descBtnRight">📖 Описание</button>
+                    <div class="watering-info light-watering-info" id="wateringInfo"></div>
+                    <div class="description-box light-description-box" id="descriptionBox" style="display:none;">
+                        <div class="desc-text light-desc-text" id="plantDescription"></div>
+                    </div>
+                    <div class="disease-box light-disease-box" id="diseaseBox" style="display:none;">
+                        <div class="disease-title">Болезнь</div>
+                        <div class="disease-text" id="diseaseText"></div>
                     </div>
                 </div>
             </div>
-            <div class="zoom-left-panel light-panel">
-                <button class="plant-btn-left light-plant-btn" id="plantBtnLeft">Посадить</button>
-                <button class="water-btn-left light-water-btn" id="waterBtnLeft">Полить</button>
-                <button class="remove-btn-left light-remove-btn" id="removeBtnLeft" style="display:none;">Выбросить</button>
-                <button class="repot-btn-left light-repot-btn" id="repotBtnLeft">Пересадить</button>
-                <button class="move-btn-left light-move-btn" id="moveBtnLeft">Переставить горшок</button>
-                <div class="timer-box light-timer-box" id="growthTimerBox" style="display:none;"></div>
-                <div class="timer-box light-timer-box" id="waterTimerBox" style="display:none;"></div>
-            </div>
-            <div class="zoom-right-panel light-panel">
-                <div class="plant-name-zoom light-name" id="zoomPlantName">Пустой горшок</div>
-                <div class="plant-stage light-stage" id="zoomStageLabel"></div>
-                <button class="desc-btn-right light-desc-btn" id="descBtnRight">📖 Описание</button>
-                <div class="watering-info light-watering-info" id="wateringInfo"></div>
-                <div class="description-box light-description-box" id="descriptionBox" style="display:none;">
-                    <div class="desc-text light-desc-text" id="plantDescription"></div>
-                </div>
-                <div class="disease-box light-disease-box" id="diseaseBox" style="display:none;">
-                    <div class="disease-title">Болезнь</div>
-                    <div class="disease-text" id="diseaseText"></div>
-                </div>
-            </div>
         </div>
-    </div>
     </div>
 </div>
 
@@ -195,69 +200,158 @@
     </div>
 </div>
 
-<!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ ДЛЯ ДОСТИЖЕНИЙ (за что) -->
+<!-- ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ -->
 <div class="achievement-toast" id="achievementToast">
     <img id="achievementToastImg" src="" alt="За что">
 </div>
-
-<!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ ДЛЯ НАГРАД -->
 <div class="reward-toast" id="rewardToast">
     <img id="rewardToastImg" src="" alt="Награда">
 </div>
-
-<!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ ДЛЯ ПОЛУЧЕНИЯ ДОСТИЖЕНИЯ -->
 <div class="achievement-unlock-toast" id="achievementUnlockToast">
     <img id="achievementUnlockToastImg" src="" alt="Достижение получено">
 </div>
 
-<!-- ОБУЧАЛКА -->
+<!-- ОБУЧАЛКА: два режима (первый вход и обычный просмотр) -->
 <div class="tutorial-overlay" id="tutorialOverlay">
     <div class="tutorial-window">
         <img src="images/traning/окно обучения.png" alt="Окно обучения">
         <div class="tutorial-content">
-            <div class="tutorial-step active" id="tutStep0">
-                <div class="tut-icon">🌿</div>
-                <h2>Добро пожаловать в Care For Me!</h2>
-                <p>Ты — начинающий садовод. Здесь ты будешь ухаживать за растениями,<br>выполнять задания и открывать новые возможности!</p>
-                <p><strong>🌱 Как играть?</strong><br>• Кликай на пунктирные места → ставь горшок → сажай цветок<br>• Поливай вовремя, иначе растение засохнет или загниёт<br>• Выполняй задания, чтобы получать новые уровни и награды</p>
+            <!-- Шаги для первого входа (с приветствием) -->
+            <div class="tutorial-text-wrapper-first" id="firstTimeTutorial">
+                <div class="tutorial-step active" id="firstStep0">
+                    <div class="tut-icon">🌿💚</div>
+                    <h2>Добро пожаловать в Care For Me!</h2>
+                    <p>Привет, начинающий садовод! 👋<br>Я буду твоим помощником в этом зелёном приключении.</p>
+                    <p><strong>🌱 Что тебя ждёт?</strong><br>• Ухаживай за растениями<br>• Выполняй задания и повышай уровень<br>• Открывай новые горшки, цветы и лейки<br>• Получай достижения за свои успехи!</p>
+                </div>
+                <div class="tutorial-step" id="firstStep1">
+                    <div class="tut-icon">🪴</div>
+                    <h2>Горшки и посадка</h2>
+                    <p><strong>Как поставить горшок?</strong><br>Кликни на пунктирное место в комнате → выбери горшок.<br>Сначала доступен только Горшок 1, новые открываются с уровнями!</p>
+                    <p><strong>Как посадить цветок?</strong><br>Кликни на горшок → нажми "Посадить" → выбери растение.<br>Новые растения: Кактус (3 уровень) и Фикус (5 уровень).</p>
+                    <p><strong>💡 Совет:</strong> Попробуй прямо сейчас поставить первый горшок!</p>
+                </div>
+                <div class="tutorial-step" id="firstStep2">
+                    <div class="tut-icon">💧</div>
+                    <h2>Уход и полив</h2>
+                    <p><strong>Когда поливать?</strong><br>У каждого растения свой график полива:<br>• Спатифиллум — каждые 1-2 дня<br>• Кактус — каждые 7-10 дней<br>• Фикус — каждые 3-4 дня</p>
+                    <p><strong>⚠️ Важно:</strong> Перелив опаснее засухи! Проверяй почву перед поливом.</p>
+                    <p>Кнопка "Полить" появляется при клике на горшок в режиме увеличения.</p>
+                </div>
+                <div class="tutorial-step" id="firstStep3">
+                    <div class="tut-icon">🏥</div>
+                    <h2>Болезни и лечение</h2>
+                    <p><strong>Почему растение болеет?</strong><br>• Неправильный полив (перелив или засуха)<br>• Неподходящее место (слишком темно/светло)<br>• Слишком большой горшок</p>
+                    <p><strong>Как вылечить?</strong><br>• Прочитай описание болезни в окне увеличения<br>• Переставь горшок в другое место кнопкой "Переставить горшок"<br>• Отрегулируй полив</p>
+                </div>
+                <div class="tutorial-step" id="firstStep4">
+                    <div class="tut-icon">📋</div>
+                    <h2>Задания и уровни</h2>
+                    <p><strong>Как повысить уровень?</strong><br>Выполняй задания из левой панели. За каждые 3 выполненных задания — новый уровень!</p>
+                    <p><strong>🎁 Награды за уровни:</strong><br>Уровень 2 → Новый горшок<br>Уровень 3 → Кактус<br>Уровень 4 → Новая лейка<br>Уровень 5 → Фикус<br>Уровень 6 → Легендарный горшок + ачивка</p>
+                    <p><strong>🏆 Достижения:</strong> Нажми на иконку 🏆, чтобы увидеть свои достижения.</p>
+                </div>
+                <div class="tutorial-step" id="firstStep5">
+                    <div class="tut-icon">🍀</div>
+                    <h2>Готов к приключению!</h2>
+                    <p>Ты узнал всё самое важное!<br>Остальное откроется в процессе игры.</p>
+                    <p><strong>💚 Советы:</strong><br>• Регулярно заходи в игру, чтобы поддерживать растения<br>• Читай описания растений — там много полезного<br>• Не бойся ошибаться — даже опытные садоводы учатся на ошибках!</p>
+                    <p style="margin-top:12px;"><strong>🌿 Удачи в выращивании зелёных друзей!</strong></p>
+                </div>
+                <div class="tutorial-dots" id="firstTimeDots">
+                    <span class="tut-dot active" data-tut-step="0"></span>
+                    <span class="tut-dot" data-tut-step="1"></span>
+                    <span class="tut-dot" data-tut-step="2"></span>
+                    <span class="tut-dot" data-tut-step="3"></span>
+                    <span class="tut-dot" data-tut-step="4"></span>
+                    <span class="tut-dot" data-tut-step="5"></span>
+                </div>
             </div>
-            <div class="tutorial-step" id="tutStep1">
-                <div class="tut-icon">🪴</div>
-                <h2>Горшки и посадка</h2>
-                <p><strong>Как поставить горшок?</strong><br>Кликни на пунктирное место в комнате → выбери горшок.<br>Сначала доступен только Горшок 1, новые открываются с уровнями!</p>
-                <p><strong>Как посадить цветок?</strong><br>Кликни на горшок → нажми "Посадить" → выбери растение.<br>Новые растения открываются на 3 и 5 уровнях.</p>
-                <p><strong>Как поливать?</strong><br>Кликни на горшок → в увеличении нажми кнопку "Полить".</p>
+
+            <!-- Шаги для обычного просмотра (краткая версия) -->
+            <div class="tutorial-text-wrapper-short" id="shortTutorial">
+                <div class="tutorial-step active" id="shortStep0">
+                    <div class="tut-icon">🪴</div>
+                    <h2>Горшки и посадка</h2>
+                    <p><strong>Как поставить горшок?</strong><br>Кликни на пунктирное место в комнате → выбери горшок.</p>
+                    <p><strong>Как посадить цветок?</strong><br>Кликни на горшок → нажми "Посадить" → выбери растение.</p>
+                </div>
+                <div class="tutorial-step" id="shortStep1">
+                    <div class="tut-icon">💧</div>
+                    <h2>Полив</h2>
+                    <p>Кликни на горшок → в увеличении нажми "Полить".<br>У каждого растения свой график полива. Не переливай!</p>
+                </div>
+                <div class="tutorial-step" id="shortStep2">
+                    <div class="tut-icon">🏥</div>
+                    <h2>Болезни</h2>
+                    <p>Причина: неправильный полив или неподходящее место.<br>Лечение: переставь горшок или отрегулируй полив.</p>
+                </div>
+                <div class="tutorial-step" id="shortStep3">
+                    <div class="tut-icon">📋</div>
+                    <h2>Задания и уровни</h2>
+                    <p>Выполняй задания → повышай уровень → получай новые горшки, цветы и лейки!</p>
+                    <p style="margin-top:8px;"><strong>🍀 Хорошей игры!</strong></p>
+                </div>
+                <div class="tutorial-dots" id="shortDots">
+                    <span class="tut-dot active" data-tut-step="0"></span>
+                    <span class="tut-dot" data-tut-step="1"></span>
+                    <span class="tut-dot" data-tut-step="2"></span>
+                    <span class="tut-dot" data-tut-step="3"></span>
+                </div>
             </div>
-            <div class="tutorial-step" id="tutStep2">
-                <div class="tut-icon">💧</div>
-                <h2>Уход и болезни</h2>
-                <p><strong>Полив</strong><br>У каждого растения свой график полива (от 1 до 10 дней).<br>Поливай вовремя — не заливай и не пересушивай!</p>
-                <p><strong>Болезни</strong><br>Неправильный полив или неподходящее место → растение болеет.<br>Если видишь предупреждение — переставь горшок в другое место!</p>
-                <p><strong>Перестановка</strong><br>Кнопка "Переставить горшок" в зуме поможет найти идеальное место.</p>
-            </div>
-            <div class="tutorial-step" id="tutStep3">
-                <div class="tut-icon">📋</div>
-                <h2>Задания и уровни</h2>
-                <p><strong>Как повысить уровень?</strong><br>Выполняй задания из левой панели. За каждые 3 задания — новый уровень!</p>
-                <p><strong>Награды за уровни:</strong><br>Уровень 2 → 🪴 Новый горшок<br>Уровень 3 → 🌵 Кактус<br>Уровень 4 → 💧 Новая лейка<br>Уровень 5 → 🌿 Фикус<br>Уровень 6 → 🏆 Горшок 3 + ачивка</p>
-                <p><strong>Достижения</strong><br>Нажми 🏆 вверху экрана, чтобы увидеть свои достижения!</p>
-                <p style="margin-top:8px;"><strong>🍀 Удачи в выращивании!</strong></p>
-            </div>
-            <div class="tutorial-dots">
-                <span class="tut-dot active" onclick="window.goToTutorialStep(0)"></span>
-                <span class="tut-dot" onclick="window.goToTutorialStep(1)"></span>
-                <span class="tut-dot" onclick="window.goToTutorialStep(2)"></span>
-                <span class="tut-dot" onclick="window.goToTutorialStep(3)"></span>
-            </div>
-            <div class="tutorial-nav">
-                <button class="tut-skip-btn" onclick="window.closeTutorialGlobal()"><img src="images/button/кнопка пропуска обучения.png" alt="Пропустить"></button>
-                <button class="tut-next-btn" onclick="window.nextTutorialGlobal()"><img src="images/button/кнопка-стрелка обучения.png" alt="Далее"></button>
+
+            <div class="tutorial-buttons-wrapper" id="tutorialButtonsWrapper">
+                <div class="tutorial-nav-buttons">
+                    <button class="tut-back-btn" id="tutBackBtn">
+                        <img src="images/button/кнопка-стрелка обучения.png" alt="Назад">
+                    </button>
+                    <button class="tut-next-btn" id="tutNextBtn">
+                        <img src="images/button/кнопка-стрелка обучения.png" alt="Далее">
+                    </button>
+                </div>
+                <div class="tutorial-skip-wrapper" id="tutorialSkipWrapper">
+                    <button class="tut-skip-btn" id="tutSkipBtn">
+                        <img src="images/button/кнопка пропуска обучения.png" alt="Пропустить обучение">
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Стек уведомлений (room.js) -->
+<!-- МОДАЛКА ОПИСАНИЯ РАСТЕНИЯ (в стиле обучалки) -->
+<div class="modal-overlay" id="modalPlantDescription">
+    <div class="tutorial-window plant-desc-window">
+        <img src="images/traning/окно обучения.png" alt="Описание растения">
+        <button class="plant-desc-close-btn" id="closePlantDescBtn">✕</button>
+        <div class="tutorial-content plant-desc-content">
+            <div class="plant-desc-text-wrapper">
+                <div class="plant-desc-icon" id="plantDescIcon">🌿</div>
+                <h2 class="plant-desc-title" id="plantDescTitle">Название растения</h2>
+                <div class="plant-desc-info" id="plantDescInfo">
+                    <div class="desc-section">
+                        <h3>📖 Описание</h3>
+                        <p id="plantDescDescription">Загрузка...</p>
+                    </div>
+                    <div class="desc-section">
+                        <h3>💧 Полив</h3>
+                        <p id="plantDescWater">Загрузка...</p>
+                    </div>
+                    <div class="desc-section">
+                        <h3>☀️ Свет</h3>
+                        <p id="plantDescLight">Загрузка...</p>
+                    </div>
+                    <div class="desc-section">
+                        <h3>💡 Советы</h3>
+                        <p id="plantDescTips">Загрузка...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Стек уведомлений -->
 <div class="notification-stack" id="notificationStack" aria-live="polite"></div>
 
 <audio id="bgMusic" loop></audio>

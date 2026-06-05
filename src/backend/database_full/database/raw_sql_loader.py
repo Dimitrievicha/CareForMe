@@ -24,21 +24,6 @@ logger = logging.getLogger(__name__)
 def load_plants_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
     """
     Загружает шаблоны растений из CSV файла в таблицу plant_templates.
-
-    Args:
-        csv_path: Путь к CSV файлу с растениями
-        db_path: Путь к файлу БД (по умолчанию 'careforme.db')
-
-    Returns:
-        True если загружено хотя бы одно растение, иначе False
-
-    Raises:
-        FileNotFoundError: Если CSV файл не найден (логируется ошибка)
-
-
-    Ожидаемая структура CSV:
-        species_id,species_name,disease,why_disease,
-        water_interval_min,water_interval_max,light_requirement,humidity_preference,sort_order
     """
     if not Path(csv_path).exists():
         logger.error(f"CSV файл не найден: {csv_path}")
@@ -62,23 +47,36 @@ def load_plants_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bo
 
         for i, row in enumerate(rows, start=2):
             try:
+                # ИСПРАВЛЕНО: теперь 18 полей (добавлен unlock_level)
                 query = """
                     INSERT INTO plant_templates (
-                        species_id, species_name, disease, why_disease,
+                        species_id, species_name, nickname, description, character_trait,
+                        disease, why_disease,
                         water_interval_min, water_interval_max,
-                        light_requirement, humidity_preference, sort_order
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        light_requirement, humidity_preference,
+                        watering_advice, light_advice, tips, symptoms, flowering_conditions,
+                        unlock_level, sort_order
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """
 
                 params = (
                     int(row.get('species_id', 0)),
                     row.get('species_name', '').strip(),
+                    row.get('nickname', '').strip(),
+                    row.get('description', '').strip(),
+                    row.get('character_trait', '').strip(),
                     row.get('disease', '').strip(),
                     row.get('why_disease', '').strip(),
                     int(row.get('water_interval_min', 0)),
                     int(row.get('water_interval_max', 0)),
                     row.get('light_requirement', 'medium').lower(),
-                    row.get('humidity_preference', 'medium'),
+                    row.get('humidity_preference', 'medium').strip(),
+                    row.get('watering_advice', '').strip(),
+                    row.get('light_advice', '').strip(),
+                    row.get('tips', '').strip(),
+                    row.get('symptoms', '').strip(),
+                    row.get('flowering_conditions', '').strip(),
+                    int(row.get('unlock_level', 1)),  # unlock_level
                     int(row.get('sort_order', 0))
                 )
 

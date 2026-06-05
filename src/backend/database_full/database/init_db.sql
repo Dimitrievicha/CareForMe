@@ -57,12 +57,26 @@ CREATE TABLE IF NOT EXISTS plant_templates (
     id VARCHAR(36) PRIMARY KEY DEFAULT (LOWER(HEX(RANDOMBLOB(16)))),
     species_id INTEGER UNIQUE NOT NULL,
     species_name VARCHAR(100) NOT NULL,
+
+    nickname VARCHAR(100),
+    description TEXT,
+    character_trait VARCHAR(100),
+
     disease TEXT DEFAULT '',
     why_disease TEXT DEFAULT '',
+    symptoms TEXT,
+
     water_interval_min INTEGER,
     water_interval_max INTEGER,
     light_requirement VARCHAR(20) CHECK (light_requirement IN ('low', 'medium', 'high')),
     humidity_preference VARCHAR(20) CHECK (humidity_preference IN ('low', 'medium', 'high')),
+
+    watering_advice TEXT,
+    light_advice TEXT,
+    tips TEXT,
+    flowering_conditions TEXT,
+    unlock_level INTEGER DEFAULT 1,
+
     sort_order INTEGER DEFAULT 0
 );
 
@@ -110,6 +124,7 @@ CREATE TABLE IF NOT EXISTS user_plants (
 CREATE TABLE IF NOT EXISTS achievements (
     id VARCHAR(36) PRIMARY KEY DEFAULT (LOWER(HEX(RANDOMBLOB(16)))),
     name VARCHAR(100) UNIQUE NOT NULL,
+    description TEXT,
     requirement_type VARCHAR(50),
     target_value INTEGER,
     is_active BOOLEAN DEFAULT 1,

@@ -5,21 +5,26 @@
 
 import sys
 from pathlib import Path
-from src.backend.database_full.database.db_manager import get_db_manager
-from src.backend.database_full.database.raw_sql_loader import (
+
+# Добавляем корневую директорию backend в путь поиска модулей
+# Определяем путь к папке backend (родительская для scripts)
+backend_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(backend_dir))
+
+print(f"Добавлен путь: {backend_dir}")
+print(f"Текущий PYTHONPATH: {sys.path[0]}")
+
+from database_full.database.db_manager import get_db_manager
+from database_full.database.raw_sql_loader import (
         load_plants_from_csv_raw,
         load_achievements_from_csv_raw,
         load_tips_from_csv_raw,
         load_level_requirements_from_csv_raw,
-        load_designs_from_csv_raw
     )
 
 
 def load_csv_data():
     """Загружает все данные из CSV файлов"""
-
-    # Добавляем путь для импорта модулей
-    sys.path.insert(0, str(Path(__file__).parent.parent))
 
     db = get_db_manager()
 
@@ -30,14 +35,18 @@ def load_csv_data():
         print("Данные уже загружены, пропускаем...")
         return True
 
-    # Путь к CSV файлам
-    csv_dir = Path(__file__).parent.parent / 'csv'
+    # Путь к CSV файлам (папка csv в корне backend)
+    csv_dir = csv_dir = backend_dir / 'database_full' / 'csv'
 
     if not csv_dir.exists():
         print(f"Директория CSV не найдена: {csv_dir}")
+        print(f"Создаю папку {csv_dir}...")
+        csv_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Пожалуйста, поместите CSV файлы в папку: {csv_dir}")
         return False
 
     print("Загрузка данных из CSV файлов...")
+    print(f"CSV директория: {csv_dir}")
 
     plant_csv = csv_dir / 'plant_catalog.csv'
     if plant_csv.exists():
@@ -70,23 +79,14 @@ def load_csv_data():
     else:
         print(f"Файл не найден: {level_csv}")
 
-    # 5. Загружаем дизайны
-    designs_csv = csv_dir / 'designs.csv'
-    if designs_csv.exists():
-        print("\nЗагрузка дизайнов...")
-        load_designs_from_csv_raw(str(designs_csv))
-    else:
-        print(f"Файл не найден: {designs_csv}")
-
-    print("Результат загрузки:")
+    print("\nРезультат загрузки:")
 
     stats = db.execute_query("""
         SELECT 
             (SELECT COUNT(*) FROM plant_templates) as plants,
             (SELECT COUNT(*) FROM achievements) as achievements,
             (SELECT COUNT(*) FROM tips) as tips,
-            (SELECT COUNT(*) FROM level_requirements) as levels,
-            (SELECT COUNT(*) FROM designs) as designs
+            (SELECT COUNT(*) FROM level_requirements) as levels
     """)
 
     if stats:
@@ -101,10 +101,12 @@ def load_csv_data():
 
 if __name__ == "__main__":
     print("Care For Me - Загрузка данных")
+    print(f"Скрипт запущен из: {Path(__file__).parent}")
+    print(f"Корневая директория backend: {Path(__file__).parent.parent}")
 
     if load_csv_data():
-        print("\nВсе данные успешно загружены!")
+        print("\n✅ Все данные успешно загружены!")
         sys.exit(0)
     else:
-        print("\nОшибка загрузки данных")
+        print("\n❌ Ошибка загрузки данных")
         sys.exit(1)

@@ -24,25 +24,14 @@ class PlantRepository(BaseRepository):
     def get_all_templates(self) -> List[Dict[str, Any]]:
         """
         Получает все шаблоны растений, отсортированные по sort_order.
-
-        Returns:
-            Список всех шаблонов растений (Спатифиллюм, Кактус, Фикус, ...)
-
-        Returns структура:
-            [
-                {
-                    "species_id": 1,
-                    "species_name": "Спатифиллюм",
-                    "water_interval_min": 3,
-                    "water_interval_max": 7,
-                    ...
-                }
-            ]
         """
         return self.db.execute_query("""
-            SELECT species_id, species_name, disease, why_disease,
-                   water_interval_min, water_interval_max, light_requirement, humidity_preference,
-                   sort_order
+            SELECT species_id, species_name, nickname, description, character_trait,
+                   disease, why_disease,
+                   water_interval_min, water_interval_max,
+                   light_requirement, humidity_preference,
+                   watering_advice, light_advice, tips, symptoms, flowering_conditions,
+                   unlock_level, sort_order
             FROM plant_templates 
             ORDER BY sort_order
         """)

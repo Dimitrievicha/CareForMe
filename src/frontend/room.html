@@ -85,7 +85,7 @@
 
 <!-- МОДАЛКА: ВЫБОР ГОРШКА -->
 <div class="modal-overlay" id="modalPlacePot">
-    <div class="modal-window light-modal">
+    <div class="modal-window light-modal choice-picker-modal">
         <div class="modal-title light-title">Выбери горшок 🪴</div>
         <div class="modal-pots-row" id="potChoicesRow"></div>
         <button class="modal-btn cancel-btn light-cancel-btn" id="cancelPlacePot">Отмена</button>
@@ -94,7 +94,7 @@
 
 <!-- МОДАЛКА: ПЕРЕСТАНОВКА ГОРШКОВ -->
 <div class="modal-overlay" id="modalMovePlant">
-    <div class="modal-window light-modal">
+    <div class="modal-window light-modal choice-picker-modal">
         <div class="modal-title light-title">Переставить горшок 🪴</div>
         <div class="modal-pots-row" id="moveChoicesRow"></div>
         <button class="modal-btn cancel-btn light-cancel-btn" id="cancelMove">Отмена</button>
@@ -103,7 +103,7 @@
 
 <!-- МОДАЛКА: ВЫБОР ЦВЕТКА -->
 <div class="modal-overlay" id="modalPickFlower">
-    <div class="modal-window light-modal">
+    <div class="modal-window light-modal choice-picker-modal">
         <div class="modal-title light-title">Выбери цветок 🌱</div>
         <div class="modal-pots-row" id="flowerChoicesRow"></div>
         <button class="modal-btn cancel-btn light-cancel-btn" id="cancelPickFlower">Отмена</button>
@@ -112,7 +112,7 @@
 
 <!-- МОДАЛКА: ВЫБОР ЛЕЙКИ -->
 <div class="modal-overlay" id="modalWaterCan">
-    <div class="modal-window light-modal">
+    <div class="modal-window light-modal choice-picker-modal">
         <div class="modal-title light-title">Выбери лейку 💧</div>
         <div class="modal-pots-row" id="waterCanChoicesRow"></div>
         <button class="modal-btn cancel-btn light-cancel-btn" id="closeWaterCan">Отмена</button>
@@ -122,50 +122,52 @@
 <!-- ЗУМ ГОРШКА -->
 <div class="zoom-overlay" id="zoomOverlay">
     <div class="zoom-viewport">
+    <div class="zoom-custom-window">
         <div class="zoom-panel" id="zoomStage">
-            <button class="zoom-close-btn" id="zoomClose">✕</button>
-            <img src="images/room/стол.png" class="zoom-table-bg" alt="стол">
-            <div class="zoom-content-wrapper">
-                <div class="zoom-left">
-                    <div class="zoom-pot-container">
-                        <img id="zoomPotImg" src="" alt="горшок" class="zoom-pot-img">
-                        <img id="zoomPlantImg" src="" alt="растение" class="zoom-plant-img">
-                        <div class="watering-anim" id="wateringAnim" data-can="1">
-                            <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img" id="wateringCanImg">
-                            <div class="water-drops" id="waterDrops"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="zoom-left-panel light-panel">
-                    <button class="plant-btn-left light-plant-btn" id="plantBtnLeft">Посадить</button>
-                    <button class="water-btn-left light-water-btn" id="waterBtnLeft">Полить</button>
-                    <button class="remove-btn-left light-remove-btn" id="removeBtnLeft" style="display:none;">Выбросить</button>
-                    <button class="repot-btn-left light-repot-btn" id="repotBtnLeft">Пересадить</button>
-                    <button class="move-btn-left light-move-btn" id="moveBtnLeft">Переставить горшок</button>
-                    <div class="timer-box light-timer-box" id="growthTimerBox" style="display:none;"></div>
-                    <div class="timer-box light-timer-box" id="waterTimerBox" style="display:none;"></div>
-                </div>
-                <div class="zoom-right-panel light-panel">
-                    <div class="plant-name-zoom light-name" id="zoomPlantName">Пустой горшок</div>
-                    <div class="plant-stage light-stage" id="zoomStageLabel"></div>
-                    <button class="desc-btn-right light-desc-btn" id="descBtnRight">📖 Описание</button>
-                    <div class="watering-info light-watering-info" id="wateringInfo"></div>
-                    <div class="description-box light-description-box" id="descriptionBox" style="display:none;">
-                        <div class="desc-text light-desc-text" id="plantDescription"></div>
-                    </div>
-                    <div class="disease-box light-disease-box" id="diseaseBox" style="display:none;">
-                        <div class="disease-title">Болезнь</div>
-                        <div class="disease-text" id="diseaseText"></div>
+        <img src="images/room/стол.png" class="zoom-table-bg" alt="стол">
+        <div class="zoom-content-wrapper">
+            <div class="zoom-left">
+                <div class="zoom-pot-container">
+                    <img id="zoomPotImg" src="" alt="горшок" class="zoom-pot-img">
+                    <img id="zoomPlantImg" src="" alt="растение" class="zoom-plant-img">
+                    <div class="watering-anim" id="wateringAnim" data-can="1">
+                        <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img" id="wateringCanImg">
+                        <div class="water-drops" id="waterDrops"></div>
                     </div>
                 </div>
             </div>
+            <div class="zoom-left-panel light-panel">
+                <button class="plant-btn-left light-plant-btn" id="plantBtnLeft">Посадить</button>
+                <button class="water-btn-left light-water-btn" id="waterBtnLeft">Полить</button>
+                <button class="repot-btn-left light-repot-btn" id="repotBtnLeft">Пересадить</button>
+                <button class="move-btn-left light-move-btn" id="moveBtnLeft">Переставить горшок</button>
+                <button class="remove-btn-left light-remove-btn" id="removeBtnLeft" style="display:none;">Выбросить</button>
+            </div>
+            <div class="zoom-right-panel light-panel">
+                <div class="plant-name-zoom light-name" id="zoomPlantName">Пустой горшок</div>
+                <div class="plant-stage light-stage" id="zoomStageLabel"></div>
+                <button class="desc-btn-right light-desc-btn" id="descBtnRight">Описание</button>
+                <div class="watering-info light-watering-info" id="wateringInfo"></div>
+                <div class="timer-box light-timer-box" id="waterTimerBox" style="display:none;"></div>
+                <div class="timer-box light-timer-box" id="growthTimerBox" style="display:none;"></div>
+                <div class="disease-box light-disease-box" id="diseaseBox" style="display:none;">
+                    <div class="disease-title">Болезнь</div>
+                    <div class="disease-text" id="diseaseText"></div>
+                </div>
+                <div class="description-box light-description-box" id="descriptionBox" style="display:none;">
+                    <div class="desc-text light-desc-text" id="plantDescription"></div>
+                </div>
+            </div>
         </div>
+        </div>
+        <button class="achievements-close-btn zoom-close-btn" id="zoomClose">✕</button>
+    </div>
     </div>
 </div>
 
 <!-- МОДАЛКА: ПЕРЕСАДКА -->
 <div class="modal-overlay" id="modalRepot">
-    <div class="modal-window light-modal">
+    <div class="modal-window light-modal choice-picker-modal">
         <div class="modal-title light-title">Выбери новый горшок 🪴</div>
         <div class="modal-pots-row" id="repotChoicesRow"></div>
         <button class="modal-btn cancel-btn light-cancel-btn" id="cancelRepot">Отмена</button>

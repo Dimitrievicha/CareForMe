@@ -1,10 +1,10 @@
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
-/** Эталонный размер сцены комнаты (координаты слотов в room.css) */
+/** Эталонный размер сцены комнаты */
 const ROOM_DESIGN_WIDTH = 1280;
 const ROOM_DESIGN_HEIGHT = 720;
-const ZOOM_DESIGN_WIDTH = 1000;
+const ZOOM_DESIGN_WIDTH = 780;
 const ZOOM_DESIGN_HEIGHT = 500;
 const ZOOM_VIEWPORT_FILL = 0.75;
 const LETTERBOX_LOGO_MIN_HEIGHT = 88;
@@ -208,6 +208,31 @@ function saveState() {
 let PLANTS = {};
 let POT_CONFIG = {};
 let WATERING_CAN_CONFIG = {};
+
+const POT_DISPLAY_NAMES = {
+    1: 'Обычный',
+    2: 'С рисунком',
+    3: 'Большой'
+};
+
+const WATERING_CAN_DISPLAY_NAMES = {
+    1: 'Бежевая',
+    2: 'Розовая'
+};
+
+function applyPotDisplayNames(pots) {
+    Object.keys(pots).forEach((num) => {
+        const key = parseInt(num, 10);
+        if (POT_DISPLAY_NAMES[key]) pots[num].name = POT_DISPLAY_NAMES[key];
+    });
+}
+
+function applyWateringCanDisplayNames(cans) {
+    Object.keys(cans).forEach((id) => {
+        const key = normalizeWateringCanId(id);
+        if (WATERING_CAN_DISPLAY_NAMES[key]) cans[id].name = WATERING_CAN_DISPLAY_NAMES[key];
+    });
+}
 let currentLevel = 1;
 let currentUser = null;
 let currentZoomedPlantId = null;
@@ -239,35 +264,35 @@ function plantVisual(bottom, width, pot1, pot2, pot3, extra = {}) {
 
 const PLANT_VISUAL_CONFIG = {
     1: { // Спатифиллум
-        sprout: plantVisual('35px', '90px', [18, 40], [12, 30], [36, 57]),
-        bloom: plantVisual('20px', '120px', [19, 37], [12, 27], [37, 53]),
+        sprout: plantVisual('35px', '90px', [18, 42], [12, 32], [36, 63]),
+        bloom: plantVisual('20px', '120px', [19, 39], [12, 29], [37, 57]),
         dead: plantVisual('35px', '100px', [-42, -39], [-48, -48], [-24, -21]),
         diseases: {
-            too_light: plantVisual('35px', '100px', [40, 70], [34, 62], [58, 87], { imageKey: 'желтение' }),
-            big_pot: plantVisual('35px', '95px', [51, 84], [45, 76], [69, 102], { imageKey: 'не цветет' }),
-            under_watered: plantVisual('35px', '100px', [44, 75], [38, 68], [63, 94], { imageKey: 'сохнут кончики' }),
-            overwatered: plantVisual('35px', '100px', [40, 70], [34, 62], [58, 87], { imageKey: 'желтение' })
+            too_light: plantVisual('35px', '100px', [40, 69], [34, 59], [58, 86], { imageKey: 'желтение' }),
+            big_pot: plantVisual('35px', '95px', [51, 84], [45, 75], [69, 103], { imageKey: 'не цветет' }),
+            under_watered: plantVisual('35px', '100px', [44, 75], [38, 65], [63, 94], { imageKey: 'сохнут кончики' }),
+            overwatered: plantVisual('35px', '100px', [40, 69], [34, 59], [58, 86], { imageKey: 'желтение' })
         }
     },
     2: { // Кактус
-        sprout: plantVisual('45px', '60px', [10, 33], [4, 24], [28, 52]),
-        bloom: plantVisual('40px', '70px', [-28, -20], [-34, -28], [-9, -2]),
+        sprout: plantVisual('45px', '60px', [10, 35], [4, 26], [28, 54]),
+        bloom: plantVisual('40px', '70px', [-28, -19], [-34, -27], [-9, -1]),
         dead: plantVisual('40px', '65px', [-28, -18], [-34, -28], [-10, 0]),
         diseases: {
-            too_dark: plantVisual('50px', '30px', [36, 70], [30, 60], [54, 87], { imageKey: 'вытягивание' }),
+            too_dark: plantVisual('50px', '30px', [36, 70], [30, 60], [54, 88], { imageKey: 'вытягивание' }),
             no_flower: plantVisual('45px', '35px', [40, 73], [34, 64], [58, 90], { imageKey: 'не цветет' }),
-            under_watered: plantVisual('38px', '34px', [42, 74], [36, 65], [60, 92], { imageKey: 'сморщенный стебель' }),
-            overwatered: plantVisual('38px', '34px', [42, 74], [36, 65], [60, 92], { imageKey: 'сморщенный стебель' })
+            under_watered: plantVisual('38px', '34px', [42, 75], [36, 66], [60, 93], { imageKey: 'сморщенный стебель' }),
+            overwatered: plantVisual('38px', '34px', [42, 75], [36, 66], [60, 93], { imageKey: 'сморщенный стебель' })
         }
     },
     3: { // Фикус
         sprout: plantVisual('40px', '75px', [-33, -23], [-38, -32], [-13, -4]),
-        bloom: plantVisual('35px', '125px', [-19, -10], [-25, -18], [0, 8]),
+        bloom: plantVisual('35px', '125px', [-19, -6], [-25, -14], [0, 12]),
         dead: plantVisual('19px', '95px', [-28, -25], [-33, -34], [-10, -8]),
         diseases: {
-            too_light: plantVisual('40px', '80px', [34, 62], [27, 54], [52, 80], { imageKey: 'пятна' }),
-            under_watered: plantVisual('40px', '75px', [42, 73], [35, 63], [60, 92], { imageKey: 'желтение' }),
-            overwatered: plantVisual('40px', '55px', [43, 77], [38, 67], [62, 97], { imageKey: 'увядание' })
+            too_light: plantVisual('40px', '80px', [34, 66], [27, 58], [52, 84], { imageKey: 'пятна' }),
+            under_watered: plantVisual('40px', '75px', [42, 77], [35, 67], [60, 96], { imageKey: 'желтение' }),
+            overwatered: plantVisual('40px', '55px', [43, 81], [38, 71], [62, 101], { imageKey: 'увядание' })
         }
     }
 };
@@ -532,6 +557,7 @@ async function loadPots() {
                     isUnlocked: isUnlocked
                 };
             });
+            applyPotDisplayNames(pots);
             POT_CONFIG = pots;
             return true;
         }
@@ -574,6 +600,7 @@ async function loadWateringCans() {
                     id: can.id
                 };
             });
+            applyWateringCanDisplayNames(cans);
             WATERING_CAN_CONFIG = cans;
             checkAndUnlockWateringCans();
             const serverCan = data.current?.watering_can;
@@ -683,16 +710,16 @@ function setDefaultPlants() {
 
 function setDefaultPots() {
     POT_CONFIG = {
-        1: { name: 'Горшок 1', img: '/images/pot/горшок1.png', unlockLevel: 1, isUnlocked: true },
-        2: { name: 'Горшок 2', img: '/images/pot/горшок2.png', unlockLevel: 2, isUnlocked: currentLevel >= 2 },
-        3: { name: 'Горшок 3', img: '/images/pot/горшок3.png', unlockLevel: 6, isUnlocked: currentLevel >= 6 }
+        1: { name: 'Обычный', img: '/images/pot/горшок1.png', unlockLevel: 1, isUnlocked: true },
+        2: { name: 'С рисунком', img: '/images/pot/горшок2.png', unlockLevel: 2, isUnlocked: currentLevel >= 2 },
+        3: { name: 'Большой', img: '/images/pot/горшок3.png', unlockLevel: 6, isUnlocked: currentLevel >= 6 }
     };
 }
 
 function setDefaultWateringCans() {
     WATERING_CAN_CONFIG = {
-        1: { name: 'Лейка', img: '/images/water can/лейка.png', unlockLevel: 1, isUnlocked: true, id: '1' },
-        2: { name: 'Лейка 2', img: '/images/water can/лейка2.png', unlockLevel: 4, isUnlocked: currentLevel >= 4, id: '2' }
+        1: { name: 'Бежевая', img: '/images/water can/лейка.png', unlockLevel: 1, isUnlocked: true, id: '1' },
+        2: { name: 'Розовая', img: '/images/water can/лейка2.png', unlockLevel: 4, isUnlocked: currentLevel >= 4, id: '2' }
     };
 }
 
@@ -701,16 +728,17 @@ const PLANT_SICK_LABEL = 'Болеет';
 const PLANT_DEAD_LABEL = 'Умерло';
 
 const LEVEL_REWARDS = {
-    2: '🎉 Получен новый горшок (Горшок 2)!',
+    2: '🎉 Получен новый горшок «С рисунком»!',
     3: '🌵 Получен новый цветок (Кактус)!',
-    4: '💧 Получена новая лейка (Лейка 2)!',
+    4: '💧 Получена новая лейка «Розовая»!',
     5: '🌿 Получен новый цветок (Фикус)!',
-    6: '🏆 Получен легендарный Горшок 3 и ачивка "Страж флоры"!'
+    6: '🏆 Получен горшок «Большой» и ачивка «Страж флоры»!'
 };
 
 const slotData = {};
 let activeSlot = null;
 let zoomedSlot = null;
+let zoomTimerTickId = null;
 
 const popupQueue = [];
 let popupShowing = false;
@@ -729,7 +757,7 @@ const devStatePanel = document.getElementById('devStatePanel');
 const devStateSelect = document.getElementById('devStateSelect');
 const devApplyStateBtn = document.getElementById('devApplyState');
 
-const NOTIFICATION_DURATION_MS = 30 * 1000;
+const NOTIFICATION_DURATION_MS = 10 * 1000;
 let notificationIdSeq = 0;
 const activeNotifications = [];
 
@@ -792,7 +820,48 @@ function showNotification(message, isError = false) {
 }
 
 function openModal(el) { if (el) el.classList.add('active'); }
-function closeModal(el) { if (el) el.classList.remove('active'); }
+function closeModal(el) {
+    if (el) el.classList.remove('active');
+    if (el === zoomOverlay) stopZoomTimerTick();
+}
+
+function stopZoomTimerTick() {
+    if (zoomTimerTickId !== null) {
+        clearInterval(zoomTimerTickId);
+        zoomTimerTickId = null;
+    }
+}
+
+function refreshZoomPanelTimers() {
+    if (!zoomedSlot?.name) return;
+
+    const slotName = zoomedSlot.name;
+    const data = slotData[slotName];
+    if (!data?.plant) return;
+
+    const prevStage = data.stage;
+    if (!isPlantDead(data)) {
+        applyGrowthFromTime(slotName);
+    }
+
+    const fresh = slotData[slotName];
+    if (!fresh) return;
+
+    if (fresh.stage !== prevStage) {
+        refreshPlantVisual(slotName);
+    }
+
+    updateGrowthTimer(fresh);
+    updateNextWateringTimer(fresh);
+}
+
+function startZoomTimerTick() {
+    stopZoomTimerTick();
+    refreshZoomPanelTimers();
+    zoomTimerTickId = setInterval(refreshZoomPanelTimers, 1000);
+}
+
+const ACHIEVEMENT_REASON_TOAST_MS = 5 * 1000;
 
 function showAchievementReasonToast(achievementId) {
     const config = ACHIEVEMENTS_CONFIG[achievementId];
@@ -810,7 +879,7 @@ function showAchievementReasonToast(achievementId) {
 
     setTimeout(() => {
         toast.classList.remove('show');
-    }, 2500);
+    }, ACHIEVEMENT_REASON_TOAST_MS);
 }
 
 function showAchievementUnlockToast(achievementId) {
@@ -1368,6 +1437,22 @@ function getBloomBlockReason(data, plant) {
     if (hasOverwaterRisk(data, plant)) return 'не может расцвести — слишком частый полив';
     if (!hasRegularWatering(data, plant)) return 'не может расцвести — нужен регулярный полив';
     return null;
+}
+
+function notifyBloomBlockedOnce(data, bloomBlock) {
+    if (!data?.plant || !bloomBlock) return;
+    if (data.bloomBlockNotified === bloomBlock) return;
+
+    data.bloomBlockNotified = bloomBlock;
+    const plantName = PLANTS[data.plant]?.name || 'Растение';
+    showNotification(`⚠️ ${plantName} ${bloomBlock}!`, true);
+    saveState();
+}
+
+function clearBloomBlockNotified(data) {
+    if (data?.bloomBlockNotified) {
+        delete data.bloomBlockNotified;
+    }
 }
 
 function getDiseaseTypeFromMessage(plantKey, diseaseMsg) {
@@ -2017,6 +2102,19 @@ function checkAndUnlockWateringCans() {
     }
 }
 
+function buildChoiceCardInnerHTML({ imgSrc, imgAlt, title, extraHtml = '', imgClass = '', imgStyle = '' }) {
+    const classAttr = imgClass ? ` class="${imgClass}"` : '';
+    const styleAttr = imgStyle ? ` style="${imgStyle}"` : '';
+    return `
+        <div class="choice-card-media">
+            <img src="${imgSrc}" alt="${imgAlt}"${classAttr}${styleAttr}>
+        </div>
+        <div class="choice-card-caption">
+            <span class="choice-card-title">${title}</span>
+            ${extraHtml}
+        </div>`;
+}
+
 function renderPotChoices() {
     const row = document.getElementById('potChoicesRow');
     if (!row) return;
@@ -2027,9 +2125,13 @@ function renderPotChoices() {
         const div = document.createElement('div');
         div.className = 'pot-choice' + (locked ? ' locked-choice' : '');
         div.dataset.pot = num;
-        div.innerHTML = `<img src="${cfg.img}" alt="${cfg.name}"${locked ? ' style="filter:grayscale(1) opacity(0.5)"' : ''}>
-            <span>${cfg.name}</span>
-            ${locked ? `<span class="unlock-hint">🔒 ур.${cfg.unlockLevel}</span>` : ''}`;
+        div.innerHTML = buildChoiceCardInnerHTML({
+            imgSrc: cfg.img,
+            imgAlt: cfg.name,
+            title: cfg.name,
+            extraHtml: locked ? `<span class="unlock-hint">🔒 ур.${cfg.unlockLevel}</span>` : '',
+            imgStyle: locked ? 'filter:grayscale(1) opacity(0.5)' : ''
+        });
         if (!locked) {
             div.addEventListener('click', () => {
                 if (activeSlot) {
@@ -2056,14 +2158,20 @@ function renderFlowerChoices() {
 
     Object.entries(PLANTS).forEach(([key, plant]) => {
         const locked = plant.unlockLevel > currentLevel;
-        const previewImage = plant.stages && plant.stages[1] ? plant.stages[1] : 'images/plant/default/stage/росток.png';
+        const previewImage = plant.stages?.[2]
+            || plant.stages?.[1]
+            || 'images/plant/default/stage/выросший.png';
 
         const div = document.createElement('div');
         div.className = 'flower-choice' + (locked ? ' locked-choice' : '');
         div.dataset.plant = key;
-        div.innerHTML = `<img src="${previewImage}" alt="${plant.name}"${locked ? ' style="filter:grayscale(1) opacity(0.5)"' : ''}>
-            <span>${plant.name}</span>
-            ${locked ? `<span class="unlock-hint">🔒 ур.${plant.unlockLevel}</span>` : ''}`;
+        div.innerHTML = buildChoiceCardInnerHTML({
+            imgSrc: previewImage,
+            imgAlt: plant.name,
+            title: plant.name,
+            extraHtml: locked ? `<span class="unlock-hint">🔒 ур.${plant.unlockLevel}</span>` : '',
+            imgStyle: locked ? 'filter:grayscale(1) opacity(0.5)' : ''
+        });
 
         if (!locked) {
             div.addEventListener('click', () => {
@@ -2118,9 +2226,13 @@ function renderWateringCanChoices() {
         const div = document.createElement('div');
         div.className = 'watercan-choice' + (locked ? ' locked-choice' : '') + (isCurrent ? ' current-can' : '');
         div.dataset.can = id;
-        div.innerHTML = `<img src="${cfg.img}" alt="${cfg.name}"${locked ? ' style="filter:grayscale(1) opacity(0.5)"' : ''}>
-            <span>${cfg.name}</span>
-            ${locked ? `<span class="unlock-hint">🔒 ур.${cfg.unlockLevel}</span>` : ''}`;
+        div.innerHTML = buildChoiceCardInnerHTML({
+            imgSrc: cfg.img,
+            imgAlt: cfg.name,
+            title: cfg.name,
+            extraHtml: locked ? `<span class="unlock-hint">🔒 ур.${cfg.unlockLevel}</span>` : '',
+            imgStyle: locked ? 'filter:grayscale(1) opacity(0.5)' : ''
+        });
 
         if (!locked && !isCurrent) {
             div.addEventListener('click', () => {
@@ -2236,11 +2348,13 @@ function renderMoveChoices() {
             statusHtml = `<span class="occupied-label">🌿 ${plantName}</span>`;
         }
 
-        div.innerHTML = `
-            <img src="${potImg}" alt="место" style="${isEmpty ? 'width:60px; height:60px; opacity:0.6' : ''}">
-            <span>${slotDisplayName}</span>
-            ${statusHtml}
-        `;
+        div.innerHTML = buildChoiceCardInnerHTML({
+            imgSrc: potImg,
+            imgAlt: 'место',
+            title: slotDisplayName,
+            extraHtml: statusHtml,
+            imgClass: isEmpty ? 'choice-card-img--empty' : ''
+        });
 
         div.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -2476,7 +2590,7 @@ function renderSlot(slotEl, data) {
     if (potConfig) {
         potImg.src = potConfig.img;
         potImg.className = 'slot-placed-pot';
-        potImg.alt = `Горшок ${data.pot}`;
+        potImg.alt = potConfig.name || `Горшок ${data.pot}`;
         slotEl.prepend(potImg);
     }
 
@@ -2817,12 +2931,13 @@ function openZoom(slotEl, name, data) {
 
         setZoomControlsForPlantState(data);
         updateWateringInfo(data);
-        if (!isPlantDead(data)) {
-            updateGrowthTimer(data);
-            updateNextWateringTimer(data);
-        }
         updateDiseaseInfo(data);
         showFixAdvice(data);
+        if (!isPlantDead(data)) {
+            startZoomTimerTick();
+        } else {
+            stopZoomTimerTick();
+        }
 
     } else {
         if (plantImg) plantImg.style.display = 'none';
@@ -2863,6 +2978,8 @@ function openZoom(slotEl, name, data) {
 
         const fixBox = document.getElementById('fixAdviceBox');
         if (fixBox) fixBox.style.display = 'none';
+
+        stopZoomTimerTick();
     }
 
     const wateringAnim = document.getElementById('wateringAnim');
@@ -2925,9 +3042,13 @@ function renderRepotChoices() {
         const div = document.createElement('div');
         div.className = 'pot-choice' + (locked ? ' locked-choice' : '') + (isCurrent ? ' current-pot' : '');
         div.dataset.pot = num;
-        div.innerHTML = `<img src="${cfg.img}" alt="${cfg.name}"${locked ? ' style="filter:grayscale(1) opacity(0.5)"' : ''}>
-            <span>${cfg.name}</span>
-            ${locked ? `<span class="unlock-hint">🔒 ур.${cfg.unlockLevel}</span>` : ''}`;
+        div.innerHTML = buildChoiceCardInnerHTML({
+            imgSrc: cfg.img,
+            imgAlt: cfg.name,
+            title: cfg.name,
+            extraHtml: locked ? `<span class="unlock-hint">🔒 ур.${cfg.unlockLevel}</span>` : '',
+            imgStyle: locked ? 'filter:grayscale(1) opacity(0.5)' : ''
+        });
         if (!locked && !isCurrent) {
             div.addEventListener('click', () => {
                 if (!zoomedSlot) return;
@@ -3247,6 +3368,7 @@ function applyGrowthFromTime(slotName) {
         const plant = PLANTS[dataAfter.plant];
         const bloomBlock = getBloomBlockReason(dataAfter, plant);
         if (!bloomBlock && dataAfter.stage >= 1) {
+            clearBloomBlockNotified(dataAfter);
             const oldStage = dataAfter.stage;
             dataAfter.stage = 2;
             dataAfter.bloomedAt = dataAfter.bloomedAt || (dataAfter.plantedAt + BLOOM_MS);
@@ -3260,7 +3382,9 @@ function applyGrowthFromTime(slotName) {
             saveState();
             checkQuestsAfterAction();
         } else if (bloomBlock) {
-            showNotification(`⚠️ ${PLANTS[dataAfter.plant]?.name} ${bloomBlock}!`, true);
+            notifyBloomBlockedOnce(dataAfter, bloomBlock);
+        } else {
+            clearBloomBlockNotified(dataAfter);
         }
     } else if (msSincePlanted >= SEEDLING_MS && data.stage < 1) {
         const oldStage = data.stage;
@@ -3314,9 +3438,10 @@ function scheduleGrowth(slotName) {
             const plant = PLANTS[fresh.plant];
             const bloomBlock = getBloomBlockReason(fresh, plant);
             if (bloomBlock) {
-                showNotification(`⚠️ ${PLANTS[fresh.plant]?.name} ${bloomBlock}!`, true);
+                notifyBloomBlockedOnce(fresh, bloomBlock);
                 return;
             }
+            clearBloomBlockNotified(fresh);
             fresh.stage = 2;
             fresh.bloomedAt = Date.now();
             const slotEl = document.querySelector(`[data-slot="${slotName}"]`);

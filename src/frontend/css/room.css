@@ -13,7 +13,6 @@ body {
     background: var(--room-letterbox-bg);
 }
 
-/* ===== ПЕРЕМЕННЫЕ ДЛЯ НАСТРОЙКИ ОКНА ЗУМА ===== */
 :root {
     --room-design-width: 1280px;
     --room-design-height: 720px;
@@ -22,13 +21,13 @@ body {
     --letterbox-x: 0px;
     --letterbox-y: 0px;
     --room-letterbox-bg: #eed1b1;
-    --zoom-design-width: 1000px;
+    --zoom-design-width: 780px;
     --zoom-design-height: 500px;
     --zoom-scale: 1;
     --zoom-bg-color: #f5e6d3;
+    --zoom-panel-height: 350;
 }
 
-/* Полосы по краям (другой aspect ratio) */
 .room-letterbox {
     position: fixed;
     z-index: 1;
@@ -98,7 +97,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .room-stage {
-    /* Эталон сцены 1280×720; cqw/cqh — % размеров от сцены (как прежние px) */
     --room-w: 1280;
     --room-h: 720;
     container-type: size;
@@ -124,8 +122,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     pointer-events: none;
 }
 
-/* UI внутри .room-stage: позиция — % сцены; размеры — cqw/cqh (эталон 1280×720) */
-/*  ПАНЕЛЬ ЗАДАНИЙ */
 .quests-panel {
     position: absolute;
     left: calc(20 / var(--room-w) * 100%);
@@ -181,7 +177,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     flex-shrink: 0;
 }
 
-/* Верхняя панель: кнопки + кружок уровня в один ряд (без наложения) */
 .room-hud-top {
     position: absolute;
     top: calc(20 / var(--room-h) * 100%);
@@ -200,7 +195,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     pointer-events: auto;
 }
 
-/* КРУЖОК УРОВНЯ */
 .level-circle {
     position: relative;
     flex-shrink: 0;
@@ -373,7 +367,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 .slot-desk-right-1 { left: calc(1050 / var(--room-w) * 100%); top: calc(485 / var(--room-h) * 100%); }
 .slot-desk-right-2 { left: calc(1130 / var(--room-w) * 100%); top: calc(485 / var(--room-h) * 100%); }
 
-/* МОДАЛЬНЫЕ ОКНА */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -401,6 +394,110 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     border: 2px solid #d4a373;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     text-align: center;
+}
+
+.modal-window.choice-picker-modal {
+    width: min(58vw, 580px);
+    min-width: 0;
+    max-width: 58vw;
+    min-height: min(38vh, 420px);
+    padding: clamp(18px, 3.5vw, 32px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.choice-picker-modal .modal-title {
+    font-size: clamp(22px, 3.2vw, 32px);
+    margin-bottom: clamp(14px, 2.5vw, 24px);
+}
+
+.choice-picker-modal .modal-pots-row {
+    flex: 1;
+    align-items: stretch;
+    gap: clamp(12px, 2.5vw, 24px);
+    margin-bottom: clamp(16px, 2.5vw, 28px);
+}
+
+.choice-picker-modal .pot-choice,
+.choice-picker-modal .flower-choice,
+.choice-picker-modal .watercan-choice {
+    width: 30%;
+    min-width: 100px;
+    max-width: 200px;
+    flex: 1 1 30%;
+    padding: clamp(10px, 2vw, 18px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
+.choice-picker-modal .choice-card-media {
+    height: clamp(110px, 15vw, 155px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.choice-picker-modal .choice-card-media img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: bottom center;
+}
+
+.choice-picker-modal .choice-card-media img.choice-card-img--empty {
+    width: 58%;
+    max-height: 72%;
+    opacity: 0.6;
+}
+
+#modalPickFlower .flower-choice[data-plant="2"] .choice-card-media img {
+    transform: translateY(30px);
+}
+
+.choice-picker-modal .choice-card-caption {
+    min-height: 2.75em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.25em;
+    margin-top: clamp(8px, 1.2vw, 12px);
+    text-align: center;
+}
+
+.choice-picker-modal .choice-card-title {
+    display: block;
+    line-height: 1.25;
+    font-size: clamp(12px, 1.6vw, 15px);
+    color: #5d3a1a;
+}
+
+.choice-picker-modal .pot-choice span,
+.choice-picker-modal .flower-choice span,
+.choice-picker-modal .watercan-choice span {
+    font-size: clamp(12px, 1.6vw, 15px);
+}
+
+.choice-picker-modal .unlock-hint {
+    font-size: clamp(9px, 1.2vw, 11px);
+}
+
+.choice-picker-modal .free-label,
+.choice-picker-modal .occupied-label {
+    font-size: clamp(10px, 1.3vw, 12px);
+    line-height: 1.2;
+}
+
+.choice-picker-modal .modal-btn {
+    font-size: clamp(14px, 2vw, 18px);
+    padding: clamp(8px, 1.5vw, 12px) clamp(18px, 3vw, 28px);
 }
 
 .modal-title {
@@ -505,7 +602,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     transform: scale(1.05);
 }
 
-/* ЗУМ: эталон 1000×500, масштаб --zoom-scale, размеры cqw/cqh */
 .zoom-overlay {
     position: fixed;
     inset: 0;
@@ -513,6 +609,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     backdrop-filter: blur(8px);
     display: none;
     z-index: 200;
+    overflow: visible;
 }
 
 .zoom-overlay.active {
@@ -525,6 +622,23 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: visible;
+}
+
+.zoom-custom-window {
+    position: relative;
+    width: var(--zoom-design-width);
+    height: var(--zoom-design-height);
+    flex-shrink: 0;
+    transform: scale(var(--zoom-scale, 1));
+    transform-origin: center center;
+    overflow: visible;
+}
+
+.zoom-custom-window .zoom-close-btn {
+    top: -9%;
+    right: -6%;
+    z-index: 20;
 }
 
 .zoom-panel {
@@ -533,11 +647,8 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     container-type: size;
     container-name: zoom;
     position: relative;
-    width: var(--zoom-design-width);
-    height: var(--zoom-design-height);
-    flex-shrink: 0;
-    transform: scale(var(--zoom-scale, 1));
-    transform-origin: center center;
+    width: 100%;
+    height: 100%;
     background: var(--zoom-bg-color, #f5e6d3);
     border-radius: calc(30 / 1000 * 100cqw);
     overflow: hidden;
@@ -550,6 +661,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center bottom;
     z-index: 0;
 }
 
@@ -604,45 +716,18 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 
 .zoom-left-panel,
 .zoom-right-panel {
+    width: calc(250 / 1000 * 100cqw);
+    height: calc(var(--zoom-panel-height) / 500 * 100cqh);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: hidden;
     background: rgba(255, 248, 235, 0.95);
     border-radius: calc(15 / 1000 * 100cqw);
     padding: calc(15 / 500 * 100cqh) calc(15 / 1000 * 100cqw);
     border: calc(1 / 1000 * 100cqw) solid #d4a373;
     box-sizing: border-box;
-}
-
-.zoom-left-panel {
-    width: calc(200 / 1000 * 100cqw);
-    flex-shrink: 0;
-}
-
-.zoom-right-panel {
-    width: calc(260 / 1000 * 100cqw);
-    flex-shrink: 0;
-}
-
-.zoom-close-btn {
-    position: absolute;
-    top: calc(15 / 500 * 100cqh);
-    right: calc(20 / 1000 * 100cqw);
-    width: calc(40 / 1000 * 100cqw);
-    height: calc(40 / 500 * 100cqh);
-    border-radius: 50%;
-    background: rgba(255, 248, 235, 0.9);
-    border: calc(2 / 1000 * 100cqw) solid #d4a373;
-    color: #5d3a1a;
-    font-size: calc(24 / 500 * 100cqh);
-    cursor: pointer;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.zoom-close-btn:hover {
-    transform: scale(1.1);
-    background: rgba(255, 200, 150, 0.9);
 }
 
 .zoom-panel .repot-btn-left,
@@ -652,50 +737,73 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 .zoom-panel .move-btn-left,
 .zoom-panel .desc-btn-right {
     width: 100%;
-    border: none;
-    border-radius: calc(25 / 1000 * 100cqw);
-    padding: calc(10 / 500 * 100cqh) calc(10 / 1000 * 100cqw);
+    padding: calc(10 / 500 * 100cqh) calc(25 / 500 * 100cqh);
+    border: calc(1 / 500 * 100cqh) solid #d4a373;
+    border-radius: calc(40 / 500 * 100cqh);
     font-weight: bold;
+    font-family: inherit;
+    font-size: calc(16 / 500 * 100cqh);
+    color: #5d3a1a;
+    background: #f0e0c0;
     cursor: pointer;
-    margin-bottom: calc(15 / 500 * 100cqh);
+    margin-bottom: calc(10 / 500 * 100cqh);
     box-sizing: border-box;
+    transition: all 0.2s;
 }
 
-.zoom-panel .repot-btn-left {
-    background: #ff9800;
-    color: white;
-    font-size: calc(14 / 500 * 100cqh);
-}
-
-.zoom-panel .remove-btn-left {
-    background: #dc3545;
-    color: white;
-    font-size: calc(14 / 500 * 100cqh);
+/* Тёплые оттенки — чуть насыщеннее, без градиентов */
+.zoom-panel .water-btn-left {
+    background: #b8dcef;
+    border-color: #5898c0;
 }
 
 .zoom-panel .plant-btn-left {
-    background: #4caf50;
-    color: white;
-    font-size: calc(14 / 500 * 100cqh);
+    background: #d4e8b0;
+    border-color: #80a850;
 }
 
-.zoom-panel .water-btn-left {
-    background: #2196f3;
-    color: white;
-    font-size: calc(16 / 500 * 100cqh);
+.zoom-panel .repot-btn-left {
+    background: #ffd878;
+    border-color: #c89818;
 }
 
-.zoom-panel .move-btn-left,
+.zoom-panel .move-btn-left {
+    background: #d8cda0;
+    border-color: #a89458;
+}
+
+.zoom-panel .remove-btn-left {
+    background: #e8b0a8;
+    border-color: #b05848;
+}
+
 .zoom-panel .desc-btn-right {
-    background: #9c27b0;
-    color: white;
-    font-size: calc(14 / 500 * 100cqh);
+    background: #d0c4e8;
+    border-color: #8870a8;
 }
 
-.repot-btn-left:hover,
-.remove-btn-left:hover,
-.plant-btn-left:hover {
-    opacity: 0.9;
+.zoom-panel .water-btn-left:hover {
+    background: #87a5b8;
+}
+
+.zoom-panel .plant-btn-left:hover {
+    background: #c0dc98;
+}
+
+.zoom-panel .repot-btn-left:hover {
+    background: #ffc830;
+}
+
+.zoom-panel .move-btn-left:hover {
+    background: #c4b888;
+}
+
+.zoom-panel .remove-btn-left:hover {
+    background: #dc9890;
+}
+
+.zoom-panel .desc-btn-right:hover {
+    background: #c0b0dc;
 }
 
 .zoom-panel .disease-box {
@@ -781,7 +889,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     border-radius: calc(10 / 1000 * 100cqw);
     padding: calc(10 / 500 * 100cqh) calc(10 / 1000 * 100cqw);
     max-height: calc(200 / 500 * 100cqh);
-    overflow-y: auto;
+    overflow: hidden;
     border: calc(1 / 1000 * 100cqw) solid #d4a373;
 }
 
@@ -802,7 +910,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     color: #3d2b1a;
 }
 
-/* Полив: лейка и капли привязаны к горшку в зуме */
 .zoom-pot-container .watering-anim {
     position: absolute;
     inset: 0;
@@ -816,7 +923,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     display: block;
 }
 
-/* Общее для всех леек */
 .zoom-pot-container .watering-can-img {
     position: absolute;
     height: auto;
@@ -846,7 +952,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     animation: dropFall 0.6s linear infinite;
 }
 
-/* ——— Лейка 1 (images/water can/лейка.png) ——— */
 .zoom-pot-container .watering-anim[data-can="1"] .watering-can-img {
     top: calc(-155 / 500 * 100cqh);
     left: 100%;
@@ -866,7 +971,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     animation-name: dropFall1;
 }
 
-/* ——— Лейка 2 (images/water can/лейка2.png) — настрой отдельно ——— */
 .zoom-pot-container .watering-anim[data-can="2"] .watering-can-img {
     top: calc(-95 / 500 * 100cqh);
     left: 98%;
@@ -932,15 +1036,16 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     }
 }
 
-/* ОКНО ДОСТИЖЕНИЙ - КАСТОМНЫЙ ДИЗАЙН */
 .achievements-custom-window {
     position: relative;
-    width: 800px;
-    max-width: 85vw;
+    width: min(82vw, 820px);
+    max-width: 92vw;
     height: auto;
     background: transparent;
     border: none;
     overflow: visible;
+    transform: scale(1.22);
+    transform-origin: center center;
 }
 
 .achievements-bg-img {
@@ -951,15 +1056,15 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 
 .achievements-close-btn {
     position: absolute;
-    top: 20px;
-    right: 30px;
-    width: 40px;
-    height: 40px;
+    top: 2.2%;
+    right: 3.5%;
+    width: clamp(32px, 5vw, 44px);
+    height: clamp(32px, 5vw, 44px);
     border-radius: 50%;
     background: rgba(255, 248, 235, 0.9);
     border: 2px solid #d4a373;
     color: #5d3a1a;
-    font-size: 24px;
+    font-size: clamp(18px, 3vw, 26px);
     cursor: pointer;
     z-index: 10;
     display: flex;
@@ -981,13 +1086,13 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     bottom: 12%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+    gap: clamp(10px, 3vw, 30px);
     overflow-y: auto;
-    padding: 15px;
+    padding: clamp(6px, 1.5vw, 15px);
 }
 
 .achievements-grid-custom::-webkit-scrollbar {
-    width: 8px;
+    width: clamp(4px, 1vw, 8px);
 }
 
 .achievements-grid-custom::-webkit-scrollbar-track {
@@ -1005,7 +1110,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     transition: transform 0.2s;
     background: transparent;
     border: none;
-    padding: 5px;
+    padding: clamp(2px, 0.6vw, 5px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1026,12 +1131,26 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .achievement-card img {
-    width: 200px;
-    height: 200px;
+    width: clamp(110px, 18vw, 200px);
+    height: clamp(110px, 18vw, 200px);
     object-fit: contain;
 }
 
-/* ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ */
+.achievement-card[data-id="collector"] img {
+    width: clamp(124px, 20vw, 225px);
+    height: clamp(124px, 20vw, 225px);
+}
+
+.achievement-card[data-id="oops_error"] {
+    align-self: start;
+    margin-top: clamp(-18px, -3.5vw, -31px);
+}
+
+.achievement-card[data-id="oops_error"] img {
+    width: clamp(132px, 21vw, 240px);
+    height: clamp(132px, 21vw, 240px);
+}
+
 .achievement-toast,
 .reward-toast,
 .achievement-unlock-toast {
@@ -1075,13 +1194,22 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
 }
 
-.achievement-toast.show,
+@keyframes toastPopAchievementReason {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    12% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    88% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+}
+
+.achievement-toast.show {
+    animation: toastPopAchievementReason 5s ease forwards;
+}
+
 .reward-toast.show,
 .achievement-unlock-toast.show {
     animation: toastPopReward 3s ease forwards;
 }
 
-/* ОБУЧАЛКА */
 .tutorial-overlay {
     position: fixed;
     top: 0;
@@ -1100,8 +1228,8 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .tutorial-window {
-    width: 550px;
-    max-width: 85vw;
+    width: min(78vw, 680px);
+    max-width: 92vw;
     background: none;
     border: none;
     box-shadow: none;
@@ -1109,7 +1237,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     overflow: visible;
 }
 
-.tutorial-window img {
+.tutorial-window > img {
     width: 100%;
     height: auto;
     display: block;
@@ -1127,6 +1255,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     align-items: center;
     padding: 12% 12% 8% 12%;
     box-sizing: border-box;
+    overflow-y: auto;
 }
 
 /* Контейнер для текста и точек */
@@ -1150,22 +1279,22 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .tut-icon {
-    font-size: 45px;
-    margin-bottom: 8px;
+    font-size: clamp(32px, 6vw, 45px);
+    margin-bottom: clamp(4px, 1vw, 8px);
 }
 
 .tutorial-step h2 {
     color: #5d3a1a;
-    margin-bottom: 10px;
-    font-size: 22px;
+    margin-bottom: clamp(6px, 1.2vw, 10px);
+    font-size: clamp(18px, 3.2vw, 24px);
     font-weight: bold;
 }
 
 .tutorial-step p {
     color: #3d2b1a;
-    font-size: 13px;
+    font-size: clamp(11px, 1.8vw, 14px);
     line-height: 1.4;
-    margin-bottom: 12px;
+    margin-bottom: clamp(8px, 1.5vw, 12px);
     text-align: center;
 }
 
@@ -1177,8 +1306,8 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .tut-dot {
-    width: 8px;
-    height: 8px;
+    width: clamp(6px, 1.2vw, 8px);
+    height: clamp(6px, 1.2vw, 8px);
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.25);
     cursor: pointer;
@@ -1470,7 +1599,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     background: rgba(93, 58, 26, 0.22);
 }
 
-/* СКРОЛЛБАР */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -1489,15 +1617,9 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     background: #b8894f;
 }
 
-/* АДАПТИВНОСТЬ (сцена комнаты масштабируется в JS; здесь только UI) */
 @media (max-width: 1000px) {
     .room-stage .quests-panel { width: calc(220 / 1280 * 100cqw); font-size: calc(12 / 720 * 100cqh); }
     .room-stage .quests-title { font-size: calc(16 / 720 * 100cqh); }
-}
-
-.zoom-panel .desc-btn-right:hover,
-.zoom-panel .move-btn-left:hover {
-    opacity: 0.9;
 }
 
 #fixAdviceBox {

@@ -83,7 +83,7 @@ passwordInput.addEventListener('input', e => {
     updateBtn();
 });
 
-const NOTIFICATION_DURATION_MS = 30 * 1000;
+const NOTIFICATION_DURATION_MS = 10 * 1000;
 let notificationIdSeq = 0;
 const activeNotifications = [];
 

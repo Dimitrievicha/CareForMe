@@ -38,6 +38,7 @@ function updateRoomScale() {
     document.documentElement.style.setProperty('--letterbox-x', `${letterboxX}px`);
     document.documentElement.style.setProperty('--letterbox-y', `${letterboxY}px`);
     document.body.classList.toggle('letterbox-logo-visible', letterboxY >= LETTERBOX_LOGO_MIN_HEIGHT);
+    if (typeof window.updateUIScale === 'function') window.updateUIScale();
 }
 
 function getAuthToken() {
@@ -439,6 +440,18 @@ const REWARD_IMAGES = {
     5: ['images/reward/5_1.png', 'images/reward/5_2.png']
 };
 
+async function markTutorialCompleteOnServer() {
+    try {
+        await fetch(`${API_BASE_URL}/auth/complete_tutorial`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: getAuthHeaders()
+        });
+    } catch (error) {
+        console.error('Не удалось сохранить прохождение обучения:', error);
+    }
+}
+
 async function checkAuth() {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/verify`, {
@@ -461,6 +474,14 @@ async function checkAuth() {
         if (!localStorage.getItem('username')) {
             localStorage.setItem('username', data.username);
             localStorage.setItem('userId', data.user_id);
+        }
+
+        if (data.need_tutorial === false) {
+            localStorage.setItem('isReturningUser', 'true');
+            localStorage.removeItem('pendingFirstTimeTutorial');
+        } else if (data.need_tutorial === true && localStorage.getItem('isReturningUser') !== 'false') {
+            localStorage.setItem('isReturningUser', 'true');
+            localStorage.removeItem('pendingFirstTimeTutorial');
         }
 
         currentUser = localStorage.getItem('username');
@@ -589,7 +610,8 @@ async function loadPots() {
 
         if (data.success && data.all_pots) {
             const pots = {};
-            const userLevel = data.user_level || currentLevel;
+            const storedLevel = parseInt(localStorage.getItem(`currentLevel_${currentUser}`) || '1', 10);
+            const userLevel = Math.max(data.user_level || 1, storedLevel, currentLevel);
 
             data.all_pots.forEach(pot => {
                 let potNum = parseInt(pot.id);
@@ -624,8 +646,9 @@ async function loadWateringCans() {
 
         if (data.success && data.all_cans) {
             const cans = {};
-            const userLevel = Math.max(data.user_level || 1, currentLevel);
-            if (data.user_level) currentLevel = userLevel;
+            const storedLevel = parseInt(localStorage.getItem(`currentLevel_${currentUser}`) || '1', 10);
+            const userLevel = Math.max(data.user_level || 1, storedLevel, currentLevel);
+            if (userLevel > currentLevel) currentLevel = userLevel;
             const unlockedCans = (data.unlocked_cans || []).map(String);
 
             data.all_cans.forEach(can => {
@@ -944,7 +967,6 @@ function wheelScrollBy(scrollEl, delta) {
 
 const WHEEL_SCROLL_LAYERS = [
     { overlayId: 'modalPlantDescription', scrollSelector: '.plant-desc-text-wrapper' },
-    { overlayId: 'tutorialOverlay', scrollSelector: '.tutorial-content' },
     { overlayId: 'modalAchievements', scrollSelector: '.achievements-grid-custom' },
 ];
 
@@ -953,7 +975,7 @@ function getActiveWheelScrollTarget() {
         const overlay = document.getElementById(overlayId);
         if (!overlay?.classList.contains('active')) continue;
         const scrollEl = overlay.querySelector(scrollSelector);
-        if (scrollEl && scrollEl.scrollHeight > scrollEl.clientHeight) return scrollEl;
+        if (scrollEl) return scrollEl;
     }
     if (document.querySelector('.modal-overlay.active, .tutorial-overlay.active')) return null;
     const questsList = document.querySelector('.quests-list');
@@ -2215,7 +2237,11 @@ function checkAndUnlockPots() {
         if (unlockLevel <= userLevel && !cfg.isUnlocked) {
             POT_CONFIG[num].isUnlocked = true;
             unlockedAny = true;
-            showNotification(`🎉 Новый горшок разблокирован: ${cfg.name}!`, false);
+            const notifyKey = `potUnlockNotified_${currentUser}_${num}`;
+            if (!localStorage.getItem(notifyKey)) {
+                localStorage.setItem(notifyKey, '1');
+                showNotification(`🎉 Новый горшок разблокирован: ${cfg.name}!`, false);
+            }
         }
     });
 
@@ -2236,7 +2262,11 @@ function checkAndUnlockWateringCans() {
         if (unlockLevel <= userLevel && !isWateringCanUnlocked(cfg)) {
             WATERING_CAN_CONFIG[id].isUnlocked = true;
             unlockedAny = true;
-            showNotification(`🎉 Новая лейка разблокирована: ${cfg.name}!`, false);
+            const notifyKey = `wateringCanUnlockNotified_${currentUser}_${id}`;
+            if (!localStorage.getItem(notifyKey)) {
+                localStorage.setItem(notifyKey, '1');
+                showNotification(`🎉 Новая лейка разблокирована: ${cfg.name}!`, false);
+            }
         }
     });
 
@@ -3328,37 +3358,6 @@ function stopWateringAnimation() {
     if (waterBtnLeft) waterBtnLeft.disabled = false;
 }
 
-let musicPlaying = false;
-const musicBtnEl = document.getElementById('musicBtn');
-const bgMusic = document.getElementById('bgMusic');
-
-if (bgMusic) bgMusic.src = 'music/song.mp3';
-
-function tryAutoplay() {
-    if (!bgMusic) return;
-    bgMusic.play().then(() => {
-        musicPlaying = true;
-        if (musicBtnEl) musicBtnEl.textContent = '🎵';
-    }).catch(() => {});
-}
-
-window.addEventListener('load', () => { setTimeout(tryAutoplay, 500); });
-
-if (musicBtnEl) {
-    musicBtnEl.addEventListener('click', () => {
-        if (!bgMusic) return;
-        if (musicPlaying) {
-            bgMusic.pause();
-            musicBtnEl.textContent = '🔇';
-            musicPlaying = false;
-        } else {
-            bgMusic.play().catch(() => showNotification('Не удалось воспроизвести музыку', true));
-            musicBtnEl.textContent = '🎵';
-            musicPlaying = true;
-        }
-    });
-}
-
 const achievementsBtn = document.getElementById('achievementsBtn');
 if (achievementsBtn) achievementsBtn.addEventListener('click', () => openModal(modalAchievements));
 const closeAchievements = document.getElementById('closeAchievements');
@@ -3384,12 +3383,6 @@ if (modalWaterCan) {
     });
 }
 
-const helpBtn = document.getElementById('helpBtn');
-if (helpBtn) {
-    helpBtn.addEventListener('click', () => {
-        openTutorial();
-    });
-}
 
 const exitBtn = document.getElementById('exitBtn');
 if (exitBtn) {
@@ -3426,12 +3419,6 @@ if (modalMovePlant) {
         }
     });
 }
-
-document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-        [modalPlacePot, modalPickFlower, zoomOverlay, modalAchievements, modalWaterCan, modalRepot, modalMovePlant].forEach(closeModal);
-    }
-});
 
 function loadState() {
     try {
@@ -3573,93 +3560,6 @@ function loadLevel() {
     updateLevelCircle(lvl);
 }
 
-const TOTAL_STEPS = 4;
-let tutStep = 0;
-
-function showTutStep(n) {
-    const steps = document.querySelectorAll('.tutorial-step');
-    const dots = document.querySelectorAll('.tut-dot');
-
-    if (n < 0) n = 0;
-    if (n >= TOTAL_STEPS) n = TOTAL_STEPS - 1;
-    tutStep = n;
-
-    for (let i = 0; i < steps.length; i++) {
-        if (i === n) {
-            steps[i].classList.add('active');
-        } else {
-            steps[i].classList.remove('active');
-        }
-    }
-
-    for (let i = 0; i < dots.length; i++) {
-        if (i === n) {
-            dots[i].classList.add('active');
-        } else {
-            dots[i].classList.remove('active');
-        }
-    }
-}
-
-function closeTutorial() {
-    const overlay = document.getElementById('tutorialOverlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-        overlay.classList.remove('active');
-    }
-    if (currentUser) {
-        localStorage.setItem(`tutorialDone_${currentUser}`, '1');
-    }
-    tutStep = 0;
-}
-
-function openTutorial() {
-    tutStep = 0;
-    showTutStep(0);
-    const overlay = document.getElementById('tutorialOverlay');
-    if (overlay) {
-        overlay.style.display = 'flex';
-        overlay.classList.add('active');
-    }
-}
-
-function nextTutorialStep() {
-    if (tutStep >= TOTAL_STEPS - 1) {
-        closeTutorial();
-    } else {
-        tutStep++;
-        showTutStep(tutStep);
-    }
-}
-
-function goToTutorialStep(step) {
-    tutStep = step;
-    showTutStep(tutStep);
-}
-
-window.closeTutorialGlobal = function() {
-    closeTutorial();
-    return false;
-};
-
-window.nextTutorialGlobal = function() {
-    nextTutorialStep();
-    return false;
-};
-
-window.goToTutorialStep = function(step) {
-    goToTutorialStep(step);
-    return false;
-};
-
-if (tutorialOverlay) {
-    tutorialOverlay.addEventListener('click', function(e) {
-        if (e.target === tutorialOverlay) {
-            closeTutorial();
-        }
-    });
-}
-
 updateRoomScale();
 window.addEventListener('resize', updateRoomScale);
 
@@ -3677,6 +3577,8 @@ window.addEventListener('resize', updateRoomScale);
 
     const isAuth = await checkAuth();
     if (!isAuth) return;
+
+    loadLevel();
 
     const results = await Promise.all([
         loadPlantsCatalog(),
@@ -3699,13 +3601,12 @@ window.addEventListener('resize', updateRoomScale);
         setDefaultWateringCans();
     }
 
-    loadLevel();
-    checkAndUnlockPots();
-    checkAndUnlockWateringCans();
+    applyUnlocksForLevel(currentLevel, { markNotified: true });
     const loadedFromServer = await loadStateFromServer();
     if (!loadedFromServer) {
         loadState();
     }
+    applyUnlocksForLevel(currentLevel, { markNotified: true });
     renderQuests();
     renderPotChoices();
     renderFlowerChoices();
@@ -3736,25 +3637,28 @@ window.addEventListener('resize', updateRoomScale);
         }
     }
 
-    const isNewUser = localStorage.getItem('isReturningUser') === 'false';
-    const tutDone = localStorage.getItem(`tutorialDone_${currentUser}`);
-    if (isNewUser && !tutDone) {
-        showTutStep(0);
-        setTimeout(() => openModal(tutorialOverlay), 600);
-    }
-
     loadingOverlay.remove();
+
+    if (typeof window.tryOpenFirstTimeTutorial === 'function') {
+        window.tryOpenFirstTimeTutorial();
+    }
 })();
 
 // ===== DEV LEVEL UP (временная отладка уровня) =====
 const DEV_MAX_LEVEL = 6;
 
-function applyUnlocksForLevel(level) {
+function applyUnlocksForLevel(level, { markNotified = false } = {}) {
     Object.entries(POT_CONFIG).forEach(([num, cfg]) => {
         POT_CONFIG[num].isUnlocked = (cfg.unlockLevel || 1) <= level;
+        if (markNotified && POT_CONFIG[num].isUnlocked && currentUser) {
+            localStorage.setItem(`potUnlockNotified_${currentUser}_${num}`, '1');
+        }
     });
     Object.entries(WATERING_CAN_CONFIG).forEach(([id, cfg]) => {
         WATERING_CAN_CONFIG[id].isUnlocked = (cfg.unlockLevel || 1) <= level;
+        if (markNotified && WATERING_CAN_CONFIG[id].isUnlocked && currentUser) {
+            localStorage.setItem(`wateringCanUnlockNotified_${currentUser}_${id}`, '1');
+        }
     });
 }
 
@@ -3850,35 +3754,52 @@ if (devApplyStateBtn) {
 
 // ===== ОБУЧАЛКА С ДВУМЯ РЕЖИМАМИ =====
 (function initTutorial() {
-    // Конфигурация режимов обучения
+    const TUTORIAL_ARROW_SRC = 'images/button/кнопка-стрелка обучения.png';
+    const FIRST_TIME_ACHIEVEMENTS_STEP = 5;
+    const FIRST_TIME_FINALE_STEP = 6;
+
     const TUTORIAL_CONFIG = {
         firstTime: {
-            totalSteps: 6,
+            totalSteps: 7,
             textWrapperId: 'firstTimeTutorial',
             dotsId: 'firstTimeDots',
             hasSkipButton: true
         },
         short: {
-            totalSteps: 4,
+            totalSteps: 6,
             textWrapperId: 'shortTutorial',
             dotsId: 'shortDots',
             hasSkipButton: false
         }
     };
 
-    let currentMode = 'short'; // 'firstTime' или 'short'
+    let currentMode = 'short';
     let tutorialCurrentStep = 0;
 
     const tutorialOverlay = document.getElementById('tutorialOverlay');
     const firstTimeWrapper = document.getElementById('firstTimeTutorial');
     const shortWrapper = document.getElementById('shortTutorial');
+    const firstTimeDotsEl = document.getElementById('firstTimeDots');
+    const shortDotsEl = document.getElementById('shortDots');
+    const tutorialDotsWrapper = document.querySelector('.tutorial-dots-wrapper');
     const skipWrapper = document.getElementById('tutorialSkipWrapper');
     const tutorialBackBtn = document.getElementById('tutBackBtn');
     const tutorialNextBtn = document.getElementById('tutNextBtn');
+    const tutorialNextBtnImg = document.getElementById('tutNextBtnImg');
+    const tutorialNextBtnLabel = document.getElementById('tutNextBtnLabel');
     const tutorialSkipBtn = document.getElementById('tutSkipBtn');
+    const tutorialSkipBtnImg = document.getElementById('tutSkipBtnImg');
+    const tutorialSkipBtnLabel = document.getElementById('tutSkipBtnLabel');
+    const tutorialCloseBtn = document.getElementById('closeTutorialBtn');
+    const tutorialWindow = tutorialOverlay?.querySelector('.tutorial-window');
 
-    function getCurrentWrapper() {
-        return currentMode === 'firstTime' ? firstTimeWrapper : shortWrapper;
+    function setTutorialClosableUi(isClosable) {
+        if (tutorialWindow) {
+            tutorialWindow.classList.toggle('tutorial-window--closable', isClosable);
+        }
+        if (tutorialCloseBtn) {
+            tutorialCloseBtn.hidden = !isClosable;
+        }
     }
 
     function getCurrentDots() {
@@ -3891,6 +3812,111 @@ if (devApplyStateBtn) {
         return currentMode === 'firstTime'
             ? document.querySelectorAll('#firstTimeTutorial .tutorial-step')
             : document.querySelectorAll('#shortTutorial .tutorial-step');
+    }
+
+    function setNextButtonNormal() {
+        if (tutorialNextBtnImg) {
+            tutorialNextBtnImg.hidden = false;
+            tutorialNextBtnImg.src = TUTORIAL_ARROW_SRC;
+            tutorialNextBtnImg.alt = 'Далее';
+        }
+        if (tutorialNextBtnLabel) {
+            tutorialNextBtnLabel.hidden = true;
+        }
+        if (tutorialNextBtn) {
+            tutorialNextBtn.classList.remove('tut-next-btn--start-game');
+        }
+    }
+
+    function setNextButtonStartGame() {
+        if (tutorialNextBtnImg) {
+            tutorialNextBtnImg.hidden = true;
+        }
+        if (tutorialNextBtnLabel) {
+            tutorialNextBtnLabel.hidden = false;
+        }
+        if (tutorialNextBtn) {
+            tutorialNextBtn.classList.add('tut-next-btn--start-game');
+        }
+    }
+
+    function setSkipButtonNormal() {
+        if (tutorialSkipBtnImg) {
+            tutorialSkipBtnImg.hidden = false;
+        }
+        if (tutorialSkipBtnLabel) {
+            tutorialSkipBtnLabel.hidden = true;
+        }
+        if (tutorialSkipBtn) {
+            tutorialSkipBtn.classList.remove('tut-skip-btn--complete');
+        }
+    }
+
+    function setSkipButtonComplete() {
+        if (tutorialSkipBtnImg) {
+            tutorialSkipBtnImg.hidden = true;
+        }
+        if (tutorialSkipBtnLabel) {
+            tutorialSkipBtnLabel.hidden = false;
+        }
+        if (tutorialSkipBtn) {
+            tutorialSkipBtn.classList.add('tut-skip-btn--complete');
+        }
+    }
+
+    function updateTutorialChrome() {
+        if (currentMode === 'firstTime') {
+            const isFinale = tutorialCurrentStep === FIRST_TIME_FINALE_STEP;
+            const isAchievementsStep = tutorialCurrentStep === FIRST_TIME_ACHIEVEMENTS_STEP;
+
+            if (tutorialDotsWrapper) {
+                tutorialDotsWrapper.style.display = isFinale ? 'none' : 'flex';
+            }
+            if (tutorialBackBtn) {
+                tutorialBackBtn.style.visibility = 'visible';
+                tutorialBackBtn.disabled = false;
+                tutorialBackBtn.classList.remove('is-disabled');
+                tutorialBackBtn.setAttribute('aria-disabled', 'false');
+                tutorialBackBtn.style.pointerEvents = 'auto';
+            }
+            if (skipWrapper) {
+                skipWrapper.style.display = 'flex';
+                skipWrapper.classList.toggle('is-hidden', isFinale);
+            }
+            setTutorialClosableUi(false);
+            if (isFinale) {
+                setNextButtonStartGame();
+            } else {
+                setNextButtonNormal();
+            }
+            if (isAchievementsStep) {
+                setSkipButtonComplete();
+            } else if (!isFinale) {
+                setSkipButtonNormal();
+            }
+            document.body.classList.add('first-time-onboarding');
+            return;
+        }
+
+        document.body.classList.remove('first-time-onboarding');
+        setSkipButtonNormal();
+        if (tutorialDotsWrapper) {
+            tutorialDotsWrapper.style.display = 'flex';
+        }
+        if (tutorialBackBtn) {
+            const onFirstStep = tutorialCurrentStep === 0;
+            tutorialBackBtn.style.visibility = 'visible';
+            tutorialBackBtn.disabled = onFirstStep;
+            tutorialBackBtn.classList.toggle('is-disabled', onFirstStep);
+            tutorialBackBtn.setAttribute('aria-disabled', onFirstStep ? 'true' : 'false');
+            tutorialBackBtn.style.pointerEvents = onFirstStep ? 'none' : 'auto';
+        }
+        if (skipWrapper) {
+            skipWrapper.style.display = 'none';
+            skipWrapper.classList.remove('is-hidden');
+        }
+        setTutorialClosableUi(true);
+        setNextButtonNormal();
     }
 
     function showTutorialStep(step) {
@@ -3909,36 +3935,69 @@ if (devApplyStateBtn) {
         dots.forEach((dot, index) => {
             dot.classList.toggle('active', index === tutorialCurrentStep);
         });
+
+        updateTutorialChrome();
+    }
+
+    function finishFirstTimeTutorial() {
+        if (currentUser) {
+            localStorage.setItem(`tutorialDone_${currentUser}`, '1');
+        }
+        localStorage.setItem('isReturningUser', 'true');
+        localStorage.removeItem('pendingFirstTimeTutorial');
+        markTutorialCompleteOnServer();
+        closeTutorial(false);
     }
 
     function nextTutorialStep() {
         const config = TUTORIAL_CONFIG[currentMode];
+        if (currentMode === 'firstTime' && tutorialCurrentStep === FIRST_TIME_FINALE_STEP) {
+            finishFirstTimeTutorial();
+            return;
+        }
         if (tutorialCurrentStep < config.totalSteps - 1) {
             showTutorialStep(tutorialCurrentStep + 1);
         } else {
-            closeTutorial();
+            closeTutorial(true);
         }
     }
 
+    function goBackToWelcomeFromTutorial() {
+        sessionStorage.setItem('showWelcomeAfterRegister', '1');
+        sessionStorage.setItem('welcomeResumeStep', '1');
+        localStorage.setItem('isReturningUser', 'false');
+        localStorage.removeItem('pendingFirstTimeTutorial');
+        closeTutorial(false);
+        window.location.href = 'welcome.html';
+    }
+
     function prevTutorialStep() {
+        if (currentMode === 'firstTime' && tutorialCurrentStep === 0) {
+            goBackToWelcomeFromTutorial();
+            return;
+        }
         if (tutorialCurrentStep > 0) {
             showTutorialStep(tutorialCurrentStep - 1);
         }
     }
 
+    function skipTutorial() {
+        if (currentMode === 'firstTime') {
+            showTutorialStep(FIRST_TIME_FINALE_STEP);
+            return;
+        }
+        closeTutorial(true);
+    }
+
     function openTutorial(mode = 'short') {
         currentMode = mode;
         tutorialCurrentStep = 0;
+        setTutorialClosableUi(mode === 'short');
 
-        // Показать нужный wrapper
         if (firstTimeWrapper) firstTimeWrapper.style.display = mode === 'firstTime' ? 'flex' : 'none';
         if (shortWrapper) shortWrapper.style.display = mode === 'short' ? 'flex' : 'none';
-
-        // Показать/скрыть кнопку пропуска
-        const config = TUTORIAL_CONFIG[mode];
-        if (skipWrapper) {
-            skipWrapper.style.display = config.hasSkipButton ? 'flex' : 'none';
-        }
+        if (firstTimeDotsEl) firstTimeDotsEl.style.display = mode === 'firstTime' ? 'flex' : 'none';
+        if (shortDotsEl) shortDotsEl.style.display = mode === 'short' ? 'flex' : 'none';
 
         showTutorialStep(0);
         if (tutorialOverlay) {
@@ -3947,22 +4006,35 @@ if (devApplyStateBtn) {
         }
     }
 
-    function closeTutorial() {
+    function closeTutorial(markFirstTimeDone = false) {
         if (tutorialOverlay) {
             tutorialOverlay.style.display = 'none';
             tutorialOverlay.classList.remove('active');
         }
-        if (currentUser && currentMode === 'firstTime') {
+        if (markFirstTimeDone && currentUser && currentMode === 'firstTime') {
             localStorage.setItem(`tutorialDone_${currentUser}`, '1');
+            localStorage.setItem('isReturningUser', 'true');
+            localStorage.removeItem('pendingFirstTimeTutorial');
+            markTutorialCompleteOnServer();
         }
+        document.body.classList.remove('first-time-onboarding');
+        setTutorialClosableUi(false);
         tutorialCurrentStep = 0;
+        setNextButtonNormal();
     }
 
     function goToTutorialStep(step) {
-        showTutorialStep(parseInt(step));
+        const config = TUTORIAL_CONFIG[currentMode];
+        const targetStep = parseInt(step, 10);
+        if (currentMode === 'firstTime' && targetStep === FIRST_TIME_FINALE_STEP) {
+            showTutorialStep(FIRST_TIME_FINALE_STEP);
+            return;
+        }
+        if (targetStep >= 0 && targetStep < config.totalSteps) {
+            showTutorialStep(targetStep);
+        }
     }
 
-    // Навешиваем обработчики
     if (tutorialBackBtn) {
         tutorialBackBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -3980,11 +4052,18 @@ if (devApplyStateBtn) {
     if (tutorialSkipBtn) {
         tutorialSkipBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            closeTutorial();
+            skipTutorial();
         });
     }
 
-    // Обработчики для точек (динамические)
+    if (tutorialCloseBtn) {
+        tutorialCloseBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeTutorial(false);
+        });
+    }
+
     function bindDotEvents() {
         const dots = document.querySelectorAll('.tut-dot');
         dots.forEach(dot => {
@@ -3997,43 +4076,49 @@ if (devApplyStateBtn) {
         });
     }
 
-    // Наблюдатель за изменением DOM для перепривязки точек
     const observer = new MutationObserver(() => bindDotEvents());
     observer.observe(document.body, { childList: true, subtree: true });
     bindDotEvents();
 
     if (tutorialOverlay) {
         tutorialOverlay.addEventListener('click', (e) => {
-            if (e.target === tutorialOverlay) closeTutorial();
+            if (e.target === tutorialOverlay && currentMode !== 'firstTime') {
+                closeTutorial(false);
+            }
         });
     }
 
-    // Переопределяем глобальные функции
     window.openTutorial = openTutorial;
-    window.closeTutorialGlobal = closeTutorial;
+    window.closeTutorialGlobal = () => closeTutorial(false);
     window.nextTutorialGlobal = nextTutorialStep;
     window.prevTutorialGlobal = prevTutorialStep;
     window.goToTutorialStep = goToTutorialStep;
 
-    // Переопределяем кнопку helpBtn для открытия краткого обучения
+    function tryOpenFirstTimeTutorial() {
+        const pendingTutorial = localStorage.getItem('pendingFirstTimeTutorial') === '1';
+        const isReturning = localStorage.getItem('isReturningUser') === 'true';
+        const tutDone = currentUser ? localStorage.getItem(`tutorialDone_${currentUser}`) : null;
+
+        if (!currentUser || isReturning || tutDone) {
+            return false;
+        }
+
+        if (pendingTutorial || localStorage.getItem('isReturningUser') === 'false') {
+            openTutorial('firstTime');
+            return true;
+        }
+
+        return false;
+    }
+
+    window.tryOpenFirstTimeTutorial = tryOpenFirstTimeTutorial;
+
     const helpBtn = document.getElementById('helpBtn');
     if (helpBtn) {
         helpBtn.addEventListener('click', () => {
             openTutorial('short');
         });
     }
-
-    // Автоматическое открытие при первом входе
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            const isNewUser = localStorage.getItem('isReturningUser') === 'false';
-            const tutDone = currentUser ? localStorage.getItem(`tutorialDone_${currentUser}`) : null;
-
-            if (isNewUser && !tutDone && currentUser) {
-                openTutorial('firstTime');
-            }
-        }, 500);
-    });
 })();
 
 // ===== МОДАЛКА ОПИСАНИЯ РАСТЕНИЯ =====
@@ -4447,9 +4532,78 @@ if (modalPlantDescription) {
     });
 }
 
-// Закрытие по Escape
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modalPlantDescription && modalPlantDescription.classList.contains('active')) {
+function closeZoomView() {
+    closeModal(zoomOverlay);
+    if (devStatePanel) devStatePanel.style.display = 'none';
+}
+
+function closeActiveChoiceModal() {
+    if (modalMovePlant?.classList.contains('active')) {
+        closeModal(modalMovePlant);
+        moveFromSlot = null;
+        return true;
+    }
+
+    const modals = [modalRepot, modalPickFlower, modalPlacePot, modalWaterCan, modalAchievements];
+    for (const modal of modals) {
+        if (modal?.classList.contains('active')) {
+            closeModal(modal);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function handleEscapeOverlays() {
+    if (modalPlantDescription?.classList.contains('active')) {
         closePlantDescription();
+        return;
+    }
+
+    if (tutorialOverlay?.classList.contains('active')) {
+        const closable = tutorialOverlay.querySelector('.tutorial-window')?.classList.contains('tutorial-window--closable');
+        if (closable && typeof window.closeTutorialGlobal === 'function') {
+            window.closeTutorialGlobal();
+        }
+        return;
+    }
+
+    if (zoomOverlay?.classList.contains('active')) {
+        closeZoomView();
+        return;
+    }
+
+    closeActiveChoiceModal();
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        handleEscapeOverlays();
+        return;
+    }
+
+    if (!tutorialOverlay?.classList.contains('active')) return;
+    if (isEditableTarget(document.activeElement)) return;
+
+    if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        if (typeof window.nextTutorialGlobal === 'function') {
+            window.nextTutorialGlobal();
+        }
+        return;
+    }
+
+    if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (typeof window.prevTutorialGlobal === 'function') {
+            window.prevTutorialGlobal();
+        }
     }
 });
+
+function isEditableTarget(el) {
+    if (!el) return false;
+    const tag = el.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
+}

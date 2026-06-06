@@ -4,15 +4,14 @@
     box-sizing: border-box;
 }
 
-body {
+.welcome-page {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    font-family: 'Segoe UI', 'Arial', sans-serif;
+    font-family: 'Segoe UI', 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
 }
 
-/* Фон - комната */
-.room-bg {
+.welcome-page .room-bg {
     position: fixed;
     top: 0;
     left: 0;
@@ -24,202 +23,261 @@ body {
     z-index: 0;
 }
 
-/* Контейнер приветствия */
-.welcome-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.welcome-overlay {
+    position: fixed;
+    inset: 0;
     z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.85);
+    padding: clamp(12px, 2.5vh, 24px) clamp(12px, 2.5vw, 24px);
+    box-sizing: border-box;
+}
+
+.welcome-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.welcome-steps {
+    flex: 1;
     width: 100%;
+    min-height: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items: center;
+    padding: 0 10px;
+    box-sizing: border-box;
 }
 
-/* Карточка приветствия */
-.welcome-card {
-    width: 500px;
-    min-height: 450px;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeInScale 0.5s ease-out;
-}
-
-.card-content {
-    width: 75%;
+.welcome-step {
+    display: none;
+    width: 100%;
     text-align: center;
-    margin-top: 60px;
-    margin-bottom: 50px;
 }
 
-/* Анимация появления */
-@keyframes fadeInScale {
+.welcome-step.active {
+    display: block;
+    animation: welcomeFadeIn 0.3s ease;
+}
+
+@keyframes welcomeFadeIn {
     from {
         opacity: 0;
-        transform: scale(0.9);
+        transform: translateY(8px);
     }
     to {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0);
     }
 }
 
-/* Иконка */
-.icon-large {
-    font-size: 64px;
-    margin-bottom: 20px;
-    animation: bounce 0.6s ease;
+.welcome-step .tut-icon {
+    font-size: clamp(32px, 6vw, 45px);
+    margin-bottom: 8px;
 }
 
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+.welcome-step h2 {
+    color: #3a1f0a;
+    font-size: 26px;
+    font-weight: bold;
+    margin: 0 0 12px;
+    text-align: center;
 }
 
-/* Заголовок */
-h1 {
-    font-size: 28px;
-    color: #2d4a2d;
-    margin-bottom: 15px;
-    font-weight: 600;
+.welcome-step p:not(.desc-point-title) {
+    color: #3d2b1a;
+    font-size: 16px;
+    line-height: 1.45;
+    font-weight: normal;
+    text-align: center;
+    margin: 0 0 8px;
 }
 
-p {
-    font-size: 18px;
-    color: #4a6b3f;
-    margin-bottom: 30px;
-    line-height: 1.5;
+.welcome-step .desc-point-title {
+    color: #3a1f0a;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 12px 0 6px;
+    text-align: center;
 }
 
-/* Анимация цветов */
-.flower-animation {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin: 30px 0 40px;
-}
-
-.flower {
-    font-size: 32px;
-    animation: float 2s ease-in-out infinite;
-}
-
-.flower:nth-child(1) { animation-delay: 0s; }
-.flower:nth-child(2) { animation-delay: 0.3s; }
-.flower:nth-child(3) { animation-delay: 0.6s; }
-.flower:nth-child(4) { animation-delay: 0.9s; }
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-/* Кнопка */
-#continueBtn {
+.welcome-step .plant-desc-list {
+    display: block;
     width: 100%;
-    border: none;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: transparent;
-    cursor: pointer;
-    padding: 14px 20px;
-    transition: transform 0.2s ease;
+    text-align: left;
+    margin: 0 0 8px;
+}
+
+.welcome-step .plant-desc-list li {
+    font-size: 16px;
+    padding-left: 16px;
+    text-align: left;
+}
+
+.welcome-step .plant-desc-list li::before {
+    position: absolute;
+    left: 0;
+    margin-right: 0;
+}
+
+.welcome-helper-line {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.welcome-daisy {
+    display: inline-block;
+    font-size: clamp(48px, 9vw, 68px);
+    line-height: 1;
+    transform-origin: center bottom;
+    animation: welcomeDaisySway 2.8s ease-in-out infinite;
+}
+
+@keyframes welcomeDaisySway {
+    0%, 100% {
+        transform: rotate(-7deg);
+    }
+    50% {
+        transform: rotate(7deg);
+    }
+}
+
+.welcome-dots {
+    width: 100%;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
     gap: 10px;
+    margin-top: auto;
+    margin-bottom: 6px;
 }
 
-#continueBtn span {
-    font-size: 18px;
-    font-weight: bold;
-    color: #2d4a2d;
-    text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+.welcome-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-#continueBtn .arrow {
-    font-size: 20px;
-    transition: transform 0.2s ease;
+.welcome-dot.active {
+    background: #d4a373;
+    transform: scale(1.3);
 }
 
-#continueBtn:hover {
-    transform: scale(1.02);
+.welcome-nav {
+    width: 100%;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    --welcome-btn-h: calc(110px * 1142 / 2220);
+    --welcome-btn-visible-h: calc(var(--welcome-btn-h) - 8px);
 }
 
-#continueBtn:hover .arrow {
-    transform: translateX(5px);
+.welcome-back-btn,
+.welcome-next-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+    width: 110px;
+    height: var(--welcome-btn-h);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#continueBtn:active {
-    transform: scale(0.98);
+.welcome-back-btn img,
+.welcome-next-btn img {
+    width: 110px;
+    height: var(--welcome-btn-h);
+    object-fit: contain;
+    object-position: top center;
+    display: block;
 }
 
-/* Конфетти */
-.confetti {
-    position: fixed;
-    top: 0;
-    left: 0;
+.welcome-back-btn img {
+    transform: scaleX(-1);
+}
+
+.welcome-next-btn--action {
+    width: 110px;
+    height: var(--welcome-btn-h);
+}
+
+.welcome-next-btn--action .welcome-next-arrow {
+    display: none;
+}
+
+.welcome-next-btn--action .welcome-action-btn {
+    display: inline-flex;
     width: 100%;
     height: 100%;
+    min-width: 0;
+    padding: 0 6px;
+    font-weight: normal;
+    font-size: 11px;
+    line-height: 1.15;
+    white-space: normal;
+    text-align: center;
+    background: #e1d8cf;
+    color: #4a3d30;
+    box-shadow: 0 2px 5px rgba(74, 48, 24, 0.18);
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+.welcome-back-btn:not(.is-disabled):hover,
+.welcome-next-btn:hover {
+    transform: scale(1.05);
+}
+
+.welcome-back-btn.is-disabled,
+.welcome-back-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
     pointer-events: none;
-    z-index: 20;
 }
 
-.confetti-piece {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    opacity: 0;
-    animation: confettiFall 3s ease-out forwards;
+/* Сразу второй шаг при возврате из обучения — без мигания первого */
+html.welcome-resume-step-1 #welcomeStep0 {
+    display: none;
 }
 
-@keyframes confettiFall {
-    0% {
-        transform: translateY(-100vh) rotate(0deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0;
-    }
+html.welcome-resume-step-1 #welcomeStep1 {
+    display: block;
 }
 
-/* Адаптив */
-@media (max-width: 600px) {
-    .welcome-card {
-        width: 90%;
-        min-height: auto;
-    }
+html.welcome-resume-step-1 .welcome-dot[data-welcome-step="0"] {
+    background: rgba(0, 0, 0, 0.25);
+    transform: none;
+}
 
-    .card-content {
-        width: 80%;
-        margin-top: 80px;
-        margin-bottom: 60px;
-    }
+html.welcome-resume-step-1 .welcome-dot[data-welcome-step="1"] {
+    background: #d4a373;
+    transform: scale(1.3);
+}
 
-    h1 {
-        font-size: 22px;
-    }
+html.welcome-resume-step-1 .welcome-next-arrow {
+    display: none;
+}
 
-    p {
-        font-size: 16px;
-    }
+html.welcome-resume-step-1 .welcome-action-btn {
+    display: inline-flex !important;
+}
 
-    .icon-large {
-        font-size: 50px;
-    }
-
-    .flower {
-        font-size: 25px;
-    }
-
-    #continueBtn span {
-        font-size: 16px;
-    }
+html.welcome-resume-step-1 .welcome-next-btn {
+    width: 110px;
+    height: var(--welcome-btn-h);
 }

@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Комната | Care For Me</title>
     <link rel="stylesheet" href="css/room.css">
+    <link rel="preload" href="music/song.mp3" as="fetch" type="audio/mpeg">
+    <script src="js/music.js"></script>
 </head>
-<body>
+<body data-music-button="musicBtn">
 <script>
     if (!localStorage.getItem('username')) { window.location.href = 'unauthorized.html'; }
 </script>
@@ -212,6 +214,9 @@
     <img id="achievementUnlockToastImg" src="" alt="Достижение получено">
 </div>
 
+<!-- Размытая комната на фоне первого обучения (как на welcome) -->
+<div class="first-time-room-bg" aria-hidden="true" style="background-image: url('images/auth/комната размытая.png');"></div>
+
 <!-- ОБУЧАЛКА: два режима (первый вход и обычный просмотр) -->
 <div class="tutorial-overlay" id="tutorialOverlay">
     <div class="tutorial-window">
@@ -220,46 +225,157 @@
             <!-- Шаги для первого входа (с приветствием) -->
             <div class="tutorial-text-wrapper-first" id="firstTimeTutorial">
                 <div class="tutorial-step active" id="firstStep0">
-                    <div class="tut-icon">🌿💚</div>
-                    <h2>Добро пожаловать в Care For Me!</h2>
-                    <p>Привет, начинающий садовод! 👋<br>Я буду твоим помощником в этом зелёном приключении.</p>
-                    <p><strong>🌱 Что тебя ждёт?</strong><br>• Ухаживай за растениями<br>• Выполняй задания и повышай уровень<br>• Открывай новые горшки, цветы и лейки<br>• Получай достижения за свои успехи!</p>
-                </div>
-                <div class="tutorial-step" id="firstStep1">
                     <div class="tut-icon">🪴</div>
                     <h2>Горшки и посадка</h2>
-                    <p><strong>Как поставить горшок?</strong><br>Кликни на пунктирное место в комнате → выбери горшок.<br>Сначала доступен только Горшок 1, новые открываются с уровнями!</p>
-                    <p><strong>Как посадить цветок?</strong><br>Кликни на горшок → нажми "Посадить" → выбери растение.<br>Новые растения: Кактус (3 уровень) и Фикус (5 уровень).</p>
-                    <p><strong>💡 Совет:</strong> Попробуй прямо сейчас поставить первый горшок!</p>
+                    <p class="desc-point-title">Как поставить горшок?</p>
+                    <p>Кликни на пунктирное место в комнате → выбери горшок.<br>Обычный горшок доступен сразу. Новые открываются с уровнями.</p>
+                    <p class="desc-point-title">Как посадить цветок?</p>
+                    <p>Кликни на горшок → нажми «Посадить» → выбери растение.<br>Кактус открывается на 3-м уровне, Фикус — на 5-м.</p>
+                </div>
+                <div class="tutorial-step" id="firstStep1">
+                    <div class="tut-icon">💧</div>
+                    <h2>Полив</h2>
+                    <p>Кликни на горшок → в режиме увеличения нажми «Полить».</p>
+                    <p>Поливать можно один раз в день.</p>
+                    <p>У каждого растения свой график. Предпочтения каждого из них ты можешь узнать из карточки цветка.</p>
+                    <p>Перелив опаснее засухи. Не поливай раньше срока.</p>
                 </div>
                 <div class="tutorial-step" id="firstStep2">
-                    <div class="tut-icon">💧</div>
-                    <h2>Уход и полив</h2>
-                    <p><strong>Когда поливать?</strong><br>У каждого растения свой график полива:<br>• Спатифиллум — каждые 1-2 дня<br>• Кактус — каждые 7-10 дней<br>• Фикус — каждые 3-4 дня</p>
-                    <p><strong>⚠️ Важно:</strong> Перелив опаснее засухи! Проверяй почву перед поливом.</p>
-                    <p>Кнопка "Полить" появляется при клике на горшок в режиме увеличения.</p>
+                    <div class="tut-icon">☀️</div>
+                    <h2>Место и свет</h2>
+                    <p class="desc-point-title">Разные места в комнате дают разный уровень освещения:</p>
+                    <ul class="plant-desc-list">
+                        <li>Подоконник (левая часть) — яркий свет</li>
+                        <li>Середина — рассеянный свет</li>
+                        <li>Стол справа — слабый свет</li>
+                    </ul>
+                    <p>Каждое растение любит определённый свет. Поставь цветок не туда — он заболеет. Переставь на правильное место — выздоровеет.</p>
                 </div>
                 <div class="tutorial-step" id="firstStep3">
                     <div class="tut-icon">🏥</div>
                     <h2>Болезни и лечение</h2>
-                    <p><strong>Почему растение болеет?</strong><br>• Неправильный полив (перелив или засуха)<br>• Неподходящее место (слишком темно/светло)<br>• Слишком большой горшок</p>
-                    <p><strong>Как вылечить?</strong><br>• Прочитай описание болезни в окне увеличения<br>• Переставь горшок в другое место кнопкой "Переставить горшок"<br>• Отрегулируй полив</p>
+                    <p class="desc-point-title">Почему растение болеет?</p>
+                    <ul class="plant-desc-list">
+                        <li>Неправильное место</li>
+                        <li>Слишком частый или недостаточный полив</li>
+                        <li>Неподходящий по размеру горшок</li>
+                    </ul>
+                    <p class="desc-point-title">Как лечить:</p>
+                    <ul class="plant-desc-list">
+                        <li>Переставь горшок на подходящее место — кнопка «Переставить горшок» в режиме увеличения</li>
+                        <li>При переливе — просто не поливай некоторое время</li>
+                        <li>При засухе — полей цветок</li>
+                        <li>Замени горшок</li>
+                    </ul>
                 </div>
                 <div class="tutorial-step" id="firstStep4">
                     <div class="tut-icon">📋</div>
                     <h2>Задания и уровни</h2>
-                    <p><strong>Как повысить уровень?</strong><br>Выполняй задания из левой панели. За каждые 3 выполненных задания — новый уровень!</p>
-                    <p><strong>🎁 Награды за уровни:</strong><br>Уровень 2 → Новый горшок<br>Уровень 3 → Кактус<br>Уровень 4 → Новая лейка<br>Уровень 5 → Фикус<br>Уровень 6 → Легендарный горшок + ачивка</p>
-                    <p><strong>🏆 Достижения:</strong> Нажми на иконку 🏆, чтобы увидеть свои достижения.</p>
+                    <p>На левой панели отображаются задания текущего уровня. Выполни все — получи новый уровень и награду.</p>
+                    <p class="desc-point-title">Уровни дают:</p>
+                    <ul class="plant-desc-list">
+                        <li>Новые горшки</li>
+                        <li>Новые растения</li>
+                        <li>Новые лейки</li>
+                    </ul>
+                    <p>Всего 5 уровней. На каждом 2–3 задания — от «посади растение» до «ухаживай 10 дней подряд».</p>
                 </div>
                 <div class="tutorial-step" id="firstStep5">
+                    <div class="tut-icon">🏆</div>
+                    <h2>Достижения</h2>
+                    <p>Нажми на 🏆 в правом верхнем углу, чтобы увидеть все достижения.</p>
+                    <p>Достижения получаются за особые события — первую гибель, идеальное выращивание, сбор всех видов. Некоторые из них нельзя запланировать — они случаются сами в процессе игры.</p>
+                </div>
+                <div class="tutorial-step" id="firstStep6">
                     <div class="tut-icon">🍀</div>
                     <h2>Готов к приключению!</h2>
-                    <p>Ты узнал всё самое важное!<br>Остальное откроется в процессе игры.</p>
-                    <p><strong>💚 Советы:</strong><br>• Регулярно заходи в игру, чтобы поддерживать растения<br>• Читай описания растений — там много полезного<br>• Не бойся ошибаться — даже опытные садоводы учатся на ошибках!</p>
-                    <p style="margin-top:12px;"><strong>🌿 Удачи в выращивании зелёных друзей!</strong></p>
+                    <p>Ты узнал всё самое важное. Остальное откроется в процессе.</p>
+                    <p class="desc-point-title">Помни:</p>
+                    <ul class="plant-desc-list">
+                        <li>Регулярно заходи — растения ждут тебя</li>
+                        <li>Читай описание растений — там много полезного</li>
+                        <li>Не бойся ошибаться — это часть игры</li>
+                    </ul>
+                    <p>🌿 Удачи в выращивании зелёных друзей!</p>
                 </div>
+            </div>
+
+            <!-- Шаги для обычного просмотра (краткая версия) -->
+            <div class="tutorial-text-wrapper-short" id="shortTutorial">
+                <div class="tutorial-step active" id="shortStep0">
+                    <div class="tut-icon">🪴</div>
+                    <h2>Горшки и посадка</h2>
+                    <p class="desc-point-title">Как поставить горшок?</p>
+                    <p>Кликни на пунктирное место в комнате → выбери горшок.<br>Обычный горшок доступен сразу. Новые открываются с уровнями.</p>
+                    <p class="desc-point-title">Как посадить цветок?</p>
+                    <p>Кликни на горшок → нажми «Посадить» → выбери растение.<br>Кактус открывается на 3-м уровне, Фикус — на 5-м.</p>
+                </div>
+                <div class="tutorial-step" id="shortStep1">
+                    <div class="tut-icon">💧</div>
+                    <h2>Полив</h2>
+                    <p>Кликни на горшок → в режиме увеличения нажми «Полить».</p>
+                    <p>Поливать можно один раз в день.</p>
+                    <p>У каждого растения свой график. Предпочтения каждого из них ты можешь узнать из карточки цветка.</p>
+                    <p>Перелив опаснее засухи. Не поливай раньше срока.</p>
+                </div>
+                <div class="tutorial-step" id="shortStep2">
+                    <div class="tut-icon">☀️</div>
+                    <h2>Место и свет</h2>
+                    <p class="desc-point-title">Разные места в комнате дают разный уровень освещения:</p>
+                    <ul class="plant-desc-list">
+                        <li>Подоконник (левая часть) — яркий свет</li>
+                        <li>Середина — рассеянный свет</li>
+                        <li>Стол справа — слабый свет</li>
+                    </ul>
+                    <p>Каждое растение любит определённый свет. Поставь цветок не туда — он заболеет. Переставь на правильное место — выздоровеет.</p>
+                </div>
+                <div class="tutorial-step" id="shortStep3">
+                    <div class="tut-icon">🏥</div>
+                    <h2>Болезни и лечение</h2>
+                    <p class="desc-point-title">Почему растение болеет?</p>
+                    <ul class="plant-desc-list">
+                        <li>Неправильное место</li>
+                        <li>Слишком частый или недостаточный полив</li>
+                        <li>Неподходящий по размеру горшок</li>
+                    </ul>
+                    <p class="desc-point-title">Как лечить:</p>
+                    <ul class="plant-desc-list">
+                        <li>Переставь горшок на подходящее место — кнопка «Переставить горшок» в режиме увеличения</li>
+                        <li>При переливе — просто не поливай некоторое время</li>
+                        <li>При засухе — полей цветок</li>
+                        <li>Замени горшок</li>
+                    </ul>
+                </div>
+                <div class="tutorial-step" id="shortStep4">
+                    <div class="tut-icon">📋</div>
+                    <h2>Задания и уровни</h2>
+                    <p>На левой панели отображаются задания текущего уровня. Выполни все — получи новый уровень и награду.</p>
+                    <p class="desc-point-title">Уровни дают:</p>
+                    <ul class="plant-desc-list">
+                        <li>Новые горшки</li>
+                        <li>Новые растения</li>
+                        <li>Новые лейки</li>
+                    </ul>
+                    <p>Всего 5 уровней. На каждом 2–3 задания — от «посади растение» до «ухаживай 10 дней подряд».</p>
+                </div>
+                <div class="tutorial-step" id="shortStep5">
+                    <div class="tut-icon">🏆</div>
+                    <h2>Достижения</h2>
+                    <p>Нажми на 🏆 в правом верхнем углу, чтобы увидеть все достижения.</p>
+                    <p>Достижения получаются за особые события — первую гибель, идеальное выращивание, сбор всех видов. Некоторые из них нельзя запланировать — они случаются сами в процессе игры.</p>
+                </div>
+            </div>
+
+            <div class="tutorial-dots-wrapper">
                 <div class="tutorial-dots" id="firstTimeDots">
+                    <span class="tut-dot active" data-tut-step="0"></span>
+                    <span class="tut-dot" data-tut-step="1"></span>
+                    <span class="tut-dot" data-tut-step="2"></span>
+                    <span class="tut-dot" data-tut-step="3"></span>
+                    <span class="tut-dot" data-tut-step="4"></span>
+                    <span class="tut-dot" data-tut-step="5"></span>
+                </div>
+                <div class="tutorial-dots" id="shortDots">
                     <span class="tut-dot active" data-tut-step="0"></span>
                     <span class="tut-dot" data-tut-step="1"></span>
                     <span class="tut-dot" data-tut-step="2"></span>
@@ -269,54 +385,25 @@
                 </div>
             </div>
 
-            <!-- Шаги для обычного просмотра (краткая версия) -->
-            <div class="tutorial-text-wrapper-short" id="shortTutorial">
-                <div class="tutorial-step active" id="shortStep0">
-                    <div class="tut-icon">🪴</div>
-                    <h2>Горшки и посадка</h2>
-                    <p><strong>Как поставить горшок?</strong><br>Кликни на пунктирное место в комнате → выбери горшок.</p>
-                    <p><strong>Как посадить цветок?</strong><br>Кликни на горшок → нажми "Посадить" → выбери растение.</p>
-                </div>
-                <div class="tutorial-step" id="shortStep1">
-                    <div class="tut-icon">💧</div>
-                    <h2>Полив</h2>
-                    <p>Кликни на горшок → в увеличении нажми "Полить".<br>У каждого растения свой график полива. Не переливай!</p>
-                </div>
-                <div class="tutorial-step" id="shortStep2">
-                    <div class="tut-icon">🏥</div>
-                    <h2>Болезни</h2>
-                    <p>Причина: неправильный полив или неподходящее место.<br>Лечение: переставь горшок или отрегулируй полив.</p>
-                </div>
-                <div class="tutorial-step" id="shortStep3">
-                    <div class="tut-icon">📋</div>
-                    <h2>Задания и уровни</h2>
-                    <p>Выполняй задания → повышай уровень → получай новые горшки, цветы и лейки!</p>
-                    <p style="margin-top:8px;"><strong>🍀 Хорошей игры!</strong></p>
-                </div>
-                <div class="tutorial-dots" id="shortDots">
-                    <span class="tut-dot active" data-tut-step="0"></span>
-                    <span class="tut-dot" data-tut-step="1"></span>
-                    <span class="tut-dot" data-tut-step="2"></span>
-                    <span class="tut-dot" data-tut-step="3"></span>
-                </div>
-            </div>
-
             <div class="tutorial-buttons-wrapper" id="tutorialButtonsWrapper">
                 <div class="tutorial-nav-buttons">
                     <button class="tut-back-btn" id="tutBackBtn">
                         <img src="images/button/кнопка-стрелка обучения.png" alt="Назад">
                     </button>
                     <button class="tut-next-btn" id="tutNextBtn">
-                        <img src="images/button/кнопка-стрелка обучения.png" alt="Далее">
+                        <img id="tutNextBtnImg" class="tut-next-arrow" src="images/button/кнопка-стрелка обучения.png" alt="Далее">
+                        <span id="tutNextBtnLabel" class="ui-clay-btn tut-action-btn" hidden>Начать игру</span>
                     </button>
                 </div>
                 <div class="tutorial-skip-wrapper" id="tutorialSkipWrapper">
                     <button class="tut-skip-btn" id="tutSkipBtn">
-                        <img src="images/button/кнопка пропуска обучения.png" alt="Пропустить обучение">
+                        <img id="tutSkipBtnImg" src="images/button/кнопка пропуска обучения.png" alt="Пропустить обучение">
+                        <span id="tutSkipBtnLabel" class="ui-clay-btn tut-action-btn" hidden>Завершить обучение</span>
                     </button>
                 </div>
             </div>
         </div>
+        <button class="achievements-close-btn tutorial-close-btn" id="closeTutorialBtn" type="button" aria-label="Закрыть обучение" hidden>✕</button>
     </div>
 </div>
 
@@ -373,8 +460,6 @@
 
 <!-- Стек уведомлений -->
 <div class="notification-stack" id="notificationStack" aria-live="polite"></div>
-
-<audio id="bgMusic" loop></audio>
 
 <script src="js/room.js"></script>
 </body>

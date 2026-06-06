@@ -211,10 +211,12 @@ def verify():
         session['user_id'] = user['user_id']
         session['username'] = user['username']
         session['session_token'] = session_token
+        profile = user_interface.get_profile(user['user_id'])
         return jsonify({
             'success': True,
             'user_id': user['user_id'],
-            'username': user['username']
+            'username': user['username'],
+            'need_tutorial': not profile.get('tutorial_completed', False) if profile else True
         })
     else:
         session.clear()

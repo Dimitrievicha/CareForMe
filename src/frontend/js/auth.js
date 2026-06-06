@@ -193,7 +193,7 @@ async function register(username, password) {
         if (result.ok && result.data.success) {
             showNotification(`Аккаунт создан! Добро пожаловать, ${username}! 🌱`, false);
             // После регистрации сразу логинимся
-            await login(username, password);
+            await login(username, password, { afterRegister: true });
         } else {
             showNotification(result.data.error || 'Ошибка регистрации');
             return false;
@@ -206,7 +206,7 @@ async function register(username, password) {
     }
 }
 
-async function login(username, password) {
+async function login(username, password, options = {}) {
     try {
         const result = await post(`${API_BASE_URL}/auth/login`, {
             username,
@@ -215,7 +215,7 @@ async function login(username, password) {
         });
 
         if (result.ok && result.data.success) {
-            onLoginSuccess(result.data);
+            onLoginSuccess(result.data, options);
             return true;
         } else if (result.status === 401) {
             showNotification(result.data.error || '❌ Неверный пароль');
@@ -244,24 +244,28 @@ async function handleAuth(username, password) {
     }
 }
 
-function onLoginSuccess(data) {
+function onLoginSuccess(data, { afterRegister = false } = {}) {
     localStorage.setItem('userId', data.user_id);
     localStorage.setItem('username', data.username);
     localStorage.setItem('session_token', data.session_token);
 
-    if (data.need_tutorial) {
+    if (afterRegister) {
+        sessionStorage.setItem('showWelcomeAfterRegister', '1');
         localStorage.setItem('isReturningUser', 'false');
         showNotification(`Добро пожаловать, ${data.username}! 🌱`, false);
         setTimeout(() => {
-            window.location.href = '/welcome.html';
+            window.location.href = 'welcome.html';
         }, 1000);
-    } else {
-        localStorage.setItem('isReturningUser', 'true');
-        showNotification(`С возвращением, ${data.username}! 🌿`, false);
-        setTimeout(() => {
-            window.location.href = '/room.html';
-        }, 1000);
+        return;
     }
+
+    sessionStorage.removeItem('showWelcomeAfterRegister');
+    localStorage.setItem('isReturningUser', 'true');
+    localStorage.removeItem('pendingFirstTimeTutorial');
+    showNotification(`С возвращением, ${data.username}! 🌿`, false);
+    setTimeout(() => {
+        window.location.href = 'room.html';
+    }, 1000);
 }
 
 function resetPassword() {

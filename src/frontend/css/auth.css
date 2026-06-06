@@ -33,23 +33,22 @@ body {
 }
 
 .game-title img {
-    height: 350px;
+    height: clamp(100px, 28vw, 350px);
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
 
-@media (max-width: 550px) {
-    .game-title img {
-        height: 100px;
-    }
+:root {
+    --register-scale: 1;
 }
 
 .register-window {
     position: absolute;
     top: 60%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(var(--register-scale, 1));
+    transform-origin: center center;
     width: 600px;
     height: 500px;
     background-size: auto 100%;
@@ -240,12 +239,6 @@ body {
 }
 
 @media (max-width: 550px) {
-    .register-window {
-        width: 90%;
-        height: auto;
-        background-size: contain;
-    }
-
     .window-content {
         width: 80%;
         margin: 30px 0 25px 0;

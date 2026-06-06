@@ -4,33 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добро пожаловать | Care For Me</title>
+    <link rel="stylesheet" href="css/room.css">
     <link rel="stylesheet" href="css/welcome.css">
+    <script>
+        try {
+            if (sessionStorage.getItem('welcomeResumeStep') === '1') {
+                document.documentElement.classList.add('welcome-resume-step-1');
+            }
+        } catch (e) {}
+    </script>
+    <link rel="preload" href="music/song.mp3" as="fetch" type="audio/mpeg">
+    <script src="js/music.js"></script>
 </head>
-<body>
+<body class="welcome-page">
     <div class="room-bg" style="background-image: url('images/auth/комната размытая.png');"></div>
 
-    <div class="welcome-container">
-        <div class="welcome-card">
-            <div class="card-content">
-                <div class="icon-large">🌱</div>
-                <h1 id="welcomeMessage">Добро пожаловать в мир растений</h1>
-
-                <div class="flower-animation">
-                    <span class="flower">🌸</span>
-                    <span class="flower">🌿</span>
-                    <span class="flower">🌵</span>
-                    <span class="flower">🌻</span>
+    <div class="welcome-overlay">
+        <div class="tutorial-window welcome-window">
+            <img src="images/traning/окно обучения.png" alt="Добро пожаловать">
+            <div class="tutorial-content welcome-content">
+                <div class="welcome-steps">
+                    <div class="welcome-step active" id="welcomeStep0">
+                        <div class="tut-icon">🌿💚</div>
+                        <h2>Добро пожаловать в<br>Care For Me!</h2>
+                        <p>Привет, начинающий садовод! 👋</p>
+                        <p class="welcome-helper-line">
+                            Я буду твоим помощником в этом зелёном приключении.
+                            <span class="welcome-daisy" aria-hidden="true">🌼</span>
+                        </p>
+                        <p>Здесь у тебя есть своя комната — и совсем скоро в ней зазеленеет жизнь.</p>
+                    </div>
+                    <div class="welcome-step" id="welcomeStep1">
+                        <div class="tut-icon">🌿💚</div>
+                        <p>Твоя задача: ставить горшки, сажать растения и ухаживать за ними день за днём. Каждый цветок живёт по своим правилам — одни любят тень и частый полив, другие терпеливо ждут воды неделями.</p>
+                        <p>Не бойся ошибаться. Растения можно вырастить заново, а каждая ошибка учит тебя быть лучшим садоводом. Даже гибель цветка — это не конец, а опыт.</p>
+                        <p class="desc-point-title">Что тебя ждёт:</p>
+                        <ul class="plant-desc-list">
+                            <li>3 вида растений с разным характером</li>
+                            <li>Система болезней и лечения</li>
+                            <li>5 уровней с наградами</li>
+                            <li>6 достижений за особые поступки</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <button id="continueBtn">
-                    <span>Войти в сад</span>
-                    <span class="arrow">→</span>
-                </button>
+                <div class="welcome-dots">
+                    <span class="welcome-dot active" data-welcome-step="0"></span>
+                    <span class="welcome-dot" data-welcome-step="1"></span>
+                </div>
+
+                <div class="welcome-nav">
+                    <button type="button" class="welcome-back-btn" id="welcomeBackBtn">
+                        <img src="images/button/кнопка-стрелка обучения.png" alt="Назад">
+                    </button>
+                    <button type="button" class="welcome-next-btn" id="welcomeNextBtn">
+                        <img id="welcomeNextBtnImg" class="welcome-next-arrow" src="images/button/кнопка-стрелка обучения.png" alt="Далее">
+                        <span id="welcomeNextBtnLabel" class="ui-clay-btn welcome-action-btn" hidden>Начать обучение</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="confetti"></div>
 
     <script src="js/welcome.js"></script>
 </body>

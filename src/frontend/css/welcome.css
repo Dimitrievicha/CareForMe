@@ -225,17 +225,21 @@
     width: 100%;
     height: 100%;
     min-width: 0;
-    padding: 0 6px;
+    padding: 0 8px;
     font-weight: normal;
-    font-size: 11px;
-    line-height: 1.15;
+    font-size: 13px;
+    line-height: 1.2;
     white-space: normal;
     text-align: center;
-    background: #e1d8cf;
-    color: #4a3d30;
-    box-shadow: 0 2px 5px rgba(74, 48, 24, 0.18);
+    background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
+    color: #3d2a1a;
+    font-family: Georgia, 'Times New Roman', serif;
+    letter-spacing: 0.01em;
+    box-shadow: none;
     box-sizing: border-box;
-    border-radius: 8px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
 }
 
 .welcome-back-btn:not(.is-disabled):hover,
@@ -280,4 +284,129 @@ html.welcome-resume-step-1 .welcome-action-btn {
 html.welcome-resume-step-1 .welcome-next-btn {
     width: 110px;
     height: var(--welcome-btn-h);
+}
+
+.welcome-nav {
+    width: 100%;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    --welcome-btn-h: calc(110px * 1142 / 2220);
+    --welcome-btn-visible-h: calc(var(--welcome-btn-h) - 8px);
+}
+
+.welcome-back-btn,
+.welcome-next-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+    width: 110px;
+    height: var(--welcome-btn-h);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-back-btn img,
+.welcome-next-btn img {
+    width: 110px;
+    height: var(--welcome-btn-h);
+    object-fit: contain;
+    object-position: top center;
+    display: block;
+}
+
+.welcome-back-btn img {
+    transform: scaleX(-1);
+}
+
+/* Обычный режим - показываем стрелку */
+.welcome-next-btn .welcome-next-arrow {
+    display: block;
+}
+
+.welcome-next-btn .welcome-action-btn {
+    display: none;
+}
+
+/* Режим "Начать обучение" - только на последнем шаге */
+.welcome-next-btn.welcome-next-btn--action {
+    background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
+    width: 160px;
+    height: 55px;
+}
+
+.welcome-next-btn.welcome-next-btn--action .welcome-next-arrow {
+    display: none;
+}
+
+.welcome-next-btn.welcome-next-btn--action .welcome-action-btn {
+    display: inline-flex;
+    background: none;
+    box-shadow: none;
+    color: #3d2a1a;
+    font-size: 14px;
+    font-weight: normal;
+    min-width: 0;
+    padding: 0;
+    white-space: nowrap;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    border: none;
+    width: auto;
+    height: auto;
+}
+
+.welcome-back-btn:not(.is-disabled):hover,
+.welcome-next-btn:hover {
+    transform: scale(1.05);
+}
+
+.welcome-back-btn.is-disabled,
+.welcome-back-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* Сразу второй шаг при возврате из обучения — без мигания первого */
+html.welcome-resume-step-1 #welcomeStep0 {
+    display: none;
+}
+
+html.welcome-resume-step-1 #welcomeStep1 {
+    display: block;
+}
+
+html.welcome-resume-step-1 .welcome-dot[data-welcome-step="0"] {
+    background: rgba(0, 0, 0, 0.25);
+    transform: none;
+}
+
+html.welcome-resume-step-1 .welcome-dot[data-welcome-step="1"] {
+    background: #d4a373;
+    transform: scale(1.3);
+}
+
+html.welcome-resume-step-1 .welcome-next-arrow {
+    display: none;
+}
+
+html.welcome-resume-step-1 .welcome-action-btn {
+    display: inline-flex !important;
+}
+
+html.welcome-resume-step-1 .welcome-next-btn {
+    background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
+    width: 160px;
+    height: 55px;
+}
+
+html.welcome-resume-step-1 .welcome-next-btn img {
+    display: none;
 }

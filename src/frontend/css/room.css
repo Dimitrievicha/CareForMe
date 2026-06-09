@@ -1372,25 +1372,24 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .ui-clay-btn {
-    display: none;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     min-width: 148px;
     padding: 0 14px;
     border: none;
     border-radius: 10px;
-    background: linear-gradient(180deg, #faf6ef 0%, #e8dfd0 100%);
-    box-shadow:
-        0 2px 5px rgba(74, 48, 24, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.85);
-    color: #4a3d30;
+    background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
+    box-shadow: none;
+    color: #3d2a1a;
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: normal;
     line-height: 1;
     text-align: center;
     cursor: pointer;
     white-space: nowrap;
+    letter-spacing: 0.01em;
 }
 
 .tut-next-btn--start-game {
@@ -1407,12 +1406,12 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     width: 100%;
     height: 100%;
     min-width: 0;
-    padding: 0 6px;
-    font-size: 11px;
-    line-height: 1.15;
+    padding: 0 8px;
+    font-size: 13px;
+    line-height: 1.2;
     white-space: normal;
     box-sizing: border-box;
-    border-radius: 8px;
+    border-radius: 10px;
 }
 
 .tut-next-btn--start-game img {
@@ -1451,7 +1450,7 @@ body.first-time-onboarding .room-letterbox {
     margin-bottom: 6px;
 }
 
-/* ===== СТИЛИ ДЛЯ КНОПОК ОБУЧАЛКИ (всегда внизу) ===== */
+/* ===== СТИЛИ ДЛЯ КНОПОК ОБУЧАЛКИ ===== */
 .tutorial-buttons-wrapper {
     width: 100%;
     display: flex;
@@ -1471,8 +1470,7 @@ body.first-time-onboarding .room-letterbox {
 }
 
 .tut-back-btn,
-.tut-next-btn,
-.tut-skip-btn--complete {
+.tut-next-btn {
     background: transparent;
     border: none;
     cursor: pointer;
@@ -1511,15 +1509,104 @@ body.first-time-onboarding .room-letterbox {
     pointer-events: none;
 }
 
-.tut-back-btn.is-disabled:hover,
-.tut-back-btn:disabled:hover {
-    transform: none;
+/* Кнопка "Далее" со стрелкой (обычный режим) */
+.tut-next-btn .tut-next-arrow {
+    display: block;
 }
 
+.tut-next-btn .tut-action-btn {
+    display: none;
+}
+
+/* Кнопка "Начать игру" (режим первого обучения) */
+.tut-next-btn.tut-next-btn--start-game {
+    background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
+    width: 160px;
+    height: 55px;
+}
+
+.tut-next-btn.tut-next-btn--start-game .tut-next-arrow {
+    display: none;
+}
+
+.tut-next-btn.tut-next-btn--start-game .tut-action-btn {
+    display: inline-flex;
+    background: none;
+    box-shadow: none;
+    color: #3d2a1a;
+    font-size: 14px;
+    font-weight: normal;
+    min-width: 0;
+    padding: 0;
+    white-space: nowrap;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    font-family: inherit;
+}
+
+/* ===== КНОПКА ПРОПУСКА ОБУЧЕНИЯ ===== */
 .tutorial-skip-wrapper {
     display: flex;
     justify-content: center;
-    margin-top: 2px;
+    margin-top: 10px;
+    flex-shrink: 0;
+}
+
+.tutorial-skip-wrapper.is-hidden {
+    visibility: hidden;
+}
+
+.tut-skip-btn {
+    background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+    width: 160px;
+    height: 55px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+}
+
+.tut-skip-btn .tut-action-btn {
+    display: inline-flex !important;
+    background: none;
+    box-shadow: none;
+    color: #3d2a1a;
+    font-size: 14px;
+    font-weight: normal;
+    min-width: 0;
+    padding: 0;
+    white-space: nowrap;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    font-family: inherit;
+}
+
+.tut-skip-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Скрываем старую картинку внутри кнопки */
+.tut-skip-btn img {
+    display: none;
+}
+
+/* Маленькая версия кнопки пропуска (если нужна) */
+.tut-skip-btn.small-skip-btn {
+    width: 120px;
+    height: 45px;
+}
+
+.tut-skip-btn.small-skip-btn .tut-action-btn {
+    font-size: 12px;
+}
+
+/* ===== СТИЛИ ДЛЯ КНОПКИ ПРОПУСКА ОБУЧЕНИЯ ===== */
+.tutorial-skip-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
     flex-shrink: 0;
 }
 
@@ -1532,23 +1619,49 @@ body.first-time-onboarding .room-letterbox {
 }
 
 .tut-skip-btn {
-    background: transparent;
+    background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
     border: none;
     cursor: pointer;
     transition: transform 0.2s;
     padding: 0;
-    width: 155px;
-    height: auto;
+    width: 160px;
+    height: 55px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
 }
 
-.tut-skip-btn img {
-    width: 100%;
-    height: auto;
-    display: block;
+.tut-skip-btn .tut-action-btn {
+    display: inline-flex !important;
+    background: none;
+    box-shadow: none;
+    color: #3d2a1a;
+    font-size: 14px;
+    min-width: 0;
+    padding: 0;
+    white-space: nowrap;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    font-family: inherit;
 }
 
 .tut-skip-btn:hover {
     transform: scale(1.05);
+}
+
+/* Маленькая версия кнопки пропуска */
+.tut-skip-btn.small-skip-btn {
+    width: 120px;
+    height: 45px;
+}
+
+.tut-skip-btn.small-skip-btn .tut-action-btn {
+    font-size: 12px;
+}
+
+/* Скрываем старую картинку внутри кнопки */
+.tut-skip-btn img {
+    display: none;
 }
 
 .tut-skip-btn--complete img {
@@ -1556,13 +1669,12 @@ body.first-time-onboarding .room-letterbox {
 }
 
 .tut-skip-btn--complete .tut-action-btn {
-    display: inline-flex;
-    width: 110px;
-    height: var(--tutorial-nav-btn-h);
+    display: inline-flex !important;
+    width: auto;
     min-width: 0;
     padding: 0 8px;
     font-size: 13px;
-    line-height: 1.1;
+    line-height: 1.2;
     white-space: normal;
     box-sizing: border-box;
     border-radius: 10px;
@@ -1971,4 +2083,77 @@ body.first-time-onboarding .room-letterbox {
     color: #3a1f0a;
     text-decoration: underline;
     text-underline-offset: 2px;
+}
+
+/* Дополнительные стили для окна перестановки */
+#moveChoicesRow .occupied-label {
+    display: inline-block;
+    background: rgba(93, 58, 26, 0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: clamp(10px, 1.3vw, 12px);
+    font-weight: 500;
+}
+
+#moveChoicesRow .free-label {
+    display: inline-block;
+    background: rgba(76, 175, 80, 0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: clamp(10px, 1.3vw, 12px);
+    font-weight: 500;
+}
+
+#moveChoicesRow .pot-choice.occupied-slot {
+    border: 1px solid #d4a373;
+}
+
+#moveChoicesRow .pot-choice.empty-slot {
+    border: 1px dashed #4caf50;
+}
+
+/* Увеличиваем окно перестановки для 5 слотов в ряд */
+#modalMovePlant.modal-overlay .modal-window {
+    width: 90vw;
+    max-width: 1000px;
+    min-width: 800px;
+}
+
+#modalMovePlant .modal-pots-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 15px;
+    overflow: visible; /* убираем скролл */
+}
+
+#modalMovePlant .pot-choice {
+    flex: 0 0 auto;
+    width: 160px; /* фиксированная ширина каждого слота */
+}
+
+/* Для маленьких экранов - делаем чуть уже */
+@media (max-width: 900px) {
+    #modalMovePlant.modal-overlay .modal-window {
+        min-width: auto;
+        width: 95vw;
+    }
+
+    #modalMovePlant .pot-choice {
+        width: 140px;
+    }
+
+    #modalMovePlant .modal-pots-row {
+        gap: 10px;
+    }
+}
+
+/* Для очень маленьких экранов - все же добавляем скролл */
+@media (max-width: 800px) {
+    #modalMovePlant .modal-pots-row {
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 10px;
+    }
 }

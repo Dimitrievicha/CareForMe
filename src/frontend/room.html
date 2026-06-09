@@ -59,7 +59,9 @@
 
         <div class="room-hud-top">
             <div class="control-buttons">
-                <button type="button" id="devBtn" class="ctrl-btn-dev" title="DEV LEVEL UP: +1 уровень (на 6-м — сброс до 1)">DEV LEVEL UP</button>
+                <button type="button" id="devBtn" class="ctrl-btn-dev"
+                        title="DEV LEVEL UP: +1 уровень (на 6-м — сброс до 1)">DEV LEVEL UP
+                </button>
                 <button type="button" class="ctrl-btn light-ctrl-btn" id="musicBtn" title="Музыка">🔇</button>
                 <button type="button" class="ctrl-btn light-ctrl-btn" id="helpBtn" title="Обучение">❓</button>
                 <button type="button" class="ctrl-btn light-ctrl-btn" id="waterCanBtn" title="Сменить лейку">💧</button>
@@ -75,14 +77,18 @@
 </div>
 
 <!-- DEV: панель переключения состояний -->
-<div id="devStatePanel" style="display:none;position:fixed;bottom:16px;left:16px;z-index:9999;background:#222;color:#fff;border-radius:10px;padding:10px 14px;font-size:13px;font-family:monospace;box-shadow:0 4px 16px rgba(0,0,0,0.5);">
+<div id="devStatePanel"
+     style="display:none;position:fixed;bottom:16px;left:16px;z-index:9999;background:#222;color:#fff;border-radius:10px;padding:10px 14px;font-size:13px;font-family:monospace;box-shadow:0 4px 16px rgba(0,0,0,0.5);">
     <div style="margin-bottom:6px;font-weight:bold;color:#ff5252;">🛠 DEV: состояние слота</div>
     <select id="devStateSelect" style="width:100%;padding:4px;border-radius:4px;margin-bottom:6px;font-size:13px;">
         <option value="sprout">🌱 Росток (stage 1)</option>
         <option value="healthy">✅ Вырос / Здоровый (stage 2)</option>
         <option value="dead">💀 Смерть</option>
     </select>
-    <button id="devApplyState" style="width:100%;background:#e53935;color:#fff;border:none;border-radius:4px;padding:5px;cursor:pointer;font-weight:bold;">Применить</button>
+    <button id="devApplyState"
+            style="width:100%;background:#e53935;color:#fff;border:none;border-radius:4px;padding:5px;cursor:pointer;font-weight:bold;">
+        Применить
+    </button>
 </div>
 
 <!-- МОДАЛКА: ВЫБОР ГОРШКА -->
@@ -124,45 +130,48 @@
 <!-- ЗУМ ГОРШКА -->
 <div class="zoom-overlay" id="zoomOverlay">
     <div class="zoom-viewport">
-    <div class="zoom-custom-window">
-        <div class="zoom-panel" id="zoomStage">
-        <img src="images/room/стол.png" class="zoom-table-bg" alt="стол">
-        <div class="zoom-content-wrapper">
-            <div class="zoom-left">
-                <div class="zoom-pot-container">
-                    <img id="zoomPotImg" src="" alt="горшок" class="zoom-pot-img">
-                    <img id="zoomPlantImg" src="" alt="растение" class="zoom-plant-img">
-                    <div class="watering-anim" id="wateringAnim" data-can="1">
-                        <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img" id="wateringCanImg">
-                        <div class="water-drops" id="waterDrops"></div>
+        <div class="zoom-custom-window">
+            <div class="zoom-panel" id="zoomStage">
+                <img src="images/room/стол.png" class="zoom-table-bg" alt="стол">
+                <div class="zoom-content-wrapper">
+                    <div class="zoom-left">
+                        <div class="zoom-pot-container">
+                            <img id="zoomPotImg" src="" alt="горшок" class="zoom-pot-img">
+                            <img id="zoomPlantImg" src="" alt="растение" class="zoom-plant-img">
+                            <div class="watering-anim" id="wateringAnim" data-can="1">
+                                <img src="images/water can/лейка.png" alt="лейка" class="watering-can-img"
+                                     id="wateringCanImg">
+                                <div class="water-drops" id="waterDrops"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="zoom-left-panel light-panel">
+                        <button class="plant-btn-left light-plant-btn" id="plantBtnLeft">Посадить</button>
+                        <button class="water-btn-left light-water-btn" id="waterBtnLeft">Полить</button>
+                        <button class="repot-btn-left light-repot-btn" id="repotBtnLeft">Пересадить</button>
+                        <button class="move-btn-left light-move-btn" id="moveBtnLeft">Переставить горшок</button>
+                        <button class="remove-btn-left light-remove-btn" id="removeBtnLeft" style="display:none;">
+                            Выбросить
+                        </button>
+                    </div>
+                    <div class="zoom-right-panel light-panel">
+                        <div class="plant-name-zoom light-name" id="zoomPlantName">Пустой горшок</div>
+                        <div class="plant-stage light-stage" id="zoomStageLabel"></div>
+                        <button class="desc-btn-right light-desc-btn" id="descBtnRight">Описание</button>
+                        <div class="timer-box light-timer-box" id="waterTimerBox" style="display:none;"></div>
+                        <div class="timer-box light-timer-box" id="growthTimerBox" style="display:none;"></div>
+                        <div class="disease-box light-disease-box" id="diseaseBox" style="display:none;">
+                            <div class="disease-title">Болезнь</div>
+                            <div class="disease-text" id="diseaseText"></div>
+                        </div>
+                        <div class="description-box light-description-box" id="descriptionBox" style="display:none;">
+                            <div class="desc-text light-desc-text" id="plantDescription"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="zoom-left-panel light-panel">
-                <button class="plant-btn-left light-plant-btn" id="plantBtnLeft">Посадить</button>
-                <button class="water-btn-left light-water-btn" id="waterBtnLeft">Полить</button>
-                <button class="repot-btn-left light-repot-btn" id="repotBtnLeft">Пересадить</button>
-                <button class="move-btn-left light-move-btn" id="moveBtnLeft">Переставить горшок</button>
-                <button class="remove-btn-left light-remove-btn" id="removeBtnLeft" style="display:none;">Выбросить</button>
-            </div>
-            <div class="zoom-right-panel light-panel">
-                <div class="plant-name-zoom light-name" id="zoomPlantName">Пустой горшок</div>
-                <div class="plant-stage light-stage" id="zoomStageLabel"></div>
-                <button class="desc-btn-right light-desc-btn" id="descBtnRight">Описание</button>
-                <div class="timer-box light-timer-box" id="waterTimerBox" style="display:none;"></div>
-                <div class="timer-box light-timer-box" id="growthTimerBox" style="display:none;"></div>
-                <div class="disease-box light-disease-box" id="diseaseBox" style="display:none;">
-                    <div class="disease-title">Болезнь</div>
-                    <div class="disease-text" id="diseaseText"></div>
-                </div>
-                <div class="description-box light-description-box" id="descriptionBox" style="display:none;">
-                    <div class="desc-text light-desc-text" id="plantDescription"></div>
-                </div>
-            </div>
+            <button class="achievements-close-btn zoom-close-btn" id="zoomClose">✕</button>
         </div>
-        </div>
-        <button class="achievements-close-btn zoom-close-btn" id="zoomClose">✕</button>
-    </div>
     </div>
 </div>
 
@@ -215,7 +224,8 @@
 </div>
 
 <!-- Размытая комната на фоне первого обучения (как на welcome) -->
-<div class="first-time-room-bg" aria-hidden="true" style="background-image: url('images/auth/комната размытая.png');"></div>
+<div class="first-time-room-bg" aria-hidden="true"
+     style="background-image: url('images/auth/комната размытая.png');"></div>
 
 <!-- ОБУЧАЛКА: два режима (первый вход и обычный просмотр) -->
 <div class="tutorial-overlay" id="tutorialOverlay">
@@ -228,16 +238,19 @@
                     <div class="tut-icon">🪴</div>
                     <h2>Горшки и посадка</h2>
                     <p class="desc-point-title">Как поставить горшок?</p>
-                    <p>Кликни на пунктирное место в комнате → выбери горшок.<br>Обычный горшок доступен сразу. Новые открываются с уровнями.</p>
+                    <p>Кликни на пунктирное место в комнате → выбери горшок.<br>Обычный горшок доступен сразу. Новые
+                        открываются с уровнями.</p>
                     <p class="desc-point-title">Как посадить цветок?</p>
-                    <p>Кликни на горшок → нажми «Посадить» → выбери растение.<br>Кактус открывается на 3-м уровне, Фикус — на 5-м.</p>
+                    <p>Кликни на горшок → нажми «Посадить» → выбери растение.<br>Кактус открывается на 3-м уровне, Фикус
+                        — на 5-м.</p>
                 </div>
                 <div class="tutorial-step" id="firstStep1">
                     <div class="tut-icon">💧</div>
                     <h2>Полив</h2>
                     <p>Кликни на горшок → в режиме увеличения нажми «Полить».</p>
                     <p>Поливать можно один раз в день.</p>
-                    <p>У каждого растения свой график. Предпочтения каждого из них ты можешь узнать из карточки цветка.</p>
+                    <p>У каждого растения свой график. Предпочтения каждого из них ты можешь узнать из карточки
+                        цветка.</p>
                     <p>Перелив опаснее засухи. Не поливай раньше срока.</p>
                 </div>
                 <div class="tutorial-step" id="firstStep2">
@@ -249,7 +262,8 @@
                         <li>Середина — рассеянный свет</li>
                         <li>Стол справа — слабый свет</li>
                     </ul>
-                    <p>Каждое растение любит определённый свет. Поставь цветок не туда — он заболеет. Переставь на правильное место — выздоровеет.</p>
+                    <p>Каждое растение любит определённый свет. Поставь цветок не туда — он заболеет. Переставь на
+                        правильное место — выздоровеет.</p>
                 </div>
                 <div class="tutorial-step" id="firstStep3">
                     <div class="tut-icon">🏥</div>
@@ -271,7 +285,8 @@
                 <div class="tutorial-step" id="firstStep4">
                     <div class="tut-icon">📋</div>
                     <h2>Задания и уровни</h2>
-                    <p>На левой панели отображаются задания текущего уровня. Выполни все — получи новый уровень и награду.</p>
+                    <p>На левой панели отображаются задания текущего уровня. Выполни все — получи новый уровень и
+                        награду.</p>
                     <p class="desc-point-title">Уровни дают:</p>
                     <ul class="plant-desc-list">
                         <li>Новые горшки</li>
@@ -284,7 +299,8 @@
                     <div class="tut-icon">🏆</div>
                     <h2>Достижения</h2>
                     <p>Нажми на 🏆 в правом верхнем углу, чтобы увидеть все достижения.</p>
-                    <p>Достижения получаются за особые события — первую гибель, идеальное выращивание, сбор всех видов. Некоторые из них нельзя запланировать — они случаются сами в процессе игры.</p>
+                    <p>Достижения получаются за особые события — первую гибель, идеальное выращивание, сбор всех видов.
+                        Некоторые из них нельзя запланировать — они случаются сами в процессе игры.</p>
                 </div>
                 <div class="tutorial-step" id="firstStep6">
                     <div class="tut-icon">🍀</div>
@@ -306,16 +322,19 @@
                     <div class="tut-icon">🪴</div>
                     <h2>Горшки и посадка</h2>
                     <p class="desc-point-title">Как поставить горшок?</p>
-                    <p>Кликни на пунктирное место в комнате → выбери горшок.<br>Обычный горшок доступен сразу. Новые открываются с уровнями.</p>
+                    <p>Кликни на пунктирное место в комнате → выбери горшок.<br>Обычный горшок доступен сразу. Новые
+                        открываются с уровнями.</p>
                     <p class="desc-point-title">Как посадить цветок?</p>
-                    <p>Кликни на горшок → нажми «Посадить» → выбери растение.<br>Кактус открывается на 3-м уровне, Фикус — на 5-м.</p>
+                    <p>Кликни на горшок → нажми «Посадить» → выбери растение.<br>Кактус открывается на 3-м уровне, Фикус
+                        — на 5-м.</p>
                 </div>
                 <div class="tutorial-step" id="shortStep1">
                     <div class="tut-icon">💧</div>
                     <h2>Полив</h2>
                     <p>Кликни на горшок → в режиме увеличения нажми «Полить».</p>
                     <p>Поливать можно один раз в день.</p>
-                    <p>У каждого растения свой график. Предпочтения каждого из них ты можешь узнать из карточки цветка.</p>
+                    <p>У каждого растения свой график. Предпочтения каждого из них ты можешь узнать из карточки
+                        цветка.</p>
                     <p>Перелив опаснее засухи. Не поливай раньше срока.</p>
                 </div>
                 <div class="tutorial-step" id="shortStep2">
@@ -327,7 +346,8 @@
                         <li>Середина — рассеянный свет</li>
                         <li>Стол справа — слабый свет</li>
                     </ul>
-                    <p>Каждое растение любит определённый свет. Поставь цветок не туда — он заболеет. Переставь на правильное место — выздоровеет.</p>
+                    <p>Каждое растение любит определённый свет. Поставь цветок не туда — он заболеет. Переставь на
+                        правильное место — выздоровеет.</p>
                 </div>
                 <div class="tutorial-step" id="shortStep3">
                     <div class="tut-icon">🏥</div>
@@ -349,7 +369,8 @@
                 <div class="tutorial-step" id="shortStep4">
                     <div class="tut-icon">📋</div>
                     <h2>Задания и уровни</h2>
-                    <p>На левой панели отображаются задания текущего уровня. Выполни все — получи новый уровень и награду.</p>
+                    <p>На левой панели отображаются задания текущего уровня. Выполни все — получи новый уровень и
+                        награду.</p>
                     <p class="desc-point-title">Уровни дают:</p>
                     <ul class="plant-desc-list">
                         <li>Новые горшки</li>
@@ -362,7 +383,8 @@
                     <div class="tut-icon">🏆</div>
                     <h2>Достижения</h2>
                     <p>Нажми на 🏆 в правом верхнем углу, чтобы увидеть все достижения.</p>
-                    <p>Достижения получаются за особые события — первую гибель, идеальное выращивание, сбор всех видов. Некоторые из них нельзя запланировать — они случаются сами в процессе игры.</p>
+                    <p>Достижения получаются за особые события — первую гибель, идеальное выращивание, сбор всех видов.
+                        Некоторые из них нельзя запланировать — они случаются сами в процессе игры.</p>
                 </div>
             </div>
 
@@ -391,19 +413,23 @@
                         <img src="images/button/кнопка-стрелка обучения.png" alt="Назад">
                     </button>
                     <button class="tut-next-btn" id="tutNextBtn">
-                        <img id="tutNextBtnImg" class="tut-next-arrow" src="images/button/кнопка-стрелка обучения.png" alt="Далее">
+                        <img id="tutNextBtnImg" class="tut-next-arrow" src="images/button/кнопка-стрелка обучения.png"
+                             alt="Далее">
                         <span id="tutNextBtnLabel" class="ui-clay-btn tut-action-btn" hidden>Начать игру</span>
                     </button>
                 </div>
                 <div class="tutorial-skip-wrapper" id="tutorialSkipWrapper">
                     <button class="tut-skip-btn" id="tutSkipBtn">
-                        <img id="tutSkipBtnImg" src="images/button/кнопка пропуска обучения.png" alt="Пропустить обучение">
-                        <span id="tutSkipBtnLabel" class="ui-clay-btn tut-action-btn" hidden>Завершить обучение</span>
+                        <img id="tutSkipBtnImg" src="images/button/кнопка.png" alt="Пропустить обучение"
+                             style="display: none;">
+                        <span id="tutSkipBtnLabel" class="ui-clay-btn tut-action-btn">Пропустить <br> обучение</span>
                     </button>
                 </div>
             </div>
         </div>
-        <button class="achievements-close-btn tutorial-close-btn" id="closeTutorialBtn" type="button" aria-label="Закрыть обучение" hidden>✕</button>
+        <button class="achievements-close-btn tutorial-close-btn" id="closeTutorialBtn" type="button"
+                aria-label="Закрыть обучение" hidden>✕
+        </button>
     </div>
 </div>
 

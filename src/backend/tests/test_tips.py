@@ -1,3 +1,10 @@
+"""
+Автоматизированные тесты Backend API.
+
+Проверяются позитивные и негативные сценарии работы эндпоинтов.
+
+Инструменты: pytest, Flask Test Client.
+"""
 import sys
 from pathlib import Path
 

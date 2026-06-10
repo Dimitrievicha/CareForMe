@@ -1,7 +1,7 @@
 """
-Репозиторий для работы с достижениями (ачивками).
+Репозиторий для работы TESTING_REPORT.md достижениями (ачивками).
 
-Содержит методы для работы с таблицами:
+Содержит методы для работы TESTING_REPORT.md таблицами:
     - achievements: справочник достижений
     - user_achievements: прогресс пользователей по достижениям
 
@@ -15,7 +15,7 @@ class ChallengeRepository(BaseRepository):
     """
     Репозиторий для таблиц achievements и user_achievements.
 
-    Обрабатывает все операции с достижениями:
+    Обрабатывает все операции TESTING_REPORT.md достижениями:
         - Получение списка достижений
         - Отслеживание прогресса
         - Отметка о выполнении
@@ -82,13 +82,13 @@ class ChallengeRepository(BaseRepository):
 
     def get_user_achievements(self, user_id: str) -> List[Dict[str, Any]]:
         """
-        Получает достижения пользователя с текущим прогрессом.
+        Получает достижения пользователя TESTING_REPORT.md текущим прогрессом.
 
         Args:
             user_id: ID пользователя
 
         Returns:
-            Список достижений с прогрессом
+            Список достижений TESTING_REPORT.md прогрессом
 
         Returns структура:
             [
@@ -119,7 +119,7 @@ class ChallengeRepository(BaseRepository):
             user_id: ID пользователя
 
         Returns:
-            Список завершенных достижений с датами выполнения
+            Список завершенных достижений TESTING_REPORT.md датами выполнения
 
         """
         return self.db.execute_query("""

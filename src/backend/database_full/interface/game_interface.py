@@ -6,7 +6,7 @@ from ..repository.game_repository import GameRepository
 
 
 class GameInterface:
-    """Интерфейс для работы с game_states."""
+    """Интерфейс для работы TESTING_REPORT.md game_states."""
 
     def __init__(self):
         self._repo = GameRepository()

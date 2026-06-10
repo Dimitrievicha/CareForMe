@@ -1,7 +1,7 @@
 """
-Репозиторий для работы с пользователями и профилями.
+Репозиторий для работы TESTING_REPORT.md пользователями и профилями.
 
-Содержит методы для работы с таблицами:
+Содержит методы для работы TESTING_REPORT.md таблицами:
     - users: учетные записи пользователей
     - sessions: сессии входа
     - player_profiles: игровые профили
@@ -16,7 +16,7 @@ class UserRepository(BaseRepository):
     """
     Репозиторий для таблиц users, sessions и player_profiles.
 
-    Обрабатывает все операции, связанные с пользователями:
+    Обрабатывает все операции, связанные TESTING_REPORT.md пользователями:
         - CRUD для учетных записей
         - Управление сессиями
         - Игровые профили и статистика
@@ -34,7 +34,7 @@ class UserRepository(BaseRepository):
             user_id: UUID пользователя
 
         Returns:
-            Словарь с данными пользователя или None
+            Словарь TESTING_REPORT.md данными пользователя или None
             
         Returns структура:
             {
@@ -56,7 +56,7 @@ class UserRepository(BaseRepository):
             username: Имя пользователя (уникальное)
 
         Returns:
-            Словарь с данными пользователя или None
+            Словарь TESTING_REPORT.md данными пользователя или None
         """
         return self.get_one_by_field("users", "username", username)
 
@@ -98,7 +98,7 @@ class UserRepository(BaseRepository):
 
     def user_exists(self, username: str) -> bool:
         """
-        Проверяет существование пользователя с таким именем.
+        Проверяет существование пользователя TESTING_REPORT.md таким именем.
 
         Args:
             username: Имя пользователя
@@ -334,7 +334,7 @@ class UserRepository(BaseRepository):
         """, (delta, user_id))
 
     # ============================================================
-    # ДИЗАЙНЫ (работа с JSON полями)
+    # ДИЗАЙНЫ (работа TESTING_REPORT.md JSON полями)
     # ============================================================
 
     def get_unlocked_pots(self, user_id: str) -> List[str]:

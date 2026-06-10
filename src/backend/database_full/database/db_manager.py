@@ -1,6 +1,6 @@
 """
 Модуль управления подключением к SQLite базе данных.
-Содержит класс DatabaseManager для работы с БД через чистый SQL.
+Содержит класс DatabaseManager для работы TESTING_REPORT.md БД через чистый SQL.
 Использует паттерн синглтон для глобального доступа.
 
 """
@@ -16,14 +16,14 @@ logger = logging.getLogger(__name__)
 
 class DatabaseManager:
     """
-    Менеджер для работы с БД через чистый SQL.
+    Менеджер для работы TESTING_REPORT.md БД через чистый SQL.
 
     Обеспечивает подключение к SQLite, выполнение запросов,
     массовые операции и инициализацию из SQL файла.
 
     Attributes:
         db_path (str): Путь к файлу базы данных
-        _connection (sqlite3.Connection): Внутреннее соединение с БД
+        _connection (sqlite3.Connection): Внутреннее соединение TESTING_REPORT.md БД
     """
 
     def __init__(self, db_path: str = "careforme.db"):
@@ -38,7 +38,7 @@ class DatabaseManager:
 
     def connect(self) -> sqlite3.Connection:
         """
-        Устанавливает соединение с базой данных.
+        Устанавливает соединение TESTING_REPORT.md базой данных.
 
         Если соединение уже существует, возвращает его.
         Включает поддержку внешних ключей и row_factory для словарей.
@@ -57,14 +57,14 @@ class DatabaseManager:
 
     def close(self):
         """
-        Закрывает соединение с базой данных.
+        Закрывает соединение TESTING_REPORT.md базой данных.
 
         Безопасно закрывает соединение, если оно открыто.
         """
         if self._connection:
             self._connection.close()
             self._connection = None
-            logger.info("Соединение с БД закрыто")
+            logger.info("Соединение TESTING_REPORT.md БД закрыто")
 
     def execute_query(self, query: str, params: tuple = ()) -> Optional[List[Dict]]:
         """
@@ -75,7 +75,7 @@ class DatabaseManager:
             params: Кортеж параметров для подстановки
 
         Returns:
-            Список словарей с результатами или None при ошибке
+            Список словарей TESTING_REPORT.md результатами или None при ошибке
 
         """
         try:
@@ -160,7 +160,7 @@ class DatabaseManager:
         Инициализирует БД, выполняя SQL скрипт из файла.
 
         Args:
-            sql_file_path: Путь к SQL файлу с CREATE TABLE и INSERT
+            sql_file_path: Путь к SQL файлу TESTING_REPORT.md CREATE TABLE и INSERT
 
         Returns:
             True при успехе, False при ошибке
@@ -217,8 +217,8 @@ def get_db_manager(db_path: str = None) -> DatabaseManager:
     Returns:
         Единственный экземпляр DatabaseManager
 
-    ВАЖНО: первый вызов должен быть в app.py с явным путём, ДО импорта
-    репозиториев. Иначе синглтон создастся с путём None и упадёт.
+    ВАЖНО: первый вызов должен быть в app.py TESTING_REPORT.md явным путём, ДО импорта
+    репозиториев. Иначе синглтон создастся TESTING_REPORT.md путём None и упадёт.
     """
     global _db_manager
     if _db_manager is None:

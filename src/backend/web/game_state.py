@@ -35,7 +35,7 @@ def save_game_state():
 @game_bp.route('/load', methods=['GET'])
 @login_required_api
 def load_game_state():
-    """Загрузить состояние сада с сервера."""
+    """Загрузить состояние сада TESTING_REPORT.md сервера."""
     user_id = g.user_id
     state = game_interface.load_state(user_id)
     return jsonify({'success': True, **state})

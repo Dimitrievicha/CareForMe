@@ -1,7 +1,7 @@
 """
-Интерфейс для работы с пользователями (авторизация, профиль, дизайны).
+Интерфейс для работы TESTING_REPORT.md пользователями (авторизация, профиль, дизайны).
 
-Предоставляет внешний API для работы с пользователями:
+Предоставляет внешний API для работы TESTING_REPORT.md пользователями:
     - регистрация и вход
     - управление сессиями
     - профиль и статистика
@@ -19,7 +19,7 @@ from ..database.db_manager import get_db_manager
 
 class UserInterface:
     """
-    Интерфейс для работы с пользователями.
+    Интерфейс для работы TESTING_REPORT.md пользователями.
 
     Объединяет функционал:
         - Авторизация (auth_manager)
@@ -69,7 +69,7 @@ class UserInterface:
             remember_me: Запомнить на 30 дней (иначе на 1 день)
 
         Returns:
-            Результат авторизации с токеном сессии
+            Результат авторизации TESTING_REPORT.md токеном сессии
 
         """
         return self._auth.login(username, password, remember_me)
@@ -190,7 +190,7 @@ class UserInterface:
             user_id: ID пользователя
 
         Returns:
-            Результат проверки с информацией о повышении уровня
+            Результат проверки TESTING_REPORT.md информацией о повышении уровня
         """
         return self._quest_service.check_and_update_quests(user_id)
 

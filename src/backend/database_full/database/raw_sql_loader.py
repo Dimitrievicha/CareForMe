@@ -105,7 +105,7 @@ def load_achievements_from_csv_raw(csv_path: str, db_path: str = "careforme.db")
     Достижения НЕ дают монет и XP, только эмоциональную ценность.
 
     Args:
-        csv_path: Путь к CSV файлу с достижениями
+        csv_path: Путь к CSV файлу TESTING_REPORT.md достижениями
         db_path: Путь к файлу БД (по умолчанию 'careforme.db')
 
     Returns:
@@ -177,7 +177,7 @@ def load_tips_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool
     Загружает советы из CSV файла в таблицу tips.
 
     Args:
-        csv_path: Путь к CSV файлу с советами
+        csv_path: Путь к CSV файлу TESTING_REPORT.md советами
         db_path: Путь к файлу БД (по умолчанию 'careforme.db')
 
     Returns:
@@ -245,7 +245,7 @@ def load_level_requirements_from_csv_raw(csv_path: str, db_path: str = "careform
     Загружает задания уровней из CSV файла в таблицу level_requirements.
 
     Args:
-        csv_path: Путь к CSV файлу с заданиями уровней
+        csv_path: Путь к CSV файлу TESTING_REPORT.md заданиями уровней
         db_path: Путь к файлу БД (по умолчанию 'careforme.db')
 
     Returns:
@@ -337,7 +337,7 @@ def verify_data(db_path: str = "careforme.db") -> dict:
         db_path: Путь к файлу БД
 
     Returns:
-        Словарь с количеством записей в таблицах
+        Словарь TESTING_REPORT.md количеством записей в таблицах
     """
     db = get_db_manager(db_path)
 
@@ -388,7 +388,7 @@ def get_plant_by_id(species_id: int, db_path: str = "careforme.db") -> Optional[
         db_path: Путь к файлу БД
 
     Returns:
-        Словарь с данными растения или None
+        Словарь TESTING_REPORT.md данными растения или None
     """
     db = get_db_manager(db_path)
     result = db.execute_query(

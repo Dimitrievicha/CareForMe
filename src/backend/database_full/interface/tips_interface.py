@@ -1,5 +1,5 @@
 """
-Интерфейс для работы с советами (вызывается из API)
+Интерфейс для работы TESTING_REPORT.md советами (вызывается из API)
 """
 
 from ..service.tips_service import tips_service

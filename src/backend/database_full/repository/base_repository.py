@@ -1,5 +1,5 @@
 """
-Базовый репозиторий с общими методами для всех таблиц.
+Базовый репозиторий TESTING_REPORT.md общими методами для всех таблиц.
 
 Предоставляет базовые CRUD операции для всех репозиториев.
 Все конкретные репозитории наследуются от этого класса.
@@ -14,7 +14,7 @@ class BaseRepository:
     """
     Базовый класс для всех репозиториев.
     
-    Содержит общие методы для работы с любой таблицей.
+    Содержит общие методы для работы TESTING_REPORT.md любой таблицей.
     Не привязан к конкретной модели - работает со словарями.
     
     Attributes:
@@ -23,7 +23,7 @@ class BaseRepository:
 
     def __init__(self, db_path: str = None):
         """
-        Инициализирует репозиторий с подключением к БД.
+        Инициализирует репозиторий TESTING_REPORT.md подключением к БД.
 
         Args:
             db_path: Путь к файлу БД. Если не указан — используется синглтон,
@@ -39,11 +39,11 @@ class BaseRepository:
 
         Args:
             table_name: Имя таблицы (например 'users', 'user_plants')
-            id_column: Название колонки с ID (обычно 'id')
+            id_column: Название колонки TESTING_REPORT.md ID (обычно 'id')
             id_value: Значение ID для поиска
 
         Returns:
-            Словарь с данными записи или None, если не найдено
+            Словарь TESTING_REPORT.md данными записи или None, если не найдено
             
         Пример:
             >>> user = repo.get_by_id("users", "id", "abc-123")
@@ -57,7 +57,7 @@ class BaseRepository:
 
     def get_all(self, table_name: str, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
         """
-        Получает все записи из таблицы с пагинацией.
+        Получает все записи из таблицы TESTING_REPORT.md пагинацией.
 
         Args:
             table_name: Имя таблицы
@@ -65,7 +65,7 @@ class BaseRepository:
             offset: Смещение - сколько записей пропустить
 
         Returns:
-            Список словарей с записями, пустой список если ничего нет
+            Список словарей TESTING_REPORT.md записями, пустой список если ничего нет
             
         Пример:
             >>> all_users = repo.get_all("users", limit=50, offset=0)
@@ -145,7 +145,7 @@ class BaseRepository:
 
         Args:
             table_name: Имя таблицы
-            id_column: Название колонки с ID
+            id_column: Название колонки TESTING_REPORT.md ID
             id_value: Значение ID
             data: Словарь {колонка: новое значение}
 
@@ -166,7 +166,7 @@ class BaseRepository:
 
         Args:
             table_name: Имя таблицы
-            id_column: Название колонки с ID
+            id_column: Название колонки TESTING_REPORT.md ID
             id_value: Значение ID
 
         Returns:
@@ -221,7 +221,7 @@ class BaseRepository:
             params: Параметры для подстановки
             
         Returns:
-            Список словарей с результатами
+            Список словарей TESTING_REPORT.md результатами
             
         Пример:
             >>> result = repo.execute_custom(

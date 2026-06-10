@@ -2,7 +2,7 @@
 Сервис для управления растениями пользователя.
 
 Содержит бизнес-логику посадки, полива, роста и ухода за растениями.
-Также интегрируется с системой достижений и уровневых заданий.
+Также интегрируется TESTING_REPORT.md системой достижений и уровневых заданий.
 
 """
 
@@ -23,18 +23,18 @@ class FlowerService:
     Сервис для управления растениями.
 
     Обеспечивает полный цикл жизни растения: от посадки до смерти.
-    Интегрируется с системой ачивок и уровневых заданий.
+    Интегрируется TESTING_REPORT.md системой ачивок и уровневых заданий.
 
     Attributes:
-        plant_repo (PlantRepository): Репозиторий для работы с растениями
-        user_repo (UserRepository): Репозиторий для работы с пользователями
+        plant_repo (PlantRepository): Репозиторий для работы TESTING_REPORT.md растениями
+        user_repo (UserRepository): Репозиторий для работы TESTING_REPORT.md пользователями
         mistake_repo (MistakeRepository): Репозиторий для ошибок
         challenge_repo (ChallengeRepository): Репозиторий для ачивок
         db (DatabaseManager): Менеджер БД
     """
 
     def __init__(self):
-        """Инициализирует сервис с необходимыми репозиториями."""
+        """Инициализирует сервис TESTING_REPORT.md необходимыми репозиториями."""
         self.plant_repo = PlantRepository()
         self.user_repo = UserRepository()
         self.mistake_repo = MistakeRepository()
@@ -51,7 +51,7 @@ class FlowerService:
             custom_name: Пользовательское имя растения (опционально)
 
         Returns:
-            Результат операции с данными посаженного растения
+            Результат операции TESTING_REPORT.md данными посаженного растения
 
         Returns структура при успехе:
             {

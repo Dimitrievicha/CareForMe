@@ -1,7 +1,7 @@
 """
-Репозиторий для работы с растениями.
+Репозиторий для работы TESTING_REPORT.md растениями.
 
-Содержит методы для работы с таблицами:
+Содержит методы для работы TESTING_REPORT.md таблицами:
     - plant_templates: шаблоны растений (справочник)
     - user_plants: растения конкретных пользователей
 """
@@ -15,7 +15,7 @@ class PlantRepository(BaseRepository):
     """
     Репозиторий для таблиц plant_templates и user_plants.
 
-    Обрабатывает все операции с растениями:
+    Обрабатывает все операции TESTING_REPORT.md растениями:
         - Получение шаблонов растений
         - Посадка, полив, рост, смерть растений
         - Статистика по растениям
@@ -89,14 +89,14 @@ class PlantRepository(BaseRepository):
 
     def get_user_plants(self, user_id: str, only_alive: bool = True) -> List[Dict[str, Any]]:
         """
-        Получает растения пользователя с данными из шаблона.
+        Получает растения пользователя TESTING_REPORT.md данными из шаблона.
 
         Args:
             user_id: ID пользователя
             only_alive: Если True, только живые растения (is_alive = 1)
 
         Returns:
-            Список растений с JOIN-данными из plant_templates
+            Список растений TESTING_REPORT.md JOIN-данными из plant_templates
 
         Returns структура:
             [
@@ -134,7 +134,7 @@ class PlantRepository(BaseRepository):
             plant_id: UUID растения
 
         Returns:
-            Данные растения с JOIN-полями из шаблона или None
+            Данные растения TESTING_REPORT.md JOIN-полями из шаблона или None
         """
         result = self.db.execute_query("""
             SELECT up.*, 
@@ -316,7 +316,7 @@ class PlantRepository(BaseRepository):
             user_id: ID пользователя
 
         Returns:
-            Список мертвых растений с причиной смерти, отсортированные по дате смерти
+            Список мертвых растений TESTING_REPORT.md причиной смерти, отсортированные по дате смерти
         """
         return self.db.execute_query("""
             SELECT up.*, pt.species_name, up.death_cause

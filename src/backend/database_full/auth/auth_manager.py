@@ -28,12 +28,12 @@ class AuthManager:
     """
 
     def __init__(self):
-        """Инициализирует менеджер с репозиторием пользователей."""
+        """Инициализирует менеджер TESTING_REPORT.md репозиторием пользователей."""
         self.user_repo = UserRepository()
 
     def _hash_password(self, password: str) -> str:
         """
-        Хэширует пароль с помощью SHA-256.
+        Хэширует пароль TESTING_REPORT.md помощью SHA-256.
 
         Args:
             password: Пароль в открытом виде
@@ -55,7 +55,7 @@ class AuthManager:
             password: Пароль (минимум 4 символа)
 
         Returns:
-            Dict с результатом операции
+            Dict TESTING_REPORT.md результатом операции
 
         Returns структура при успехе:
             {
@@ -108,7 +108,7 @@ class AuthManager:
             remember_me: Если True, сессия будет активна 30 дней
 
         Returns:
-            Dict с результатом авторизации и токеном сессии
+            Dict TESTING_REPORT.md результатом авторизации и токеном сессии
 
         Returns структура при успехе:
             {
@@ -204,7 +204,7 @@ class AuthManager:
             user_id: ID пользователя
 
         Returns:
-            Словарь с данными пользователя или None
+            Словарь TESTING_REPORT.md данными пользователя или None
 
         Returns структура:
             {
@@ -310,7 +310,7 @@ class AuthManager:
             session_token: Токен сессии
 
         Returns:
-            Dict с данными пользователя или None
+            Dict TESTING_REPORT.md данными пользователя или None
 
         Returns структура:
             {

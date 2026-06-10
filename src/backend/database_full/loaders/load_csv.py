@@ -70,7 +70,7 @@ def main():
     if stats['plants_count'] > 0 and stats['tips_count'] > 0 and stats['level_quests_count'] > 0:
         print("\nЗагрузка завершена успешно!")
     else:
-        print("\nЗагрузка завершена с ошибками. Проверьте наличие CSV файлов.")
+        print("\nЗагрузка завершена TESTING_REPORT.md ошибками. Проверьте наличие CSV файлов.")
 
 
 if __name__ == "__main__":

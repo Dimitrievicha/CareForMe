@@ -1,5 +1,5 @@
 """
-Сервис для работы с советами
+Сервис для работы TESTING_REPORT.md советами
 """
 
 from typing import List, Dict, Any, Optional
@@ -14,7 +14,7 @@ class TipsService:
         self._repo = TipsRepository()
 
     def get_all_tips(self) -> List[Dict[str, Any]]:
-        """Получить все советы с форматированием."""
+        """Получить все советы TESTING_REPORT.md форматированием."""
         rows = self._repo.get_all_tips()
         return [
             {

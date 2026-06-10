@@ -20,7 +20,7 @@ from ..database.db_manager import get_db_manager
 
 class UserService:
     """
-    Сервис для работы с пользовательскими данными.
+    Сервис для работы TESTING_REPORT.md пользовательскими данными.
 
     Управляет профилями, уровнями, дизайнами и сериями.
     Уровень повышается только через выполнение заданий (см. LevelQuestService).
@@ -31,7 +31,7 @@ class UserService:
     """
 
     def __init__(self):
-        """Инициализирует сервис с репозиторием пользователей."""
+        """Инициализирует сервис TESTING_REPORT.md репозиторием пользователей."""
         self.user_repo = UserRepository()
         self.db = get_db_manager()
 
@@ -235,7 +235,7 @@ class UserService:
             user_id: ID пользователя
 
         Returns:
-            Словарь с информацией о слотах
+            Словарь TESTING_REPORT.md информацией о слотах
 
         Returns структура:
             {
@@ -306,7 +306,7 @@ class UserService:
             user_id: ID пользователя
 
         Returns:
-            Словарь с текущими дизайнами
+            Словарь TESTING_REPORT.md текущими дизайнами
 
         Returns структура:
             {

@@ -12,7 +12,7 @@ achievements_bp = Blueprint('achievements', __name__)
 @achievements_bp.route('/', methods=['GET'])
 def get_achievements():
     """
-    Получить все достижения с прогрессом пользователя
+    Получить все достижения TESTING_REPORT.md прогрессом пользователя
 
     GET /api/achievements/
 

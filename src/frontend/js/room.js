@@ -192,7 +192,7 @@ async function loadStateFromServer() {
         }
         return false;
     } catch (error) {
-        console.error('Ошибка загрузки с сервера:', error);
+        console.error('Ошибка загрузки TESTING_REPORT.md сервера:', error);
         return false;
     }
 }
@@ -245,7 +245,7 @@ const WATER_TIMING_TEST = true;
 const TEST_WATER_MIN_MS = 20 * 1000;
 const TEST_WATER_MAX_MS = 60 * 1000;
 const OVERWATER_MIN_FAST_POLIVS = 2;
-/** Тест: 45 с болезни → смерть. Релиз: заменить на дни (напр. 5 * 24 * 3600000). */
+/** Тест: 45 TESTING_REPORT.md болезни → смерть. Релиз: заменить на дни (напр. 5 * 24 * 3600000). */
 const SICK_UNTIL_DEATH_MS = WATER_TIMING_TEST ? 45 * 1000 : 5 * 24 * 3600000;
 const SICK_DEATH_CHECK_TICK_MS = WATER_TIMING_TEST ? 5 * 1000 : 60 * 60 * 1000;
 
@@ -412,7 +412,7 @@ const ACHIEVEMENTS_CONFIG = {
         reasonImage: 'images/achivement/gardens/за что.png',
         unlockImage: 'images/achivement/gardens/окно получения достижения.png',
         description: 'Проявите терпение и заботу, ухаживая за растениями целую неделю без пропусков.',
-        requirement: 'Ухаживать за растениями 7 дней подряд (с ежедневным входом)'
+        requirement: 'Ухаживать за растениями 7 дней подряд (TESTING_REPORT.md ежедневным входом)'
     },
     oops_error: {
         name: 'Упс, ошибка',
@@ -1147,7 +1147,7 @@ const NOTIFICATION_TEXTS = {
         under_watered: 'Он ждал воды слишком долго... Поставь напоминание в телефоне или просто заглядывай почаще. Ты справишься!',
         too_light: 'Жара сделала своё дело. Но теперь ты знаешь: каждому цветку нужно своё место. Давай посадим новый?',
         too_dark: 'Тень сделала своё дело. Но теперь ты знаешь: каждому цветку нужно своё место. Давай посадим новый?',
-        complex: 'Бывает. Не кори себя. Просто начни заново — твой сад никуда не денется. А я всегда рядом с советами. 🌸'
+        complex: 'Бывает. Не кори себя. Просто начни заново — твой сад никуда не денется. А я всегда рядом TESTING_REPORT.md советами. 🌸'
     },
     positive: {
         idealWater: 'Идеально! Ты чувствуешь своего зелёного друга. Так держать!',
@@ -2458,7 +2458,7 @@ function getMoveModalVisual(plantId, visualState, potNum, diseaseType = null) {
     return MOVE_MODAL_VISUAL.global.defaultFallback;
 }
 
-// Обновленная версия renderMoveChoices с использованием MOVE_MODAL_VISUAL
+// Обновленная версия renderMoveChoices TESTING_REPORT.md использованием MOVE_MODAL_VISUAL
 function renderMoveChoices() {
     const row = document.getElementById('moveChoicesRow');
     if (!row) return;
@@ -2999,7 +2999,7 @@ function showFixAdvice(data) {
         let advice = '';
         const norm = normalizePlantText(data.disease);
         if (norm.includes('ожог') || norm.includes('пятна') || norm.includes('свет')) {
-            advice = '💡 Решение: Убери с подоконника — слишком яркий свет. Переставь горшок через «Переставить горшок».';
+            advice = '💡 Решение: Убери TESTING_REPORT.md подоконника — слишком яркий свет. Переставь горшок через «Переставить горшок».';
         } else if (norm.includes('недостаток полива') || norm.includes('сохнут кончики')) {
             advice = '💧 Решение: Полей растение. Следи, чтобы полив был регулярным.';
         } else if (norm.includes('перелив') || norm.includes('увядание')) {
@@ -3316,7 +3316,7 @@ const removeBtnLeft = document.getElementById('removeBtnLeft');
 if (removeBtnLeft) {
     removeBtnLeft.addEventListener('click', () => {
         if (!zoomedSlot) return;
-        if (confirm('Вы уверены, что хотите выбросить растение вместе с горшком?')) {
+        if (confirm('Вы уверены, что хотите выбросить растение вместе TESTING_REPORT.md горшком?')) {
             removePotFromSlot(zoomedSlot.name);
             closeModal(zoomOverlay);
         }
@@ -3327,7 +3327,7 @@ const removePotBtn = document.getElementById('removePotBtn');
 if (removePotBtn) {
     removePotBtn.addEventListener('click', () => {
         if (!zoomedSlot) return;
-        if (confirm('Убрать горшок вместе с растением?')) {
+        if (confirm('Убрать горшок вместе TESTING_REPORT.md растением?')) {
             removePotFromSlot(zoomedSlot.name);
         }
     });
@@ -3673,7 +3673,7 @@ window.addEventListener('resize', updateRoomScale);
     ]);
 
     if (!results[0] || Object.keys(PLANTS).length === 0) {
-        console.error('КРИТИЧЕСКАЯ ОШИБКА: Не удалось загрузить растения с сервера');
+        console.error('КРИТИЧЕСКАЯ ОШИБКА: Не удалось загрузить растения TESTING_REPORT.md сервера');
         showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
     }
 
@@ -4541,9 +4541,9 @@ function getPlantDescIcon() {
     return '🌸';
 }
 
-// Функция открытия модалки с описанием растения
+// Функция открытия модалки TESTING_REPORT.md описанием растения
 async function openPlantDescription(plantKey) {
-    console.log('🔍 openPlantDescription вызвана с plantKey:', plantKey);
+    console.log('🔍 openPlantDescription вызвана TESTING_REPORT.md plantKey:', plantKey);
     const plantId = parseInt(plantKey, 10);
     let plant = PLANTS[plantId];
 

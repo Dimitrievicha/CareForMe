@@ -1,7 +1,7 @@
 """
-Репозиторий для работы с уровневыми заданиями.
+Репозиторий для работы TESTING_REPORT.md уровневыми заданиями.
 
-Содержит методы для работы с таблицами:
+Содержит методы для работы TESTING_REPORT.md таблицами:
     - level_requirements: определения заданий для уровней (справочник)
     - user_level_progress: прогресс пользователя по заданиям
 
@@ -15,7 +15,7 @@ class LevelQuestRepository(BaseRepository):
     """
     Репозиторий для таблиц level_requirements и user_level_progress.
 
-    Обрабатывает все операции с уровневыми заданиями:
+    Обрабатывает все операции TESTING_REPORT.md уровневыми заданиями:
         - Получение заданий для уровней
         - Отслеживание прогресса пользователя
         - Обновление выполнения заданий
@@ -30,7 +30,7 @@ class LevelQuestRepository(BaseRepository):
             level: Номер уровня (1-5)
 
         Returns:
-            Словарь с данными заданий уровня или None
+            Словарь TESTING_REPORT.md данными заданий уровня или None
 
         Returns структура:
             {
@@ -87,7 +87,7 @@ class LevelQuestRepository(BaseRepository):
             level: Номер уровня
 
         Returns:
-            Словарь с информацией о награде
+            Словарь TESTING_REPORT.md информацией о награде
 
         Returns структура:
             {
@@ -112,7 +112,7 @@ class LevelQuestRepository(BaseRepository):
             level: Номер уровня
 
         Returns:
-            Словарь с прогрессом или None если нет записи
+            Словарь TESTING_REPORT.md прогрессом или None если нет записи
 
         Returns структура:
             {
@@ -270,7 +270,7 @@ class LevelQuestRepository(BaseRepository):
             current_level: Текущий уровень пользователя
 
         Returns:
-            Словарь с прогрессом всех заданий текущего уровня
+            Словарь TESTING_REPORT.md прогрессом всех заданий текущего уровня
 
         Returns структура:
             {

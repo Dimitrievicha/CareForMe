@@ -1,5 +1,5 @@
 """
-Репозиторий для работы с советами
+Репозиторий для работы TESTING_REPORT.md советами
 """
 
 from typing import List, Dict, Any, Optional

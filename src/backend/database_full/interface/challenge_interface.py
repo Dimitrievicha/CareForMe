@@ -1,7 +1,7 @@
 """
-Интерфейс для работы с достижениями (ачивками).
+Интерфейс для работы TESTING_REPORT.md достижениями (ачивками).
 
-Предоставляет внешний API для работы с достижениями.
+Предоставляет внешний API для работы TESTING_REPORT.md достижениями.
 Все методы предназначены для вызова из GUI, CLI или REST API.
 
 """
@@ -25,7 +25,7 @@ class ChallengeInterface:
 
     def __init__(self, db_path: str = None):
         """
-        Инициализирует интерфейс с сервисным слоем.
+        Инициализирует интерфейс TESTING_REPORT.md сервисным слоем.
 
         Args:
             db_path: Путь к БД (опционально)
@@ -38,13 +38,13 @@ class ChallengeInterface:
 
     def get_all_achievements(self, user_id: str) -> List[Dict[str, Any]]:
         """
-        Получить все достижения с прогрессом пользователя.
+        Получить все достижения TESTING_REPORT.md прогрессом пользователя.
 
         Args:
             user_id: ID пользователя
 
         Returns:
-            Список достижений с прогрессом
+            Список достижений TESTING_REPORT.md прогрессом
 
         """
         return self._service.get_achievements(user_id)
@@ -131,7 +131,7 @@ class ChallengeInterface:
             mistake_type: Тип ошибки (overwater, drought, light, cold)
 
         Returns:
-            Результат с новыми достижениями
+            Результат TESTING_REPORT.md новыми достижениями
         """
         return self._service.record_mistake(user_id, plant_id, mistake_type)
 
@@ -144,7 +144,7 @@ class ChallengeInterface:
             plant_id: ID растения
 
         Returns:
-            Результат с новыми достижениями
+            Результат TESTING_REPORT.md новыми достижениями
         """
         return self._service.record_perfect_growth(user_id, plant_id)
 
@@ -157,7 +157,7 @@ class ChallengeInterface:
             plant_id: ID растения
 
         Returns:
-            Результат с новыми достижениями
+            Результат TESTING_REPORT.md новыми достижениями
         """
         return self._service.record_plant_death(user_id, plant_id)
 
@@ -169,7 +169,7 @@ class ChallengeInterface:
             user_id: ID пользователя
 
         Returns:
-            Результат с новыми достижениями
+            Результат TESTING_REPORT.md новыми достижениями
         """
         return self._service.record_species_collected(user_id)
 

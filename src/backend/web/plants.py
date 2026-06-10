@@ -1,5 +1,5 @@
 """
-API маршруты для работы с отдельным растением
+API маршруты для работы TESTING_REPORT.md отдельным растением
 Префикс: /api/plants
 
 Маршруты:
@@ -148,7 +148,7 @@ def set_light(plant_id):
     if not success:
         return jsonify({'success': False, 'error': 'Ошибка обновления'}), 500
 
-    # Перепроверяем здоровье с новым светом
+    # Перепроверяем здоровье TESTING_REPORT.md новым светом
     health = flower_interface.check_health(plant_id, user_id)
 
     return jsonify({

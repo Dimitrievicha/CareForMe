@@ -33,7 +33,7 @@ class LevelQuestService:
     """
 
     def __init__(self):
-        """Инициализирует сервис с необходимыми репозиториями."""
+        """Инициализирует сервис TESTING_REPORT.md необходимыми репозиториями."""
         self.user_repo = UserRepository()
         self.plant_repo = PlantRepository()
         self.challenge_repo = ChallengeRepository()
@@ -177,7 +177,7 @@ class LevelQuestService:
             user_id: ID пользователя
 
         Returns:
-            Результат проверки с информацией о повышении уровня
+            Результат проверки TESTING_REPORT.md информацией о повышении уровня
 
         Returns структура:
             {

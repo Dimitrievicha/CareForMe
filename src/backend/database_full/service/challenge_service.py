@@ -18,7 +18,7 @@ from ..repository.plant_repository import PlantRepository
 
 class ChallengeService:
     """
-    Сервис для работы с достижениями (ачивками).
+    Сервис для работы TESTING_REPORT.md достижениями (ачивками).
 
     Ачивки служат для:
         - Коллекционирования
@@ -33,7 +33,7 @@ class ChallengeService:
     """
 
     def __init__(self):
-        """Инициализирует сервис с необходимыми репозиториями."""
+        """Инициализирует сервис TESTING_REPORT.md необходимыми репозиториями."""
         self.challenge_repo = ChallengeRepository()
         self.mistake_repo = MistakeRepository()
         self.user_repo = UserRepository()
@@ -41,13 +41,13 @@ class ChallengeService:
 
     def get_achievements(self, user_id: str) -> List[Dict[str, Any]]:
         """
-        Получает все достижения с прогрессом пользователя.
+        Получает все достижения TESTING_REPORT.md прогрессом пользователя.
 
         Args:
             user_id: ID пользователя
 
         Returns:
-            Список достижений с прогрессом
+            Список достижений TESTING_REPORT.md прогрессом
 
         Returns структура:
             [
@@ -72,7 +72,7 @@ class ChallengeService:
             user_id: ID пользователя
 
         Returns:
-            Список выполненных достижений с датами
+            Список выполненных достижений TESTING_REPORT.md датами
         """
         return self.challenge_repo.get_completed_achievements(user_id)
 
@@ -164,7 +164,7 @@ class ChallengeService:
             mistake_type: Тип ошибки (overwater, drought, light, cold)
 
         Returns:
-            Результат с новыми достижениями
+            Результат TESTING_REPORT.md новыми достижениями
 
         Returns структура:
             {
@@ -197,7 +197,7 @@ class ChallengeService:
             plant_id: ID растения
 
         Returns:
-            Результат с новыми достижениями
+            Результат TESTING_REPORT.md новыми достижениями
         """
         self.plant_repo.mark_perfect_growth(plant_id)
 
@@ -217,7 +217,7 @@ class ChallengeService:
             plant_id: ID растения
 
         Returns:
-            Результат с новыми достижениями
+            Результат TESTING_REPORT.md новыми достижениями
         """
         completed = self.check_all(user_id)
 
@@ -234,7 +234,7 @@ class ChallengeService:
             user_id: ID пользователя
 
         Returns:
-            Результат с новыми достижениями
+            Результат TESTING_REPORT.md новыми достижениями
         """
         completed = self.check_all(user_id)
 
@@ -252,7 +252,7 @@ class ChallengeService:
             streak: Текущая серия дней
 
         Returns:
-            Результат с новыми достижениями
+            Результат TESTING_REPORT.md новыми достижениями
         """
         completed = self.check_all(user_id)
 

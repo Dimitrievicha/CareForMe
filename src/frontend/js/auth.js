@@ -201,7 +201,7 @@ async function register(username, password) {
         return true;
     } catch (err) {
         console.error('register error:', err);
-        showNotification('Ошибка соединения с сервером');
+        showNotification('Ошибка соединения TESTING_REPORT.md сервером');
         return false;
     }
 }
@@ -228,7 +228,7 @@ async function login(username, password, options = {}) {
         }
     } catch (err) {
         console.error('login error:', err);
-        showNotification('Ошибка соединения с сервером');
+        showNotification('Ошибка соединения TESTING_REPORT.md сервером');
         resetPassword();
         return false;
     }

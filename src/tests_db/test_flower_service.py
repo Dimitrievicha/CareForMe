@@ -219,3 +219,92 @@ def test_water_flower_overwatered(mock_level_quest_service):
         "plant1",
         "overwater"
     )
+# =========================
+# set_light_level()
+# =========================
+
+def test_set_light_level_plant_not_found():
+    service = create_service()
+
+    service.plant_repo.get_user_plant_by_id.return_value = None
+
+    assert service.set_light_level("plant1", "user1", "high") is False
+
+
+def test_set_light_level_not_owner():
+    service = create_service()
+
+    service.plant_repo.get_user_plant_by_id.return_value = {
+        "user_id": "other_user"
+    }
+
+    assert service.set_light_level("plant1", "user1", "high") is False
+
+
+def test_set_light_level_success():
+    service = create_service()
+
+    service.plant_repo.get_user_plant_by_id.return_value = {
+        "user_id": "user1"
+    }
+
+    service.plant_repo.update_light_level.return_value = True
+
+    assert service.set_light_level("plant1", "user1", "high") is True
+
+
+# =========================
+# set_location()
+# =========================
+
+def test_set_location_plant_not_found():
+    service = create_service()
+
+    service.plant_repo.get_user_plant_by_id.return_value = None
+
+    assert service.set_location("plant1", "user1", "Балкон") is False
+
+
+def test_set_location_not_owner():
+    service = create_service()
+
+    service.plant_repo.get_user_plant_by_id.return_value = {
+        "user_id": "other_user"
+    }
+
+    assert service.set_location("plant1", "user1", "Балкон") is False
+
+
+def test_set_location_success():
+    service = create_service()
+
+    service.plant_repo.get_user_plant_by_id.return_value = {
+        "user_id": "user1"
+    }
+
+    service.plant_repo.update_location.return_value = True
+
+    assert service.set_location("plant1", "user1", "Балкон") is True
+
+
+# =========================
+# get_all_growth_stages()
+# =========================
+
+def test_get_all_growth_stages():
+    service = create_service()
+
+    service.plant_repo.get_user_plants.return_value = [
+        {"growth_stage": "seed"},
+        {"growth_stage": "seedling"},
+        {"growth_stage": "seedling"},
+        {"growth_stage": "mature"},
+    ]
+
+    result = service.get_all_growth_stages("user1")
+
+    assert result["seed"] == 1
+    assert result["seedling"] == 2
+    assert result["growing"] == 0
+    assert result["mature"] == 1
+    assert result["flowering"] == 0

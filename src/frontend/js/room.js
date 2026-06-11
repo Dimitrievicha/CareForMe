@@ -1,7 +1,5 @@
-
 const API_BASE_URL = 'http://localhost:5000/api';
 
-/** Эталонный размер сцены комнаты */
 const ROOM_DESIGN_WIDTH = 1280;
 const ROOM_DESIGN_HEIGHT = 720;
 const ZOOM_DESIGN_WIDTH = 780;
@@ -46,13 +44,9 @@ function getAuthToken() {
 }
 
 function getAuthHeaders() {
-    const headers = {
-        'Content-Type': 'application/json'
-    };
+    const headers = { 'Content-Type': 'application/json' };
     const token = getAuthToken();
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     return headers;
 }
 
@@ -122,13 +116,19 @@ async function saveStateToServer() {
             credentials: 'include',
             body: JSON.stringify(stateToSave)
         });
-        const data = await response.json();
-        if (!data.success) {
-            console.warn('Не удалось сохранить состояние на сервер');
-        }
+        await response.json();
     } catch (error) {
         console.error('Ошибка сохранения на сервер:', error);
     }
+}
+
+function normalizeTipsLines(input) {
+    if (input == null || input === '') return [];
+    const rawItems = Array.isArray(input) ? input : [input];
+    return rawItems
+        .flatMap((item) => String(item).replace(/\\n/g, '\n').split(/\r?\n|\|/))
+        .map((line) => line.trim().replace(/^[•\-–—]\s*/, ''))
+        .filter(Boolean);
 }
 
 async function loadStateFromServer() {
@@ -187,7 +187,6 @@ async function loadStateFromServer() {
 
             updateAchievementsDisplay();
             renderQuests();
-
             return true;
         }
         return false;
@@ -202,7 +201,6 @@ function saveState() {
         slotData,
         currentWateringCan: getCurrentWateringCanId()
     }));
-
     saveStateToServer().catch(console.error);
 }
 
@@ -222,30 +220,29 @@ const WATERING_CAN_DISPLAY_NAMES = {
 };
 
 function applyPotDisplayNames(pots) {
-    Object.keys(pots).forEach((num) => {
+    Object.keys(pots).forEach(num => {
         const key = parseInt(num, 10);
         if (POT_DISPLAY_NAMES[key]) pots[num].name = POT_DISPLAY_NAMES[key];
     });
 }
 
 function applyWateringCanDisplayNames(cans) {
-    Object.keys(cans).forEach((id) => {
+    Object.keys(cans).forEach(id => {
         const key = normalizeWateringCanId(id);
         if (WATERING_CAN_DISPLAY_NAMES[key]) cans[id].name = WATERING_CAN_DISPLAY_NAMES[key];
     });
 }
+
 let currentLevel = 1;
 let currentUser = null;
 let currentZoomedPlantId = null;
 
-// Тестовые значения — заменить на дни/часы перед релизом
 const SEEDLING_MS = 10 * 1000;
 const BLOOM_MS = 61 * 1000;
 const WATER_TIMING_TEST = true;
 const TEST_WATER_MIN_MS = 20 * 1000;
 const TEST_WATER_MAX_MS = 60 * 1000;
 const OVERWATER_MIN_FAST_POLIVS = 2;
-/** Тест: 45 с болезни → смерть. Релиз: заменить на дни (напр. 5 * 24 * 3600000). */
 const SICK_UNTIL_DEATH_MS = WATER_TIMING_TEST ? 45 * 1000 : 5 * 24 * 3600000;
 const SICK_DEATH_CHECK_TICK_MS = WATER_TIMING_TEST ? 5 * 1000 : 60 * 60 * 1000;
 
@@ -264,7 +261,7 @@ function plantVisual(bottom, width, pot1, pot2, pot3, extra = {}) {
 }
 
 const PLANT_VISUAL_CONFIG = {
-    1: { // Спатифиллум
+    1: {
         sprout: plantVisual('35px', '90px', [18, 42], [12, 32], [36, 63]),
         bloom: plantVisual('20px', '120px', [19, 39], [12, 29], [37, 57]),
         dead: plantVisual('35px', '100px', [-42, -39], [-48, -48], [-24, -21]),
@@ -275,7 +272,7 @@ const PLANT_VISUAL_CONFIG = {
             overwatered: plantVisual('35px', '100px', [40, 69], [34, 59], [58, 86], { imageKey: 'желтение' })
         }
     },
-    2: { // Кактус
+    2: {
         sprout: plantVisual('45px', '60px', [10, 35], [4, 26], [28, 54]),
         bloom: plantVisual('40px', '70px', [-28, -19], [-34, -27], [-9, -1]),
         dead: plantVisual('40px', '65px', [-28, -18], [-34, -28], [-10, 0]),
@@ -286,7 +283,7 @@ const PLANT_VISUAL_CONFIG = {
             overwatered: plantVisual('38px', '34px', [42, 75], [36, 66], [60, 93], { imageKey: 'сморщенный стебель' })
         }
     },
-    3: { // Фикус
+    3: {
         sprout: plantVisual('40px', '75px', [-33, -23], [-38, -32], [-13, -4]),
         bloom: plantVisual('35px', '125px', [-19, -6], [-25, -14], [0, 12]),
         dead: plantVisual('19px', '95px', [-28, -25], [-33, -34], [-10, -8]),
@@ -451,7 +448,6 @@ async function markTutorialCompleteOnServer() {
         console.error('Не удалось сохранить прохождение обучения:', error);
     }
 }
-
 async function checkAuth() {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/verify`, {
@@ -493,26 +489,72 @@ async function checkAuth() {
     }
 }
 
-function mergePlantCatalogExtras(plants) {
-    Object.entries(PLANT_CATALOG_EXTRAS).forEach(([id, extras]) => {
-        const numericId = Number(id);
-        const plant = plants[id] || plants[numericId]
-            || Object.values(plants).find((entry) => Number(entry.id) === numericId);
-        if (!plant) return;
-        if (extras.description) {
-            plant.description = extras.description;
-            plant.fullDescription = extras.description;
-        }
-        if (extras.character_description) {
-            plant.character_description = extras.character_description;
-        }
-        if (extras.flowering_conditions) {
-            plant.flowering_conditions = extras.flowering_conditions;
-        }
-        if (extras.why_disease) {
-            plant.why_disease = extras.why_disease;
-        }
-    });
+const SPECIES_ASSETS = {
+    1: {
+        plantFolder: 'spathiphyllum',
+        diseaseImages: {
+            'желтение': 'images/plant/spathiphyllum/disease/желтение.png',
+            'не цветет': 'images/plant/spathiphyllum/disease/не цветет.png',
+            'сохнут кончики': 'images/plant/spathiphyllum/disease/сохнут кончики.png'
+        },
+        deadImage: 'images/plant/spathiphyllum/stage/спатифиллум умер.png'
+    },
+    2: {
+        plantFolder: 'cactus',
+        diseaseImages: {
+            'вытягивание': 'images/plant/cactus/disease/вытягивание.png',
+            'не цветет': 'images/plant/cactus/disease/не цветет.png',
+            'сморщенный стебель': 'images/plant/cactus/disease/сморщенный стебель.png'
+        },
+        deadImage: 'images/plant/cactus/stage/кактус умер.png'
+    },
+    3: {
+        plantFolder: 'ficus',
+        diseaseImages: {
+            'желтение': 'images/plant/ficus/disease/желтение.png',
+            'пятна': 'images/plant/ficus/disease/пятна.png',
+            'увядание': 'images/plant/ficus/disease/увядание.png'
+        },
+        deadImage: 'images/plant/ficus/stage/фикус умер.png'
+    }
+};
+
+function resolveSpeciesFolder(speciesName) {
+    const n = String(speciesName || '').toLowerCase().replace(/ё/g, 'е');
+    if (n.includes('спатифилл') || n.includes('spathiphyllum')) return 'spathiphyllum';
+    if (n.includes('кактус') || n.includes('cactus')) return 'cactus';
+    if (n.includes('фикус') || n.includes('ficus')) return 'ficus';
+    return null;
+}
+
+function resolveSpeciesId(plantKey, plant) {
+    const n = parseInt(plantKey, 10);
+    if (n >= 1 && n <= 3) return n;
+    const folder = plant?.plantFolder;
+    if (folder === 'spathiphyllum') return 1;
+    if (folder === 'cactus') return 2;
+    if (folder === 'ficus') return 3;
+    const name = String(plant?.name || '').toLowerCase().replace(/ё/g, 'е');
+    if (name.includes('спатифилл') || name.includes('spathiphyllum')) return 1;
+    if (name.includes('кактус') || name.includes('cactus')) return 2;
+    if (name.includes('фикус') || name.includes('ficus')) return 3;
+    return Number.isFinite(n) && n > 0 ? n : 1;
+}
+
+function ensurePlantDiseaseAssets(plant, speciesId) {
+    if (!plant) return;
+    const sid = speciesId >= 1 && speciesId <= 3 ? speciesId : 1;
+    const assets = SPECIES_ASSETS[sid];
+    if (!assets) return;
+    if (!plant.diseaseImages || Object.keys(plant.diseaseImages).length === 0) {
+        plant.diseaseImages = { ...assets.diseaseImages };
+    }
+    if (!plant.plantFolder || plant.plantFolder === 'default') {
+        plant.plantFolder = assets.plantFolder;
+    }
+    if (!plant.deadImage) {
+        plant.deadImage = assets.deadImage;
+    }
 }
 
 async function loadPlantsCatalog() {
@@ -568,8 +610,6 @@ async function loadPlantsCatalog() {
                 ensurePlantDiseaseAssets(plants[plantId], sid);
             });
             PLANTS = plants;
-
-            console.log('✅ Растения загружены:', PLANTS);
             return true;
         }
         return false;
@@ -578,7 +618,6 @@ async function loadPlantsCatalog() {
         return false;
     }
 }
-
 
 async function loadPots() {
     try {
@@ -683,7 +722,6 @@ function applyWateringCanChange(canId, canConfig) {
     saveState();
 }
 
-
 const STAGE_NAMES = ['🌰 Семечко посажено', '🌱 Росток', '🌸 Расцвёл'];
 const PLANT_SICK_LABEL = 'Болеет';
 const PLANT_DEAD_LABEL = 'Умерло';
@@ -731,7 +769,7 @@ function refreshNotificationLayers() {
 }
 
 function dismissNotification(id) {
-    const index = activeNotifications.findIndex((n) => n.id === id);
+    const index = activeNotifications.findIndex(n => n.id === id);
     if (index === -1) return;
 
     const [entry] = activeNotifications.splice(index, 1);
@@ -980,6 +1018,51 @@ function getUnlockedAchievementsCount() {
     });
     return count;
 }
+async function notifyAchievementToServer(event = null, extra = {}) {
+    try {
+        const body = event ? { event, ...extra } : {};
+        await fetch(`${API_BASE_URL}/achievements/event`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(body)
+        });
+    } catch (e) {
+        console.error('Ошибка синхронизации достижения с сервером:', e);
+    }
+}
+
+async function loadAchievementsFromServer() {
+    if (!currentUser) return;
+    try {
+        const resp = await fetch(`${API_BASE_URL}/achievements/`, {
+            credentials: 'include',
+            headers: getAuthHeaders()
+        });
+        const data = await resp.json();
+        if (!data.success) return;
+
+        const backToFrontId = {
+            'grow_to_maturity_perfect': 'caring_parent',
+            'first_wither':             'all_lost',
+            'first_negative_effect':    'oops_error',
+            'grow_all_species':         'collector',
+            'daily_streak':             'patient_gardener',
+            'reach_level':              'flora_guard'
+        };
+
+        data.achievements.forEach(ach => {
+            if (ach.is_completed) {
+                const frontId = backToFrontId[ach.requirement_type] || ach.requirement_type;
+                localStorage.setItem(`achievement_unlocked_${currentUser}_${frontId}`, 'true');
+            }
+        });
+
+        updateAchievementsDisplay();
+    } catch (e) {
+        console.error('Ошибка загрузки достижений с сервера:', e);
+    }
+}
 
 function checkAchievement_caringParent(slotName, data) {
     if (data.stage === 2 && !data.hasDisease && data.hadMistakes !== true) {
@@ -991,6 +1074,7 @@ function checkAchievement_caringParent(slotName, data) {
                 id: 'caring_parent'
             });
             updateAchievementsDisplay();
+            notifyAchievementToServer('perfect_growth');
             return true;
         }
     }
@@ -1019,6 +1103,7 @@ function checkAchievement_collector() {
                 id: 'collector'
             });
             updateAchievementsDisplay();
+            notifyAchievementToServer('species_collected');
             return true;
         }
     }
@@ -1035,6 +1120,7 @@ function checkAchievement_level(level) {
                 id: 'flora_guard'
             });
             updateAchievementsDisplay();
+            notifyAchievementToServer('reach_level');
             return true;
         }
     }
@@ -1051,6 +1137,7 @@ function checkAchievement_streak(streak) {
                 id: 'patient_gardener'
             });
             updateAchievementsDisplay();
+            notifyAchievementToServer('daily_streak');
             return true;
         }
     }
@@ -1066,6 +1153,7 @@ function checkAchievement_death() {
             id: 'all_lost'
         });
         updateAchievementsDisplay();
+        notifyAchievementToServer('death');
         return true;
     }
     return false;
@@ -1080,6 +1168,7 @@ function checkAchievement_negativeEffect() {
             id: 'oops_error'
         });
         updateAchievementsDisplay();
+        notifyAchievementToServer('mistake');
         return true;
     }
     return false;
@@ -1131,7 +1220,6 @@ const PLANT_DISEASE_TO_IMAGE_KEY = {
     3: { too_light: 'пятна', under_watered: 'желтение', overwatered: 'увядание' }
 };
 
-/** Тексты всплывающих уведомлений (советы)*/
 const NOTIFICATION_TEXTS = {
     disease: {
         overwatered: 'Ой, кажется, ты слишком любишь свой цветок. Перелив опаснее засухи. Дай земле просохнуть, прежде чем поливать снова! 🌱',
@@ -1215,78 +1303,9 @@ function showPlantDeathNotification(data) {
     showNotification(text, false);
 }
 
-const SPECIES_ASSETS = {
-    1: {
-        plantFolder: 'spathiphyllum',
-        diseaseImages: {
-            'желтение': 'images/plant/spathiphyllum/disease/желтение.png',
-            'не цветет': 'images/plant/spathiphyllum/disease/не цветет.png',
-            'сохнут кончики': 'images/plant/spathiphyllum/disease/сохнут кончики.png'
-        },
-        deadImage: 'images/plant/spathiphyllum/stage/спатифиллум умер.png'
-    },
-    2: {
-        plantFolder: 'cactus',
-        diseaseImages: {
-            'вытягивание': 'images/plant/cactus/disease/вытягивание.png',
-            'не цветет': 'images/plant/cactus/disease/не цветет.png',
-            'сморщенный стебель': 'images/plant/cactus/disease/сморщенный стебель.png'
-        },
-        deadImage: 'images/plant/cactus/stage/кактус умер.png'
-    },
-    3: {
-        plantFolder: 'ficus',
-        diseaseImages: {
-            'желтение': 'images/plant/ficus/disease/желтение.png',
-            'пятна': 'images/plant/ficus/disease/пятна.png',
-            'увядание': 'images/plant/ficus/disease/увядание.png'
-        },
-        deadImage: 'images/plant/ficus/stage/фикус умер.png'
-    }
-};
-
-function resolveSpeciesFolder(speciesName) {
-    const n = String(speciesName || '').toLowerCase().replace(/ё/g, 'е');
-    if (n.includes('спатифилл') || n.includes('spathiphyllum')) return 'spathiphyllum';
-    if (n.includes('кактус') || n.includes('cactus')) return 'cactus';
-    if (n.includes('фикус') || n.includes('ficus')) return 'ficus';
-    return null;
-}
-
-function resolveSpeciesId(plantKey, plant) {
-    const n = parseInt(plantKey, 10);
-    if (n >= 1 && n <= 3) return n;
-    const folder = plant?.plantFolder;
-    if (folder === 'spathiphyllum') return 1;
-    if (folder === 'cactus') return 2;
-    if (folder === 'ficus') return 3;
-    const name = String(plant?.name || '').toLowerCase().replace(/ё/g, 'е');
-    if (name.includes('спатифилл') || name.includes('spathiphyllum')) return 1;
-    if (name.includes('кактус') || name.includes('cactus')) return 2;
-    if (name.includes('фикус') || name.includes('ficus')) return 3;
-    return Number.isFinite(n) && n > 0 ? n : 1;
-}
-
-function ensurePlantDiseaseAssets(plant, speciesId) {
-    if (!plant) return;
-    const sid = speciesId >= 1 && speciesId <= 3 ? speciesId : 1;
-    const assets = SPECIES_ASSETS[sid];
-    if (!assets) return;
-    if (!plant.diseaseImages || Object.keys(plant.diseaseImages).length === 0) {
-        plant.diseaseImages = { ...assets.diseaseImages };
-    }
-    if (!plant.plantFolder || plant.plantFolder === 'default') {
-        plant.plantFolder = assets.plantFolder;
-    }
-    if (!plant.deadImage) {
-        plant.deadImage = assets.deadImage;
-    }
-}
-
 const LOCATION_DISEASE_TYPES = ['too_light', 'too_dark', 'no_flower', 'big_pot'];
 const WATER_DISEASE_TYPES = ['under_watered', 'overwatered'];
 
-/** Категории ухода для «гибели от комплекса» (вариант A). */
 const MISTAKE_CATEGORY_BY_SOURCE = {
     water: 'water',
     location: 'place',
@@ -1490,7 +1509,6 @@ function isWaterDisease(plantKey, diseaseText) {
     }
     return false;
 }
-
 function applyPlantDisease(slotName, data, diseaseType, source) {
     const plant = PLANTS[data.plant];
     const plantKey = resolveSpeciesId(data.plant, plant);
@@ -1603,10 +1621,6 @@ function getFirstDiseaseImage(plant) {
     return paths.length ? paths[0] : null;
 }
 
-/**
- * Единые метаданные для картинки и позиции (слот + зум).
- * layout: sprout | bloom | disease | dead
- */
 function getPlantVisualMeta(plant, data) {
     if (!plant || !data?.plant) return null;
 
@@ -1769,7 +1783,6 @@ function tryHealUnderwaterOnWater(data) {
     return true;
 }
 
-/** Время без полива, после которого снимается перелив (= минимальный интервал полива вида). */
 function getOverwaterHealDryMs(plant) {
     return getWaterMinMs(plant);
 }
@@ -1995,7 +2008,6 @@ function markQuestDone(id) {
     if (!done.includes(id)) { done.push(id); localStorage.setItem(`questsDone_${currentUser}`, JSON.stringify(done)); }
 }
 
-/** Блокирует автоповышение уровня из renderQuests (для DEV LEVEL UP) */
 let suppressQuestAutoLevelUp = false;
 let questLevelUpTimeoutId = null;
 
@@ -2106,7 +2118,6 @@ function checkAndUnlockWateringCans() {
         renderWateringCanChoices();
     }
 }
-
 function buildChoiceCardInnerHTML({ imgSrc, imgAlt, title, extraHtml = '', imgClass = '', imgStyle = '' }) {
     const classAttr = imgClass ? ` class="${imgClass}"` : '';
     const styleAttr = imgStyle ? ` style="${imgStyle}"` : '';
@@ -2163,9 +2174,7 @@ function renderFlowerChoices() {
 
     Object.entries(PLANTS).forEach(([key, plant]) => {
         const locked = plant.unlockLevel > currentLevel;
-        const previewImage = plant.stages?.[2]
-            || plant.stages?.[1]
-            || 'images/plant/default/stage/выросший.png';
+        const previewImage = plant.stages?.[2] || plant.stages?.[1] || 'images/plant/default/stage/выросший.png';
 
         const div = document.createElement('div');
         div.className = 'flower-choice' + (locked ? ' locked-choice' : '');
@@ -2301,7 +2310,7 @@ function updateWateringCanDisplay(canId) {
 }
 
 const MOVE_MODAL_VISUAL = {
-    1: { // Спатифиллум
+    1: {
         sprout: {
             1: { bottom: '8px', width: '55px', lift: -43 },
             2: { bottom: '10px', width: '50px', lift: -46 },
@@ -2340,7 +2349,7 @@ const MOVE_MODAL_VISUAL = {
             }
         }
     },
-    2: { // Кактус
+    2: {
         sprout: {
             1: { bottom: '35px', width: '50px', lift: -78 },
             2: { bottom: '30px', width: '45px', lift: -75 },
@@ -2379,7 +2388,7 @@ const MOVE_MODAL_VISUAL = {
             }
         }
     },
-    3: { // Фикус
+    3: {
         sprout: {
             1: { bottom: '30px', width: '65px', lift: -115 },
             2: { bottom: '25px', width: '60px', lift: -108 },
@@ -2388,7 +2397,7 @@ const MOVE_MODAL_VISUAL = {
         bloom: {
             1: { bottom: '25px', width: '110px', lift: -105 },
             2: { bottom: '20px', width: '105px', lift: -100 },
-            3: { bottom: '30px', width: '115px', lift: -100}
+            3: { bottom: '30px', width: '115px', lift: -100 }
         },
         dead: {
             1: { bottom: '15px', width: '85px', lift: -118 },
@@ -2409,36 +2418,31 @@ const MOVE_MODAL_VISUAL = {
             overwatered: {
                 1: { bottom: '35px', width: '50px', lift: -55 },
                 2: { bottom: '30px', width: '45px', lift: -53 },
-                3: { bottom: '40px', width: '55px', lift: -48}
+                3: { bottom: '40px', width: '55px', lift: -48 }
             }
         }
     },
-    // Глобальные настройки
     global: {
-        enabled: true,           // true - использовать ручные настройки, false - использовать авторасчет
-        baseLiftPx: 50,          // базовая высота подъема
-        plantScale: 1.50,        // масштаб цветка
-        containerMinHeight: 150, // минимальная высота контейнера
-        defaultFallback: { bottom: '35px', width: '75px', lift: 0 } // если нет настроек для конкретного случая
+        enabled: true,
+        baseLiftPx: 50,
+        plantScale: 1.50,
+        containerMinHeight: 150,
+        defaultFallback: { bottom: '35px', width: '75px', lift: 0 }
     }
 };
 
 let moveFromSlot = null;
 
-// Функция получения визуальных настроек для модалки перестановки
 function getMoveModalVisual(plantId, visualState, potNum, diseaseType = null) {
     const plantConfig = MOVE_MODAL_VISUAL[plantId];
     if (!plantConfig || !MOVE_MODAL_VISUAL.global.enabled) return null;
 
     let stateConfig = null;
-
-    // Определяем состояние (sprout/bloom/dead/disease)
     let stateKey = visualState;
     if (visualState === 'disease' && diseaseType) {
         stateKey = diseaseType;
     }
 
-    // Получаем конфиг для состояния
     if (stateKey === 'sprout' || stateKey === 'bloom' || stateKey === 'dead') {
         stateConfig = plantConfig[stateKey];
     } else if (plantConfig.diseases && plantConfig.diseases[stateKey]) {
@@ -2447,25 +2451,24 @@ function getMoveModalVisual(plantId, visualState, potNum, diseaseType = null) {
 
     if (!stateConfig) return null;
 
-    // Получаем настройки для конкретного горшка
     const potConfig = stateConfig[potNum];
     if (potConfig) return potConfig;
-
-    // Если нет для конкретного горшка, ищем для горшка 1 как fallback
     if (stateConfig[1]) return stateConfig[1];
-
-    // Иначе глобальный fallback
     return MOVE_MODAL_VISUAL.global.defaultFallback;
 }
 
-// Обновленная версия renderMoveChoices с использованием MOVE_MODAL_VISUAL
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function renderMoveChoices() {
     const row = document.getElementById('moveChoicesRow');
     if (!row) return;
     row.innerHTML = '';
 
     if (!moveFromSlot) {
-        console.error('moveFromSlot is null');
         closeModal(modalMovePlant);
         return;
     }
@@ -2479,12 +2482,19 @@ function renderMoveChoices() {
     }
 
     const allSlots = document.querySelectorAll('.pot-slot');
+    const slotNamesMap = {
+        'windowsill-1': 'Подоконник левый',
+        'windowsill-2': 'Подоконник центр',
+        'windowsill-3': 'Подоконник правый',
+        'desk-left': 'Стол левый',
+        'desk-right-1': 'Стол правый 1',
+        'desk-right-2': 'Стол правый 2'
+    };
 
     allSlots.forEach(slotEl => {
         const slotName = slotEl.dataset.slot;
         const targetData = slotData[slotName];
         const isCurrent = slotName === moveFromSlot;
-
         if (isCurrent) return;
 
         const isEmpty = !targetData || !targetData.pot;
@@ -2492,23 +2502,9 @@ function renderMoveChoices() {
 
         const div = document.createElement('div');
         div.className = 'pot-choice';
-
-        if (isEmpty) {
-            div.classList.add('empty-slot');
-        } else if (hasPlant) {
-            div.classList.add('occupied-slot');
-        }
-
+        if (isEmpty) div.classList.add('empty-slot');
+        else if (hasPlant) div.classList.add('occupied-slot');
         div.dataset.slot = slotName;
-
-        const slotNamesMap = {
-            'windowsill-1': 'Подоконник левый',
-            'windowsill-2': 'Подоконник центр',
-            'windowsill-3': 'Подоконник правый',
-            'desk-left': 'Стол левый',
-            'desk-right-1': 'Стол правый 1',
-            'desk-right-2': 'Стол правый 2'
-        };
 
         let slotDisplayName = slotNamesMap[slotName] || slotName.replace(/-/g, ' ');
         let potImg = '/images/room/пунктир.png';
@@ -2520,19 +2516,16 @@ function renderMoveChoices() {
 
         if (isEmpty) {
             statusHtml = '<span class="free-label">🆓 Свободно</span>';
-        } else {
-            if (hasPlant) {
-                const plant = PLANTS[targetData.plant];
-                const plantName = plant.name;
-                const stageText = targetData.stage >= 2 ? '🌸' : '🌱';
-                const diseaseText = targetData.hasDisease ? ' 🤒' : '';
-                statusHtml = `<span class="occupied-label">${stageText} ${plantName}${diseaseText}</span>`;
-            } else if (targetData.pot) {
-                statusHtml = `<span class="occupied-label">🪴 Пустой горшок</span>`;
-            }
+        } else if (hasPlant) {
+            const plant = PLANTS[targetData.plant];
+            const plantName = plant.name;
+            const stageText = targetData.stage >= 2 ? '🌸' : '🌱';
+            const diseaseText = targetData.hasDisease ? ' 🤒' : '';
+            statusHtml = `<span class="occupied-label">${stageText} ${plantName}${diseaseText}</span>`;
+        } else if (targetData.pot) {
+            statusHtml = `<span class="occupied-label">🪴 Пустой горшок</span>`;
         }
 
-        // ===== ИСПОЛЬЗУЕМ НОВУЮ КОНСТАНТУ MOVE_MODAL_VISUAL =====
         let mediaHtml = '';
 
         if (hasPlant) {
@@ -2541,7 +2534,6 @@ function renderMoveChoices() {
             const potNum = targetData.pot || 1;
             const stage = targetData.stage >= 2 ? 'bloom' : 'sprout';
 
-            // Определяем визуальное состояние
             let visualState = stage;
             let diseaseType = null;
 
@@ -2552,11 +2544,9 @@ function renderMoveChoices() {
                 diseaseType = targetData.diseaseType;
             }
 
-            // Получаем ручные настройки из новой константы
             const customVisual = getMoveModalVisual(plantId, visualState, potNum, diseaseType);
 
             if (customVisual) {
-                // Используем ручные настройки
                 const finalBottom = `calc(${customVisual.bottom} + ${MOVE_MODAL_VISUAL.global.baseLiftPx + (customVisual.lift || 0)}px)`;
                 const plantImage = getPlantDisplayImage(plant, targetData);
 
@@ -2567,7 +2557,6 @@ function renderMoveChoices() {
                     </div>
                 `;
             } else {
-                // Fallback: автоматический расчет
                 const meta = getPlantVisualMeta(plant, targetData);
                 if (meta?.imageUrl) {
                     const offsets = getOffsetsForVisual(meta);
@@ -2623,14 +2612,6 @@ function renderMoveChoices() {
         row.appendChild(div);
     });
 }
-
-// Добавим вспомогательную функцию для экранирования HTML
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 function movePlantToEmptySlot(fromSlot, toSlot) {
     if (!slotData[fromSlot]) {
         showNotification('❌ Ошибка: источник не найден', true);
@@ -2742,6 +2723,7 @@ slots.forEach(slot => {
 
 const cancelPlacePot = document.getElementById('cancelPlacePot');
 if (cancelPlacePot) cancelPlacePot.addEventListener('click', () => closeModal(modalPlacePot));
+
 const cancelPickFlower = document.getElementById('cancelPickFlower');
 if (cancelPickFlower) {
     cancelPickFlower.addEventListener('click', () => {
@@ -2750,6 +2732,7 @@ if (cancelPickFlower) {
         showNotification('Выбери цветок позже 🌱', false);
     });
 }
+
 if (modalPlacePot) modalPlacePot.addEventListener('click', e => { if (e.target === modalPlacePot) closeModal(modalPlacePot); });
 
 function placePot(slotEl, potNum) {
@@ -2856,8 +2839,6 @@ function renderSlot(slotEl, data) {
     if (data.plant && data.stage >= 1 && PLANTS[data.plant]) {
         const plantImg = document.createElement('img');
         const plant = PLANTS[data.plant];
-        const plantId = parseInt(data.plant);
-
         const meta = getPlantVisualMeta(plant, data);
 
         if (meta?.imageUrl) {
@@ -2944,12 +2925,10 @@ function updateNextWateringTimer(data) {
     const plant = PLANTS[data.plant];
     if (!plant) return;
 
-    const now = Date.now();
-    let timerText = '';
-
     const minMs = getWaterMinMs(plant);
     const maxMs = getWaterMaxMs(plant);
     const sinceMs = msSinceLastWater(data);
+    let timerText = '';
 
     if (data.lastWateredAt) {
         if (sinceMs < minMs) {
@@ -3022,7 +3001,6 @@ function showFixAdvice(data) {
         fixBox.style.display = 'none';
     }
 }
-
 function showDescription(plantKey) {
     const plant = PLANTS[plantKey];
     const descEl = document.getElementById('plantDescription');
@@ -3157,7 +3135,6 @@ function openZoom(slotEl, name, data) {
 
     if (hasPlant) {
         const plant = PLANTS[data.plant];
-        const plantId = parseInt(data.plant);
         populateDevPanel(plant);
 
         if (plantImg) {
@@ -3202,7 +3179,6 @@ function openZoom(slotEl, name, data) {
         } else {
             stopZoomTimerTick();
         }
-
     } else {
         if (plantImg) plantImg.style.display = 'none';
 
@@ -3214,7 +3190,8 @@ function openZoom(slotEl, name, data) {
 
         if (waterBtn) {
             waterBtn.disabled = true;
-            waterBtn.style.display = 'none'; }
+            waterBtn.style.display = 'none';
+        }
         if (descBtn) descBtn.style.display = 'none';
         if (repotBtn) repotBtn.style.display = 'none';
         if (moveBtn) moveBtn.style.display = 'none';
@@ -3251,11 +3228,12 @@ function openZoom(slotEl, name, data) {
 
 const zoomClose = document.getElementById('zoomClose');
 if (zoomClose) zoomClose.addEventListener('click', () => { closeModal(zoomOverlay); if (devStatePanel) devStatePanel.style.display = 'none'; });
+
 if (zoomOverlay) zoomOverlay.addEventListener('click', e => { if (e.target === zoomOverlay) { closeModal(zoomOverlay); if (devStatePanel) devStatePanel.style.display = 'none'; } });
 
-// ПЕРЕСАДКА (смена дизайна горшка)
 const cancelRepot = document.getElementById('cancelRepot');
 if (cancelRepot) cancelRepot.addEventListener('click', () => closeModal(modalRepot));
+
 if (modalRepot) modalRepot.addEventListener('click', e => { if (e.target === modalRepot) closeModal(modalRepot); });
 
 function renderRepotChoices() {
@@ -3358,7 +3336,6 @@ if (moveBtnLeft) {
         }, 100);
     });
 }
-
 const waterBtnLeft = document.getElementById('waterBtnLeft');
 if (waterBtnLeft) {
     waterBtnLeft.addEventListener('click', () => {
@@ -3446,8 +3423,10 @@ function stopWateringAnimation() {
 
 const achievementsBtn = document.getElementById('achievementsBtn');
 if (achievementsBtn) achievementsBtn.addEventListener('click', () => openModal(modalAchievements));
+
 const closeAchievements = document.getElementById('closeAchievements');
 if (closeAchievements) closeAchievements.addEventListener('click', () => closeModal(modalAchievements));
+
 if (modalAchievements) modalAchievements.addEventListener('click', e => { if (e.target === modalAchievements) closeModal(modalAchievements); });
 
 const waterCanBtn = document.getElementById('waterCanBtn');
@@ -3469,7 +3448,6 @@ if (modalWaterCan) {
     });
 }
 
-
 const exitBtn = document.getElementById('exitBtn');
 if (exitBtn) {
     exitBtn.addEventListener('click', () => {
@@ -3483,8 +3461,7 @@ if (exitBtn) {
                 method: 'POST',
                 credentials: 'include',
                 headers: getAuthHeaders()
-            })
-                .finally(() => { window.location.href = 'register.html'; });
+            }).finally(() => { window.location.href = 'register.html'; });
         }
     });
 }
@@ -3649,88 +3626,6 @@ function loadLevel() {
 updateRoomScale();
 window.addEventListener('resize', updateRoomScale);
 
-(async function init() {
-
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.id = 'loadingOverlay';
-    loadingOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;justify-content:center;align-items:center;flex-direction:column;';
-    loadingOverlay.innerHTML = '<div style="font-size:50px;animation:spin 1s linear infinite;">🌱</div><div style="color:white;margin-top:20px;">Загрузка игры...</div>';
-    document.body.appendChild(loadingOverlay);
-
-    const style = document.createElement('style');
-    style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
-    document.head.appendChild(style);
-
-    const isAuth = await checkAuth();
-    if (!isAuth) return;
-
-    loadLevel();
-
-    const results = await Promise.all([
-        loadPlantsCatalog(),
-        loadPots(),
-        loadWateringCans()
-    ]);
-
-    if (!results[0] || Object.keys(PLANTS).length === 0) {
-        console.error('КРИТИЧЕСКАЯ ОШИБКА: Не удалось загрузить растения с сервера');
-        showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
-    }
-
-    if (!results[1] || Object.keys(POT_CONFIG).length === 0) {
-        console.warn('Не удалось загрузить горшки, использую стандартные');
-        showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
-    }
-
-    if (!results[2] || Object.keys(WATERING_CAN_CONFIG).length === 0) {
-        console.warn('Не удалось загрузить лейки, использую стандартные');
-        showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
-    }
-
-    applyUnlocksForLevel(currentLevel, { markNotified: true });
-    const loadedFromServer = await loadStateFromServer();
-    if (!loadedFromServer) {
-        loadState();
-    }
-    applyUnlocksForLevel(currentLevel, { markNotified: true });
-    renderQuests();
-    renderPotChoices();
-    renderFlowerChoices();
-    renderWateringCanChoices();
-    updateAchievementsDisplay();
-    initAchievementsClick();
-    scheduleOverwateringCheck();
-
-    restoreWateringCanSelection();
-
-    const today = new Date().toDateString();
-    const lastVisit = localStorage.getItem(`lastVisitDate_${currentUser}`);
-    if (lastVisit !== today) {
-        localStorage.setItem(`lastVisitDate_${currentUser}`, today);
-        if (lastVisit) {
-            const yesterday = new Date(lastVisit);
-            yesterday.setDate(yesterday.getDate() + 1);
-            if (yesterday.toDateString() === today) {
-                const streak = getLoginStreak() + 1;
-                localStorage.setItem(`loginStreak_${currentUser}`, String(streak));
-                checkAchievement_streak(streak);
-                checkQuestsAfterAction();
-            } else {
-                localStorage.setItem(`loginStreak_${currentUser}`, '1');
-            }
-        } else {
-            localStorage.setItem(`loginStreak_${currentUser}`, '1');
-        }
-    }
-
-    loadingOverlay.remove();
-
-    if (typeof window.tryOpenFirstTimeTutorial === 'function') {
-        window.tryOpenFirstTimeTutorial();
-    }
-})();
-
-// ===== DEV LEVEL UP (временная отладка уровня) =====
 const DEV_MAX_LEVEL = 6;
 
 function applyUnlocksForLevel(level, { markNotified = false } = {}) {
@@ -3808,7 +3703,6 @@ if (devBtn) {
     devBtn.addEventListener('click', stepDevLevel);
 }
 
-// ===== DEV: панель переключения состояний =====
 document.getElementById('zoomOverlay')?.addEventListener('transitionend', () => {
     if (devStatePanel) {
         devStatePanel.style.display = zoomedSlot ? 'block' : 'none';
@@ -3833,12 +3727,90 @@ if (devApplyStateBtn) {
         }
 
         const data = slotData[name];
-        console.log('[DEV] state:', state, '| stage:', data?.stage, '| disease:', data?.disease, '| type:', data?.diseaseType);
         if (devStatePanel) devStatePanel.style.display = 'block';
     });
 }
+(async function init() {
+    const loadingOverlay = document.createElement('div');
+    loadingOverlay.id = 'loadingOverlay';
+    loadingOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;justify-content:center;align-items:center;flex-direction:column;';
+    loadingOverlay.innerHTML = '<div style="font-size:50px;animation:spin 1s linear infinite;">🌱</div><div style="color:white;margin-top:20px;">Загрузка игры...</div>';
+    document.body.appendChild(loadingOverlay);
 
-// ===== ОБУЧАЛКА С ДВУМЯ РЕЖИМАМИ =====
+    const style = document.createElement('style');
+    style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+    document.head.appendChild(style);
+
+    const isAuth = await checkAuth();
+    if (!isAuth) return;
+
+    loadLevel();
+
+    const results = await Promise.all([
+        loadPlantsCatalog(),
+        loadPots(),
+        loadWateringCans()
+    ]);
+
+    if (!results[0] || Object.keys(PLANTS).length === 0) {
+        console.error('КРИТИЧЕСКАЯ ОШИБКА: Не удалось загрузить растения с сервера');
+        showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
+    }
+
+    if (!results[1] || Object.keys(POT_CONFIG).length === 0) {
+        console.warn('Не удалось загрузить горшки, использую стандартные');
+        showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
+    }
+
+    if (!results[2] || Object.keys(WATERING_CAN_CONFIG).length === 0) {
+        console.warn('Не удалось загрузить лейки, использую стандартные');
+        showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
+    }
+
+    applyUnlocksForLevel(currentLevel, { markNotified: true });
+    const loadedFromServer = await loadStateFromServer();
+    if (!loadedFromServer) {
+        loadState();
+    }
+    await loadAchievementsFromServer();
+    applyUnlocksForLevel(currentLevel, { markNotified: true });
+    renderQuests();
+    renderPotChoices();
+    renderFlowerChoices();
+    renderWateringCanChoices();
+    updateAchievementsDisplay();
+    initAchievementsClick();
+    scheduleOverwateringCheck();
+
+    restoreWateringCanSelection();
+
+    const today = new Date().toDateString();
+    const lastVisit = localStorage.getItem(`lastVisitDate_${currentUser}`);
+    if (lastVisit !== today) {
+        localStorage.setItem(`lastVisitDate_${currentUser}`, today);
+        if (lastVisit) {
+            const yesterday = new Date(lastVisit);
+            yesterday.setDate(yesterday.getDate() + 1);
+            if (yesterday.toDateString() === today) {
+                const streak = getLoginStreak() + 1;
+                localStorage.setItem(`loginStreak_${currentUser}`, String(streak));
+                checkAchievement_streak(streak);
+                checkQuestsAfterAction();
+            } else {
+                localStorage.setItem(`loginStreak_${currentUser}`, '1');
+            }
+        } else {
+            localStorage.setItem(`loginStreak_${currentUser}`, '1');
+        }
+    }
+
+    loadingOverlay.remove();
+
+    if (typeof window.tryOpenFirstTimeTutorial === 'function') {
+        window.tryOpenFirstTimeTutorial();
+    }
+})();
+
 (function initTutorial() {
     const TUTORIAL_ARROW_SRC = 'images/button/кнопка-стрелка обучения.png';
     const FIRST_TIME_ACHIEVEMENTS_STEP = 5;
@@ -4206,497 +4178,3 @@ if (devApplyStateBtn) {
         });
     }
 })();
-
-// ===== МОДАЛКА ОПИСАНИЯ РАСТЕНИЯ =====
-const modalPlantDescription = document.getElementById('modalPlantDescription');
-const closePlantDescBtn = document.getElementById('closePlantDescBtn');
-const plantDescIcon = document.getElementById('plantDescIcon');
-const plantDescTitle = document.getElementById('plantDescTitle');
-const plantDescDescription = document.getElementById('plantDescDescription');
-const plantDescCharacter = document.getElementById('plantDescCharacter');
-const plantDescCharacterTitle = document.getElementById('plantDescCharacterTitle');
-const plantDescCharacterSection = document.getElementById('plantDescCharacterSection');
-const plantDescWater = document.getElementById('plantDescWater');
-const plantDescLight = document.getElementById('plantDescLight');
-const plantDescSymptoms = document.getElementById('plantDescSymptoms');
-const plantDescSymptomsBlock = document.getElementById('plantDescSymptomsBlock');
-const plantDescExtraFeatures = document.getElementById('plantDescExtraFeatures');
-const plantDescFlowering = document.getElementById('plantDescFlowering');
-const plantDescFloweringBlock = document.getElementById('plantDescFloweringBlock');
-const plantDescFeaturesSection = document.getElementById('plantDescFeaturesSection');
-const plantDescAdvice = document.getElementById('plantDescAdvice');
-const plantDescAdviceSection = document.getElementById('plantDescAdviceSection');
-const plantDescNeedsSection = document.getElementById('plantDescNeedsSection');
-
-function escapePlantDescHtml(text) {
-    return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-function normalizeTipsLines(input) {
-    if (input == null || input === '') return [];
-    const rawItems = Array.isArray(input) ? input : [input];
-    return rawItems
-        .flatMap((item) => String(item).replace(/\\n/g, '\n').split(/\r?\n|\|/))
-        .map((line) => line.trim().replace(/^[•\-–—]\s*/, ''))
-        .filter(Boolean);
-}
-
-function splitCharacterAndAdvice(tipsArray) {
-    if (!Array.isArray(tipsArray) || !tipsArray.length) {
-        return { characterBody: '', advice: [] };
-    }
-    const cleaned = normalizeTipsLines(tipsArray);
-    if (cleaned.length === 1 && !cleaned[0].includes('?')) {
-        return { characterBody: cleaned[0], advice: [] };
-    }
-    if (cleaned.length > 1 && !cleaned[0].includes('?')) {
-        return { characterBody: cleaned[0], advice: cleaned.slice(1) };
-    }
-    return { characterBody: '', advice: cleaned };
-}
-
-function getPlantTipsArray(plant) {
-    if (Array.isArray(plant.advice_list) && plant.advice_list.length) {
-        return normalizeTipsLines(plant.advice_list);
-    }
-    if (Array.isArray(plant.tips_array) && plant.tips_array.length) {
-        return normalizeTipsLines(plant.tips_array);
-    }
-    if (typeof plant.tips === 'string' && plant.tips.trim()) {
-        return normalizeTipsLines(plant.tips);
-    }
-    return [];
-}
-
-function getPlantAdviceItems(plant) {
-    if (Array.isArray(plant.advice_list) && plant.advice_list.length) {
-        return normalizeTipsLines(plant.advice_list);
-    }
-    const { advice } = splitCharacterAndAdvice(getPlantTipsArray(plant));
-    return normalizeTipsLines(advice);
-}
-
-function parseSymptomEntries(text) {
-    if (!text) return [];
-    return text.split('|').map((entry) => entry.trim()).filter(Boolean);
-}
-
-function parsePlantFeatureBlocks(text) {
-    const value = String(text || '').trim();
-    if (!value.startsWith('FEATURES||')) return [];
-    return value.slice('FEATURES||'.length).split('||').map((block) => {
-        const idx = block.indexOf('::');
-        if (idx === -1) return null;
-        return {
-            title: block.slice(0, idx).trim(),
-            text: block.slice(idx + 2).trim()
-        };
-    }).filter(Boolean);
-}
-
-function renderPlantDescExtraFeatures(blocks) {
-    if (!plantDescExtraFeatures) return;
-    if (!blocks.length) {
-        plantDescExtraFeatures.innerHTML = '';
-        plantDescExtraFeatures.style.display = 'none';
-        return;
-    }
-    plantDescExtraFeatures.style.display = '';
-    plantDescExtraFeatures.innerHTML = blocks.map((block) => (
-        `<div class="desc-subsection plant-desc-feature-block">`
-        + `<p class="desc-point-title">${escapePlantDescHtml(block.title)}:</p>`
-        + `<p class="desc-point-text">${escapePlantDescHtml(block.text)}</p>`
-        + `</div>`
-    )).join('');
-}
-
-function getPlantDescriptionText(plant) {
-    // Убираем зависимость от PLANT_CATALOG_EXTRAS
-    // const extras = PLANT_CATALOG_EXTRAS[plant.id];
-    // if (extras?.description) return extras.description;
-
-    let text = (plant.description || plant.fullDescription || '').trim();
-
-    // Если description пустой, используем дефолтное значение
-    if (!text) {
-        return 'Описание отсутствует';
-    }
-
-    const charTailPatterns = [
-        /\s*Спатифилл(?:лю|)м\s+очень\s+чувствителен[\s\S]*$/i,
-        /\s*Кактус\s+может\s+простить[\s\S]*$/i
-    ];
-    for (const pattern of charTailPatterns) {
-        const match = text.match(pattern);
-        if (match) {
-            text = text.slice(0, match.index).trim();
-            break;
-        }
-    }
-
-    const charBody = (plant.character_description || '').trim();
-    if (charBody && text.includes(charBody)) {
-        text = text.replace(charBody, '').trim();
-    }
-
-    return text.replace(/\s{2,}/g, ' ').trim() || 'Описание отсутствует';
-}
-
-function renderPlantDescCharacter(plant) {
-    if (!plantDescCharacterSection) return;
-    const trait = (plant.character_trait || '').trim();
-    const { characterBody } = splitCharacterAndAdvice(getPlantTipsArray(plant));
-    const body = (plant.character_description || characterBody || '').trim();
-
-    if (plantDescCharacterTitle) {
-        plantDescCharacterTitle.textContent = trait ? `Характер — ${trait}:` : 'Характер:';
-    }
-
-    if (!trait && !body) {
-        plantDescCharacterSection.style.display = 'none';
-        if (plantDescCharacter) plantDescCharacter.textContent = '';
-        return;
-    }
-
-    plantDescCharacterSection.style.display = '';
-    if (plantDescCharacter) plantDescCharacter.textContent = body;
-}
-
-function renderPlantDescNeeds(plant) {
-    const water = plant.watering_advice || plant.waterAdvice || '';
-    const light = plant.light_advice || plant.lightAdvice || '';
-    if (plantDescWater) plantDescWater.textContent = water || '—';
-    if (plantDescLight) plantDescLight.textContent = light || '—';
-    if (plantDescNeedsSection) {
-        plantDescNeedsSection.style.display = (water || light) ? '' : 'none';
-    }
-}
-
-function renderPlantDescSymptoms(entries) {
-    if (!plantDescSymptoms || !plantDescSymptomsBlock) return;
-    if (!entries.length) {
-        plantDescSymptomsBlock.style.display = 'none';
-        plantDescSymptoms.innerHTML = '';
-        return;
-    }
-    plantDescSymptomsBlock.style.display = '';
-    plantDescSymptoms.innerHTML = entries.map((entry) => {
-        const colonIdx = entry.indexOf(':');
-        if (colonIdx === -1) return `<li>${entry}</li>`;
-        const title = entry.slice(0, colonIdx).trim();
-        const detail = entry.slice(colonIdx + 1).trim();
-        return `<li><span class="plant-desc-symptom-title">${escapePlantDescHtml(title)}:</span> ${escapePlantDescHtml(detail)}</li>`;
-    }).join('');
-}
-
-function parseInlineNumberedFlowering(value) {
-    const numberedStart = value.search(/\s1[.)]\s/i);
-    if (numberedStart === -1) return null;
-
-    const intro = value.slice(0, numberedStart).trim();
-    const body = value.slice(numberedStart).trim();
-    const segments = body.split(/\s*(?=\d+[.)]\s*)/).filter(Boolean);
-    if (segments.length < 2) return null;
-
-    const items = [];
-    let footer = '';
-
-    segments.forEach((segment, index) => {
-        let item = segment.replace(/^\d+[.)]\s*/, '').trim().replace(/,\s*$/, '');
-        if (index === segments.length - 1) {
-            const footerMatch = item.match(/^(.+?\.\s*)(.+)$/);
-            if (footerMatch && footerMatch[2].length > 20) {
-                item = footerMatch[1].trim();
-                footer = footerMatch[2].trim();
-            }
-        }
-        if (item) items.push(item);
-    });
-
-    return items.length >= 2 ? { intro, items, footer } : null;
-}
-
-function parseFloweringContent(text) {
-    const value = String(text || '').replace(/\\n/g, '\n').trim();
-    if (!value) return null;
-
-    if (value.includes('|')) {
-        const parts = value.split('|').map((part) => part.trim()).filter(Boolean);
-        if (parts.length >= 4 && !parts[0].includes(':') && parts[1].includes(':')) {
-            return {
-                prefix: parts[0],
-                intro: parts[1],
-                items: parts.slice(2),
-                footer: ''
-            };
-        }
-        if (parts.length >= 4 && parts[0].includes(':')) {
-            return {
-                intro: parts[0],
-                items: parts.slice(1, -1),
-                footer: parts[parts.length - 1]
-            };
-        }
-        if (parts.length >= 3 && parts[0].includes(':')) {
-            return { intro: parts[0], items: parts.slice(1), footer: '' };
-        }
-    }
-
-    const lines = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-    if (lines.length > 1) {
-        const intro = lines[0];
-        const items = [];
-        let footer = '';
-
-        for (let i = 1; i < lines.length; i++) {
-            const line = lines[i];
-            const isBullet = /^[•\-–—]/.test(line) || /^\d+[.)]\s/.test(line);
-            if (isBullet) {
-                items.push(line.replace(/^(?:•|[\-–—]|\d+[.)])\s*/, '').trim());
-                continue;
-            }
-            if (items.length) {
-                footer = footer ? `${footer} ${line}` : line;
-            }
-        }
-
-        if (items.length) {
-            return { intro, items, footer };
-        }
-    }
-
-    const inline = parseInlineNumberedFlowering(value);
-    if (inline) return inline;
-
-    return { intro: '', items: [], footer: '', plain: value };
-}
-
-function renderPlantDescFlowering(text) {
-    if (!plantDescFlowering || !plantDescFloweringBlock) return;
-    if (parsePlantFeatureBlocks(text).length) {
-        plantDescFloweringBlock.style.display = 'none';
-        plantDescFlowering.innerHTML = '';
-        return;
-    }
-    const parsed = parseFloweringContent(text);
-    if (!parsed) {
-        plantDescFloweringBlock.style.display = 'none';
-        plantDescFlowering.innerHTML = '';
-        return;
-    }
-
-    plantDescFloweringBlock.style.display = '';
-
-    if (parsed.plain) {
-        plantDescFlowering.innerHTML = `<p class="plant-desc-flowering-plain">${escapePlantDescHtml(parsed.plain)}</p>`;
-        return;
-    }
-
-    let html = '';
-    if (parsed.prefix) {
-        html += `<p class="plant-desc-flowering-prefix">${escapePlantDescHtml(parsed.prefix)}</p>`;
-    }
-    if (parsed.intro) {
-        html += `<p class="plant-desc-flowering-intro">${escapePlantDescHtml(parsed.intro)}</p>`;
-    }
-    if (parsed.items.length) {
-        html += `<ol class="plant-desc-numbered-list">${parsed.items.map((item) => `<li>${escapePlantDescHtml(item)}</li>`).join('')}</ol>`;
-    }
-    if (parsed.footer) {
-        html += `<p class="plant-desc-flowering-footer">${escapePlantDescHtml(parsed.footer)}</p>`;
-    }
-    plantDescFlowering.innerHTML = html;
-}
-
-function renderPlantDescAdvice(plant) {
-    if (!plantDescAdvice || !plantDescAdviceSection) return;
-    const items = getPlantAdviceItems(plant);
-    if (!items.length) {
-        plantDescAdviceSection.style.display = 'none';
-        plantDescAdvice.innerHTML = '';
-        return;
-    }
-    plantDescAdviceSection.style.display = '';
-    plantDescAdvice.innerHTML = items.map((item) => `<li>${escapePlantDescHtml(item)}</li>`).join('');
-}
-
-function renderPlantDescFeatures(plant) {
-    const symptoms = parseSymptomEntries(plant.why_disease);
-    const featureBlocks = parsePlantFeatureBlocks(plant.flowering_conditions);
-    renderPlantDescSymptoms(symptoms);
-    renderPlantDescExtraFeatures(featureBlocks);
-    renderPlantDescFlowering(plant.flowering_conditions);
-    if (plantDescFeaturesSection) {
-        const hasFlowering = !!(plant.flowering_conditions || '').trim() && !featureBlocks.length;
-        const hasFeatures = symptoms.length > 0 || featureBlocks.length > 0 || hasFlowering;
-        plantDescFeaturesSection.style.display = hasFeatures ? '' : 'none';
-    }
-}
-
-function getPlantDescIcon() {
-    return '🌸';
-}
-
-// Функция открытия модалки с описанием растения
-async function openPlantDescription(plantKey) {
-    console.log('🔍 openPlantDescription вызвана с plantKey:', plantKey);
-    const plantId = parseInt(plantKey, 10);
-    let plant = PLANTS[plantId];
-
-    if (!plant) {
-        await loadPlantsCatalog();
-        plant = PLANTS[plantId];
-    }
-
-    if (!plant) {
-        console.warn('Растение не найдено:', plantKey);
-        showNotification('Ошибка: данные о растении не найдены', true);
-        return;
-    }
-
-    let icon = getPlantDescIcon();
-    if (plantDescIcon) plantDescIcon.textContent = icon;
-
-    const displayName = plant.nickname ? `${plant.name} — ${plant.nickname}` : plant.name;
-    if (plantDescTitle) plantDescTitle.textContent = displayName;
-    if (plantDescDescription) plantDescDescription.textContent = getPlantDescriptionText(plant);
-    renderPlantDescCharacter(plant);
-    renderPlantDescNeeds(plant);
-    renderPlantDescFeatures(plant);
-    renderPlantDescAdvice(plant);
-
-    if (modalPlantDescription) {
-        modalPlantDescription.classList.add('active');
-    }
-
-    if (!localStorage.getItem(`readDescriptionDone_${currentUser}`)) {
-        localStorage.setItem(`readDescriptionDone_${currentUser}`, '1');
-        checkQuestsAfterAction();
-        showNotification('📖 Задание выполнено: описание прочитано!', false);
-    }
-}
-
-// Закрытие модалки описания
-function closePlantDescription() {
-    if (modalPlantDescription) {
-        modalPlantDescription.classList.remove('active');
-    }
-}
-
-/// Обработчик для кнопки описания в зуме (обновлённый)
-const descBtnRight = document.getElementById('descBtnRight');
-if (descBtnRight) {
-    // Удаляем старые обработчики
-    const newDescBtn = descBtnRight.cloneNode(true);
-    descBtnRight.parentNode.replaceChild(newDescBtn, descBtnRight);
-
-    newDescBtn.addEventListener('click', () => {
-        if (!zoomedSlot) {
-            console.log('zoomedSlot отсутствует');
-            return;
-        }
-        const data = slotData[zoomedSlot.name];
-        if (data && data.plant && PLANTS[data.plant]) {
-            openPlantDescription(data.plant);
-        } else {
-            showNotification('Сначала посади цветок! 🌱', false);
-        }
-    });
-    // Обновляем ссылку
-    window.descBtnRight = newDescBtn;
-} else {
-    console.warn('Кнопка descBtnRight не найдена в DOM');
-}
-
-if (closePlantDescBtn) {
-    closePlantDescBtn.addEventListener('click', closePlantDescription);
-}
-
-// Закрытие по клику на overlay
-if (modalPlantDescription) {
-    modalPlantDescription.addEventListener('click', (e) => {
-        if (e.target === modalPlantDescription) {
-            closePlantDescription();
-        }
-    });
-}
-
-function closeZoomView() {
-    closeModal(zoomOverlay);
-    if (devStatePanel) devStatePanel.style.display = 'none';
-}
-
-function closeActiveChoiceModal() {
-    if (modalMovePlant?.classList.contains('active')) {
-        closeModal(modalMovePlant);
-        moveFromSlot = null;
-        return true;
-    }
-
-    const modals = [modalRepot, modalPickFlower, modalPlacePot, modalWaterCan, modalAchievements];
-    for (const modal of modals) {
-        if (modal?.classList.contains('active')) {
-            closeModal(modal);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function handleEscapeOverlays() {
-    if (modalPlantDescription?.classList.contains('active')) {
-        closePlantDescription();
-        return;
-    }
-
-    if (tutorialOverlay?.classList.contains('active')) {
-        const closable = tutorialOverlay.querySelector('.tutorial-window')?.classList.contains('tutorial-window--closable');
-        if (closable && typeof window.closeTutorialGlobal === 'function') {
-            window.closeTutorialGlobal();
-        }
-        return;
-    }
-
-    if (zoomOverlay?.classList.contains('active')) {
-        closeZoomView();
-        return;
-    }
-
-    closeActiveChoiceModal();
-}
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        handleEscapeOverlays();
-        return;
-    }
-
-    if (!tutorialOverlay?.classList.contains('active')) return;
-    if (isEditableTarget(document.activeElement)) return;
-
-    if (e.key === 'ArrowRight' || e.key === ' ') {
-        e.preventDefault();
-        if (typeof window.nextTutorialGlobal === 'function') {
-            window.nextTutorialGlobal();
-        }
-        return;
-    }
-
-    if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        if (typeof window.prevTutorialGlobal === 'function') {
-            window.prevTutorialGlobal();
-        }
-    }
-});
-
-function isEditableTarget(el) {
-    if (!el) return false;
-    const tag = el.tagName;
-    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
-}

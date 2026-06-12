@@ -121,7 +121,14 @@ class ChallengeInterface:
     # ЗАПИСЬ СОБЫТИЙ (для автоматической проверки)
     # =====================================================
 
-    def record_mistake(self, user_id: str, plant_id: str, mistake_type: str) -> Dict[str, Any]:
+    def record_mistake(
+        self,
+        user_id: str,
+        plant_id: str,
+        mistake_type: str,
+        *,
+        check_achievements: bool = True,
+    ) -> Dict[str, Any]:
         """
         Записать ошибку пользователя.
 
@@ -129,11 +136,14 @@ class ChallengeInterface:
             user_id: ID пользователя
             plant_id: ID растения
             mistake_type: Тип ошибки (overwater, drought, light, cold)
+            check_achievements: Проверять достижения после записи
 
         Returns:
             Результат с новыми достижениями
         """
-        return self._service.record_mistake(user_id, plant_id, mistake_type)
+        return self._service.record_mistake(
+            user_id, plant_id, mistake_type, check_achievements=check_achievements
+        )
 
     def record_perfect_growth(self, user_id: str, plant_id: str) -> Dict[str, Any]:
         """

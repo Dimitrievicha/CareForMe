@@ -592,11 +592,11 @@ async function loadStateFromServer() {
                     if (slotData[name].plant && slotData[name].stage < 2) {
                         scheduleGrowth(name);
                     }
-                    if (slotData[name].plant) {
+                    if (slotData[name].pot) {
                         scheduleLocationCheck(name);
-                        if (slotData[name].hasDisease || isPlantDead(slotData[name])) {
-                            scheduleSicknessDeathCheck(name);
-                        }
+                    }
+                    if (slotData[name].plant && (slotData[name].hasDisease || isPlantDead(slotData[name]))) {
+                        scheduleSicknessDeathCheck(name);
                     }
                 }
             });
@@ -653,13 +653,44 @@ let currentLevel = 1;
 let currentUser = null;
 let currentZoomedPlantId = null;
 
-const SEEDLING_MS = 10 * 1000;
-const BLOOM_MS = 61 * 1000;
-const WATER_TIMING_TEST = true;
-const TEST_WATER_MIN_MS = 20 * 1000;
-const TEST_WATER_MAX_MS = 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Сроки роста в игровых днях: семечко → росток / посадка → цветение */
+const PLANT_GROWTH_DAYS = {
+    1: { seedToSprout: 1, plantToBloom: 7 },   // Спатифиллум
+    2: { seedToSprout: 4, plantToBloom: 21 },  // Кактус
+    3: { seedToSprout: 2, plantToBloom: 14 }   // Фикус
+};
+
+// Тестовые тайминги роста — раскомментировать для отладки:
+// const GROWTH_TIMING_TEST = true;
+// const TEST_SEEDLING_MS = 10 * 1000;
+// const TEST_BLOOM_MS = 61 * 1000;
+const GROWTH_TIMING_TEST = false;
+
+/** Интервалы полива в игровых днях (мин / макс) */
+const PLANT_WATER_INTERVALS_DAYS = {
+    1: { min: 1, max: 2 },   // Спатифиллум
+    2: { min: 7, max: 10 },  // Кактус
+    3: { min: 3, max: 4 }    // Фикус
+};
+
+// Тестовый режим полива — раскомментировать для отладки:
+// const WATER_TIMING_TEST = true;
+// const TEST_WATER_MIN_MS = 20 * 1000;
+// const TEST_WATER_MAX_MS = 60 * 1000;
+const WATER_TIMING_TEST = false;
+
 const OVERWATER_MIN_FAST_POLIVS = 2;
-const SICK_UNTIL_DEATH_MS = WATER_TIMING_TEST ? 45 * 1000 : 5 * 24 * 3600000;
+const OVERWATER_DEATH_MIN_FAST_POLIVS = 3;
+
+/** Болезнь → гибель (свет / горшок), в игровых днях */
+const PLANT_SICK_UNTIL_DEATH_DAYS = {
+    1: 3,   // Спатифиллум
+    2: 7,   // Кактус
+    3: 5    // Фикус
+};
+
 const SICK_DEATH_CHECK_TICK_MS = WATER_TIMING_TEST ? 5 * 1000 : 60 * 60 * 1000;
 
 function plantVisual(bottom, width, pot1, pot2, pot3, extra = {}) {
@@ -949,6 +980,31 @@ function resolveSpeciesId(plantKey, plant) {
     return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
+function plantGrowthDays(plant) {
+    const speciesId = resolveSpeciesId(plant?.id, plant);
+    return PLANT_GROWTH_DAYS[speciesId] || PLANT_GROWTH_DAYS[1];
+}
+
+function getSeedlingMs(plant) {
+    if (GROWTH_TIMING_TEST) return TEST_SEEDLING_MS;
+    return plantGrowthDays(plant).seedToSprout * DAY_MS;
+}
+
+function getBloomMs(plant) {
+    if (GROWTH_TIMING_TEST) return TEST_BLOOM_MS;
+    return plantGrowthDays(plant).plantToBloom * DAY_MS;
+}
+
+function plantSickUntilDeathDays(plant) {
+    const speciesId = resolveSpeciesId(plant?.id, plant);
+    return PLANT_SICK_UNTIL_DEATH_DAYS[speciesId] ?? PLANT_SICK_UNTIL_DEATH_DAYS[1];
+}
+
+function getSickUntilDeathMs(plant) {
+    if (WATER_TIMING_TEST) return 45 * 1000;
+    return plantSickUntilDeathDays(plant) * DAY_MS;
+}
+
 function ensurePlantDiseaseAssets(plant, speciesId) {
     if (!plant) return;
     const sid = speciesId >= 1 && speciesId <= 3 ? speciesId : 1;
@@ -1028,6 +1084,7 @@ async function loadPlantsCatalog() {
                 const plantFolder = folder || assets.plantFolder;
                 const diseaseImages = { ...assets.diseaseImages };
 
+                const intervals = PLANT_WATER_INTERVALS_DAYS[sid] || { min: 1, max: 2 };
                 plants[plantId] = {
                     id: plantId,
                     name: plant.species_name || plant.name,
@@ -1038,8 +1095,8 @@ async function loadPlantsCatalog() {
                     waterAdvice: plant.watering_advice || 'Поливай по графику',
                     lightAdvice: plant.light_advice || 'Обеспечь правильное освещение',
                     tips: Array.isArray(plant.tips) ? plant.tips.join('|') : (plant.tips || 'Бережный уход - залог здоровья'),
-                    waterIntervalMin: plant.water_interval_min || 24,
-                    waterIntervalMax: plant.water_interval_max || 48,
+                    waterIntervalMin: plant.water_interval_min ?? intervals.min,
+                    waterIntervalMax: plant.water_interval_max ?? intervals.max,
                     unlockLevel: plant.unlock_level || 1,
                     plantFolder: plantFolder,
                     stages: {
@@ -1173,20 +1230,26 @@ function applyWateringCanChange(canId, canConfig) {
     saveState();
 }
 
-const STAGE_NAMES = ['🌰 Семечко посажено', '🌱 Росток', '🌸 Расцвёл'];
+const ZOOM_STAGE_LABEL = {
+    seed: '🌰 Семечко посажено',
+    sprout: '🌱 Росток',
+    bloom: '🌸 Расцвёл',
+    sick: '🤒 Болеет',
+    dead: '💀 Умерло'
+};
 const PLANT_SICK_LABEL = 'Болеет';
 const PLANT_DEAD_LABEL = 'Умерло';
 const ZOOM_DISEASE_DEAD_TEXT = 'Растение погибло. Выбросите горшок, чтобы посадить новое.';
 
 function getZoomStageLabel(data) {
     if (!data?.plant) return '';
-    if (isPlantDead(data)) return PLANT_DEAD_LABEL;
-    if (data.hasDisease) return PLANT_SICK_LABEL;
+    if (isPlantDead(data)) return ZOOM_STAGE_LABEL.dead;
+    if (data.hasDisease) return ZOOM_STAGE_LABEL.sick;
     const stage = resolvePlantStage(data);
-    if (stage === 0) return STAGE_NAMES[0];
-    if (stage === 1) return STAGE_NAMES[1];
-    if (stage >= 2) return STAGE_NAMES[2];
-    return STAGE_NAMES[0];
+    if (stage === 0) return ZOOM_STAGE_LABEL.seed;
+    if (stage === 1) return ZOOM_STAGE_LABEL.sprout;
+    if (stage >= 2) return ZOOM_STAGE_LABEL.bloom;
+    return ZOOM_STAGE_LABEL.seed;
 }
 
 function updateZoomStageLabel(data) {
@@ -1211,12 +1274,7 @@ function getWaterTimerLabel(data, plant) {
     const sinceMs = msSinceLastWater(data);
 
     if (sinceMs < minMs) {
-        if (WATER_TIMING_TEST) {
-            const leftSec = Math.ceil((minMs - sinceMs) / 1000);
-            return `💧 Полив через ${leftSec} сек.`;
-        }
-        const leftHours = Math.ceil((minMs - sinceMs) / 3600000);
-        return `💧 Полив через ${leftHours} ч`;
+        return `💧 Полив через ${formatWaitDuration(minMs - sinceMs)}`;
     }
     if (sinceMs <= maxMs) {
         return '⏰ Пора поливать!';
@@ -1241,15 +1299,31 @@ function getGrowthTimerLabel(data) {
         return null;
     }
 
+    const plant = PLANTS[data.plant];
+    if (!plant) return null;
+
     const msSincePlanted = Date.now() - data.plantedAt;
 
     if (data.stage === 0) {
-        const secondsLeft = Math.ceil(Math.max(0, SEEDLING_MS - msSincePlanted) / 1000);
-        return `🌱 Росток через ${secondsLeft} сек.`;
+        if (!data.lastWateredAt) {
+            return '🌱 Полей, чтобы семечко проросло';
+        }
+        const msLeft = Math.max(0, getSeedlingMs(plant) - msSincePlanted);
+        if (msLeft > 0) {
+            if (GROWTH_TIMING_TEST) {
+                return `🌱 Росток через ${Math.ceil(msLeft / 1000)} сек.`;
+            }
+            return `🌱 Росток через ${formatWaitDuration(msLeft)}`;
+        }
+        return '🌱 Росток скоро появится...';
     }
     if (data.stage === 1) {
-        const secondsLeft = Math.ceil(Math.max(0, BLOOM_MS - msSincePlanted) / 1000);
-        return `🌸 Цветение через ${secondsLeft} сек.`;
+        const msLeft = Math.max(0, getBloomMs(plant) - msSincePlanted);
+        if (msLeft <= 0) return null;
+        if (GROWTH_TIMING_TEST) {
+            return `🌸 Цветение через ${Math.ceil(msLeft / 1000)} сек.`;
+        }
+        return `🌸 Цветение через ${formatWaitDuration(msLeft)}`;
     }
     return null;
 }
@@ -1336,6 +1410,18 @@ function dismissNotification(id) {
     setTimeout(() => {
         if (entry.element.isConnected) removeEl();
     }, 400);
+}
+
+function formatDaysRu(n) {
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return `${n} день`;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return `${n} дня`;
+    return `${n} дней`;
+}
+
+function getSeedlingWaitLabel(plant) {
+    return formatDaysRu(plantGrowthDays(plant).seedToSprout);
 }
 
 function showNotification(message, isError = false, options = {}) {
@@ -1471,11 +1557,6 @@ function showAchievementReasonToast(achievementId) {
     }, ACHIEVEMENT_REASON_TOAST_MS);
 }
 
-function showAchievementUnlockedNotification(name) {
-    const displayName = (name || '').trim() || 'Достижение';
-    showNotification(`🏆 Достижение получено: ${displayName}!`, false);
-}
-
 function showAchievementUnlockToast(achievementId) {
     const config = ACHIEVEMENTS_CONFIG[achievementId];
     if (!config) return;
@@ -1557,6 +1638,25 @@ async function notifyAchievementToServer(event = null, extra = {}) {
         });
     } catch (e) {
         console.error('Ошибка синхронизации достижения с сервером:', e);
+    }
+}
+
+async function recordMistakeToServer(plantId, mistakeType, { countForAchievement = true } = {}) {
+    if (!currentUser) return;
+    try {
+        await fetch(`${API_BASE_URL}/achievements/event`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                event: 'mistake',
+                plant_id: String(plantId),
+                mistake_type: mistakeType,
+                count_for_achievement: countForAchievement
+            })
+        });
+    } catch (e) {
+        console.error('Ошибка записи ошибки на сервер:', e);
     }
 }
 
@@ -1696,7 +1796,7 @@ function checkAchievement_negativeEffect() {
             id: 'oops_error'
         });
         updateAchievementsDisplay();
-        notifyAchievementToServer('mistake');
+        notifyAchievementToServer();
         return true;
     }
     return false;
@@ -1855,7 +1955,7 @@ function resolveDeathCauseType(data) {
     return getDiseaseTypeFromMessage(plantKey, data.disease);
 }
 
-function showPlantDeathNotification(data) {
+function showPlantDeathNotification(data, notificationCause = null) {
     if (!data?.plant) return;
 
     const firstKey = `firstPlantDeath_${currentUser}`;
@@ -1868,7 +1968,7 @@ function showPlantDeathNotification(data) {
     } else if (isComplexMistakeDeath(data)) {
         text = NOTIFICATION_TEXTS.death.complex;
     } else {
-        const cause = resolveDeathCauseType(data);
+        const cause = notificationCause || resolveDeathCauseType(data);
         if (cause === 'overwatered') text = NOTIFICATION_TEXTS.death.overwatered;
         else if (cause === 'under_watered') text = NOTIFICATION_TEXTS.death.under_watered;
         else if (cause === 'too_light') text = NOTIFICATION_TEXTS.death.too_light;
@@ -1924,7 +2024,7 @@ function ensureDiseaseStartTime(data) {
     }
 }
 
-function applyPlantDeath(slotName, data) {
+function applyPlantDeath(slotName, data, { notificationCause = null } = {}) {
     if (!data?.plant || isPlantDead(data)) return false;
 
     data.hasDisease = true;
@@ -1934,11 +2034,19 @@ function applyPlantDeath(slotName, data) {
     data.diseaseSource = 'neglect';
     data.devManualState = false;
 
-    showPlantDeathNotification(data);
+    showPlantDeathNotification(data, notificationCause);
     checkAchievement_death();
     saveState();
 
     refreshPlantVisual(slotName);
+    if (zoomedSlot?.name === slotName) {
+        updateZoomPlantVisual(data);
+        updateZoomStageLabel(data);
+        updateDiseaseInfo(data);
+        setZoomControlsForPlantState(data);
+        updateNextWateringTimer(data);
+        updateGrowthTimer(data);
+    }
     return true;
 }
 
@@ -1947,9 +2055,14 @@ function checkPlantDeathFromSickness(slotName) {
     if (!data?.plant || data.stage < 1) return;
     if (data.devManualState || isPlantDead(data)) return;
     if (!data.hasDisease) return;
+    if (data.diseaseType === 'under_watered' || data.diseaseType === 'overwatered') return;
+    if (!LOCATION_DISEASE_TYPES.includes(data.diseaseType)) return;
+
+    const plant = PLANTS[data.plant];
+    if (!plant) return;
 
     ensureDiseaseStartTime(data);
-    if (Date.now() - data.diseaseStartTime < SICK_UNTIL_DEATH_MS) return;
+    if (Date.now() - data.diseaseStartTime < getSickUntilDeathMs(plant)) return;
 
     applyPlantDeath(slotName, data);
 }
@@ -1993,17 +2106,47 @@ function setZoomControlsForPlantState(data) {
     }
 }
 
+function formatWaitDuration(ms) {
+    if (WATER_TIMING_TEST) {
+        return `${Math.ceil(ms / 1000)} сек.`;
+    }
+    const days = Math.ceil(ms / DAY_MS);
+    if (days >= 1) return formatDaysRu(days);
+    return `${Math.ceil(ms / 3600000)} ч.`;
+}
+
+function plantWaterIntervalDays(plant) {
+    const speciesId = resolveSpeciesId(plant?.id, plant);
+    const fallback = PLANT_WATER_INTERVALS_DAYS[speciesId] || { min: 1, max: 2 };
+    return {
+        min: plant?.waterIntervalMin ?? fallback.min,
+        max: plant?.waterIntervalMax ?? fallback.max
+    };
+}
+
 function getWaterMinMs(plant) {
-    return WATER_TIMING_TEST ? TEST_WATER_MIN_MS : (plant.waterIntervalMin || 24) * 3600000;
+    if (WATER_TIMING_TEST) return TEST_WATER_MIN_MS;
+    const { min } = plantWaterIntervalDays(plant);
+    return min * DAY_MS;
 }
 
 function getWaterMaxMs(plant) {
-    return WATER_TIMING_TEST ? TEST_WATER_MAX_MS : (plant.waterIntervalMax || 48) * 3600000;
+    if (WATER_TIMING_TEST) return TEST_WATER_MAX_MS;
+    const { max } = plantWaterIntervalDays(plant);
+    return max * DAY_MS;
 }
 
 function msSinceLastWater(data) {
     if (!data?.lastWateredAt) return Infinity;
     return Date.now() - data.lastWateredAt;
+}
+
+/** Сколько прошло без полива: от lastWateredAt или от plantedAt, если ещё не поливали */
+function getMsWithoutWater(data, now = Date.now()) {
+    if (!data?.plant) return 0;
+    if (data.lastWateredAt) return Math.max(0, now - data.lastWateredAt);
+    if (data.plantedAt) return Math.max(0, now - data.plantedAt);
+    return 0;
 }
 
 function isWateringOnTime(data, plant, atTime = Date.now()) {
@@ -2022,17 +2165,56 @@ function hasRegularWatering(data, plant) {
     return msSinceLastWater(data) <= getWaterMaxMs(plant);
 }
 
+function wateringGapMs(entry) {
+    if (!entry) return Infinity;
+    if (entry.gapMs != null) return entry.gapMs;
+    if (entry.intervalMs != null) return entry.intervalMs;
+    return Infinity;
+}
+
 function countRecentFastWaterings(data, plant) {
     if (!data?.wateringHistory?.length) return 0;
     const minMs = getWaterMinMs(plant);
-    return data.wateringHistory.slice(-3).filter(w => {
-        const gap = w.gapMs != null ? w.gapMs : (w.intervalMs != null ? w.intervalMs : Infinity);
-        return gap < minMs;
-    }).length;
+    return data.wateringHistory.slice(-3).filter(w => wateringGapMs(w) < minMs).length;
 }
 
 function hasOverwaterRisk(data, plant) {
     return countRecentFastWaterings(data, plant) >= OVERWATER_MIN_FAST_POLIVS;
+}
+
+function hasOverwaterDeathRisk(data, plant) {
+    const recent = data?.wateringHistory?.slice(-OVERWATER_DEATH_MIN_FAST_POLIVS) || [];
+    if (recent.length < OVERWATER_DEATH_MIN_FAST_POLIVS) return false;
+    const minMs = getWaterMinMs(plant);
+    return recent.every(w => wateringGapMs(w) < minMs);
+}
+
+function isStillWithinMinWaterInterval(data, plant) {
+    if (!data?.lastWateredAt) return false;
+    return msSinceLastWater(data) < getWaterMinMs(plant);
+}
+
+function shouldApplyOverwaterDisease(data, plant) {
+    if (!hasOverwaterRisk(data, plant)) return false;
+    return isStillWithinMinWaterInterval(data, plant);
+}
+
+function shouldApplyOverwaterDeath(data, plant) {
+    if (!hasOverwaterDeathRisk(data, plant)) return false;
+    return isStillWithinMinWaterInterval(data, plant);
+}
+
+function handleOverwaterEarlyWarning(data, plant, now = Date.now()) {
+    const minMs = getWaterMinMs(plant);
+    const sinceMs = data.lastWateredAt ? now - data.lastWateredAt : 0;
+    const unit = formatWaitDuration(Math.max(0, minMs - sinceMs));
+    showNotification(
+        `Слишком рано! Лучше поливать через ${unit} Растение может заболеть.`,
+        false,
+        { warning: true }
+    );
+    recordPlantMistakeCategory(data, 'water');
+    recordMistakeToServer(data.plant, 'overwater', { countForAchievement: false });
 }
 
 function getBloomBlockReason(data, plant) {
@@ -2097,22 +2279,24 @@ function isWaterDisease(plantKey, diseaseText) {
     }
     return false;
 }
-function applyPlantDisease(slotName, data, diseaseType, source) {
+function applyPlantDisease(slotName, data, diseaseType, source, { triggerAchievement = true } = {}) {
     const plant = PLANTS[data.plant];
     const plantKey = resolveSpeciesId(data.plant, plant);
     const msg = PLANT_DISEASES[plantKey]?.[diseaseType];
     if (!msg || isPlantDead(data) || data.hasDisease || data.stage < 1) return false;
 
-    data.hasDisease = true;
-    data.hadMistakes = true;
+        data.hasDisease = true;
+        data.hadMistakes = true;
     data.disease = msg;
     data.diseaseType = diseaseType;
     data.diseaseSource = source;
     data.diseaseStartTime = Date.now();
     recordPlantMistakeCategory(data, source);
     showDiseaseAdvice(diseaseType);
-    saveState();
-    checkAchievement_negativeEffect();
+        saveState();
+    if (triggerAchievement) {
+        checkAchievement_negativeEffect();
+    }
     refreshPlantVisual(slotName);
     scheduleSicknessDeathCheck(slotName);
     return true;
@@ -2331,10 +2515,10 @@ function refreshPlantVisual(slotName) {
     const slotEl = document.querySelector(`[data-slot="${slotName}"]`);
     if (slotEl) renderSlot(slotEl, data);
 
-    if (zoomedSlot && zoomedSlot.name === slotName) {
+        if (zoomedSlot && zoomedSlot.name === slotName) {
         updateZoomPlantVisual(data);
-        updateDiseaseInfo(data);
-        showFixAdvice(data);
+            updateDiseaseInfo(data);
+            showFixAdvice(data);
         setZoomControlsForPlantState(data);
 
         updateZoomStageLabel(data);
@@ -2395,16 +2579,18 @@ function checkWateringHealth(slotName, data) {
 
     const now = Date.now();
     const maxMs = getWaterMaxMs(plant);
-    const sinceWaterMs = msSinceLastWater(data);
+    const dryMs = getMsWithoutWater(data, now);
+    const droughtDeathMs = maxMs * 2;
 
-    const needsWater = !data.lastWateredAt
-        ? (now - (data.plantedAt || now)) > maxMs
-        : sinceWaterMs > maxMs;
-
-    if (hasOverwaterRisk(data, plant) && PLANT_DISEASES[plantKey]?.overwatered) {
+    if (shouldApplyOverwaterDeath(data, plant)) {
         recordPlantMistakeCategory(data, 'water');
+        applyPlantDeath(slotName, data, { notificationCause: 'overwatered' });
+    } else if (shouldApplyOverwaterDisease(data, plant) && PLANT_DISEASES[plantKey]?.overwatered) {
         applyPlantDisease(slotName, data, 'overwatered', 'water');
-    } else if (needsWater && PLANT_DISEASES[plantKey]?.under_watered) {
+    } else if (dryMs > droughtDeathMs) {
+        recordPlantMistakeCategory(data, 'water');
+        applyPlantDeath(slotName, data, { notificationCause: 'under_watered' });
+    } else if (dryMs > maxMs && PLANT_DISEASES[plantKey]?.under_watered) {
         recordPlantMistakeCategory(data, 'water');
         if (!data.hasDisease) {
             applyPlantDisease(slotName, data, 'under_watered', 'water');
@@ -2416,7 +2602,7 @@ function checkWateringHealth(slotName, data) {
 
 function getLocationDiseaseForSlot(plantKey, slotName, data) {
     const slotLight = SLOT_LIGHT[slotName];
-    const diseases = PLANT_DISEASES[plantKey];
+        const diseases = PLANT_DISEASES[plantKey];
     if (!diseases) return null;
 
     if (plantKey === 1 && data.pot === 3) return diseases.big_pot;
@@ -2449,14 +2635,15 @@ function checkLocationDisease(slotName) {
         recordPlantMistakeCategory(data, mistakeSource);
 
         if (!data.hasDisease) {
-            data.hasDisease = true;
-            data.hadMistakes = true;
-            data.disease = diseaseMsg;
+        data.hasDisease = true;
+        data.hadMistakes = true;
+        data.disease = diseaseMsg;
             data.diseaseType = getDiseaseTypeFromMessage(plantKey, diseaseMsg);
             data.diseaseSource = mistakeSource;
-            saveState();
+            data.diseaseStartTime = Date.now();
+        saveState();
             if (data.diseaseType) showDiseaseAdvice(data.diseaseType);
-            checkAchievement_negativeEffect();
+        checkAchievement_negativeEffect();
             refreshPlantVisual(slotName);
             scheduleSicknessDeathCheck(slotName);
         } else {
@@ -2468,6 +2655,7 @@ function checkLocationDisease(slotName) {
         data.disease = null;
         data.diseaseType = null;
         data.diseaseSource = null;
+        data.diseaseStartTime = null;
         saveState();
         const isLightRecovery = ['too_light', 'too_dark', 'no_flower'].includes(clearedType);
         markHealedPlant({ showRecoveryTip: !isLightRecovery });
@@ -2482,7 +2670,7 @@ function checkLocationDisease(slotName) {
 function scheduleLocationCheck(slotName) {
     checkLocationDisease(slotName);
     setTimeout(() => {
-        if (slotData[slotName]?.plant) {
+        if (slotData[slotName]?.pot) {
             scheduleLocationCheck(slotName);
         }
     }, 30000);
@@ -2526,8 +2714,6 @@ function showLevelRewardPopup({ level, rewardText }) {
 }
 
 function showAchievementPopup({ name, id }) {
-    const config = ACHIEVEMENTS_CONFIG[id];
-    showAchievementUnlockedNotification(name || config?.name);
     showAchievementUnlockToast(id);
     setTimeout(processPopupQueue, 3000);
 }
@@ -2807,7 +2993,10 @@ function renderFlowerChoices() {
                 renderSlot(activeSlot, slotData[name]);
                 closeModal(modalPickFlower);
                 activeSlot = null;
-                showNotification(`${plant.name} посажен! 🌱 Первый росток появится через 10 секунд...`, false);
+                showNotification(
+                    `Цветок посажен\n${plant.name} посажен! 🌱 Первый росток появится через ${getSeedlingWaitLabel(plant)}...`,
+                    false
+                );
                 saveState();
                 checkQuestsAfterAction();
                 scheduleGrowth(name);
@@ -3150,7 +3339,7 @@ function renderMoveChoices() {
                         <img src="${plantImage}" alt="растение" style="position: absolute; bottom: ${finalBottom}; left: 50%; transform: translateX(-50%) scale(${MOVE_MODAL_VISUAL.global.plantScale}); transform-origin: bottom center; width: ${customVisual.width}; z-index: 2;">
                     </div>
                 `;
-            } else {
+        } else {
                 const meta = getPlantVisualMeta(plant, targetData);
                 if (meta?.imageUrl) {
                     const offsets = getOffsetsForVisual(meta);
@@ -3186,23 +3375,23 @@ function renderMoveChoices() {
             ${mediaHtml}
             <div class="choice-card-caption">
                 <span class="choice-card-title">${escapeHtml(slotDisplayName)}</span>
-                ${statusHtml}
+            ${statusHtml}
             </div>
         `;
 
         if (!isCurrent) {
-            div.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (!moveFromSlot) return;
+        div.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!moveFromSlot) return;
 
-                if (isEmpty) {
-                    movePlantToEmptySlot(moveFromSlot, slotName);
-                } else {
-                    swapPlants(moveFromSlot, slotName);
-                }
-                closeModal(modalMovePlant);
-                moveFromSlot = null;
-            });
+            if (isEmpty) {
+                movePlantToEmptySlot(moveFromSlot, slotName);
+            } else {
+                swapPlants(moveFromSlot, slotName);
+            }
+            closeModal(modalMovePlant);
+            moveFromSlot = null;
+        });
         }
 
         row.appendChild(div);
@@ -3336,6 +3525,7 @@ function placePot(slotEl, potNum) {
     renderSlot(slotEl, slotData[name]);
     showNotification('Горшок поставлен! Теперь посади цветок 🌱', false);
     saveState();
+    scheduleLocationCheck(name);
 }
 
 function removePlantFromSlot(slotName) {
@@ -3438,22 +3628,22 @@ function renderSlot(slotEl, data) {
 
         if (meta?.imageUrl) {
             plantImg.src = meta.imageUrl;
-            plantImg.className = 'slot-plant-img';
-            plantImg.alt = plant.name;
+        plantImg.className = 'slot-plant-img';
+        plantImg.alt = plant.name;
 
             const offsets = getOffsetsForVisual(meta);
-            if (offsets) {
+        if (offsets) {
                 const baseLiftPx = 50;
                 const extraLiftPx = getPotLiftForVisual('slot', meta);
 
                 plantImg.style.bottom = `calc(${offsets.bottom} + ${baseLiftPx + extraLiftPx}px)`;
-                plantImg.style.width = offsets.width;
-                plantImg.style.left = offsets.left;
+            plantImg.style.width = offsets.width;
+            plantImg.style.left = offsets.left;
                 plantImg.style.transform = 'translateX(-50%) scale(1.50)';
                 plantImg.style.transformOrigin = 'bottom center';
-            }
+        }
 
-            slotEl.appendChild(plantImg);
+        slotEl.appendChild(plantImg);
         }
     }
 
@@ -3462,7 +3652,7 @@ function renderSlot(slotEl, data) {
         if (!data.plant) {
             hint.innerHTML = 'Посадить<br>цветок';
         } else if (data.stage === 0) {
-            hint.textContent = 'Прорастает...';
+            hint.textContent = data.lastWateredAt ? 'Прорастает...' : 'Полей!';
         } else if (isPlantDead(data)) {
             hint.textContent = PLANT_DEAD_LABEL;
         } else if (data.hasDisease) {
@@ -3476,7 +3666,7 @@ function renderSlot(slotEl, data) {
 }
 
 function updateGrowthTimer(data) {
-    const timerBox = document.getElementById('growthTimerBox');
+        const timerBox = document.getElementById('growthTimerBox');
     if (!timerBox) return;
 
     const timerText = getGrowthTimerLabel(data);
@@ -3486,11 +3676,11 @@ function updateGrowthTimer(data) {
     }
 
     timerBox.textContent = timerText;
-    timerBox.style.display = 'block';
+            timerBox.style.display = 'block';
 }
 
 function updateNextWateringTimer(data) {
-    const timerBox = document.getElementById('waterTimerBox');
+        const timerBox = document.getElementById('waterTimerBox');
     if (!timerBox) return;
 
     const plant = data?.plant ? PLANTS[data.plant] : null;
@@ -3502,7 +3692,7 @@ function updateNextWateringTimer(data) {
     }
 
     timerBox.textContent = timerText;
-    timerBox.style.display = 'block';
+        timerBox.style.display = 'block';
 }
 
 function updateDiseaseInfo(data) {
@@ -3517,7 +3707,7 @@ function updateDiseaseInfo(data) {
     }
 
     diseaseTextEl.textContent = text;
-    diseaseBox.style.display = 'block';
+        diseaseBox.style.display = 'block';
 }
 
 function showFixAdvice(data) {
@@ -3537,9 +3727,7 @@ function showFixAdvice(data) {
         } else if (norm.includes('перелив') || norm.includes('увядание')) {
             const plant = PLANTS[data.plant];
             const dryMs = plant ? getOverwaterHealDryMs(plant) : 0;
-            const dryHint = WATER_TIMING_TEST
-                ? `${Math.ceil(dryMs / 1000)} сек.`
-                : `${Math.round(dryMs / 3600000)} ч.`;
+            const dryHint = formatWaitDuration(dryMs);
             advice = `💧 Решение: Не поливай ${dryHint} — дай почве просохнуть. После этого растение выздоровеет.`;
         } else if (norm.includes('вытягивание') || norm.includes('нехватк') || norm.includes('нет цветения')) {
             advice = '💡 Решение: Переставь на более светлое место (подоконник).';
@@ -3795,13 +3983,21 @@ function renderRepotChoices() {
                 const data = slotData[name];
                 if (!data || isPlantDead(data)) return;
                 data.pot = parseInt(num);
+                checkLocationDisease(name);
+                refreshPlantVisual(name);
                 const slotEl = document.querySelector(`[data-slot="${name}"]`);
-                if (slotEl) renderSlot(slotEl, data);
+                if (slotEl) renderSlot(slotEl, slotData[name]);
                 closeModal(modalRepot);
                 showNotification(`🪴 Растение пересажено в ${cfg.name}!`, false);
                 saveState();
                 const zoomPotImg = document.getElementById('zoomPotImg');
                 if (zoomPotImg && POT_CONFIG[data.pot]) zoomPotImg.src = POT_CONFIG[data.pot].img;
+                if (zoomedSlot?.name === name) {
+                    updateZoomPlantVisual(slotData[name]);
+                    updateZoomStageLabel(slotData[name]);
+                    updateDiseaseInfo(slotData[name]);
+                    showFixAdvice(slotData[name]);
+                }
             });
         } else if (locked) {
             div.title = `Открывается на ${cfg.unlockLevel}-м уровне`;
@@ -3900,13 +4096,7 @@ if (waterBtnLeft) {
             const minMs = getWaterMinMs(plant);
             if (sinceMs < minMs) {
                 wateredTooEarly = true;
-                const waitSec = Math.ceil((minMs - sinceMs) / 1000);
-                const unit = WATER_TIMING_TEST ? `${waitSec} сек.` : `${Math.ceil((minMs - sinceMs) / 3600000)} ч.`;
-                showNotification(
-                    `Слишком рано! Лучше поливать через ${unit} Растение может заболеть.`,
-                    false,
-                    { warning: true }
-                );
+                handleOverwaterEarlyWarning(data, plant, now);
             }
         }
 
@@ -4057,7 +4247,7 @@ function loadState() {
                     pendingWateringCanFromGame = normalizeWateringCanId(parsed.currentWateringCan);
                 }
             } else if (parsed && typeof parsed === 'object') {
-                Object.assign(slotData, parsed);
+            Object.assign(slotData, parsed);
             }
             slots.forEach(slot => {
                 const name = slot.dataset.slot;
@@ -4069,11 +4259,11 @@ function loadState() {
                     if (slotData[name].plant && slotData[name].stage < 2) {
                         scheduleGrowth(name);
                     }
-                    if (slotData[name].plant) {
+                    if (slotData[name].pot) {
                         scheduleLocationCheck(name);
-                        if (slotData[name].hasDisease || isPlantDead(slotData[name])) {
-                            scheduleSicknessDeathCheck(name);
-                        }
+                    }
+                    if (slotData[name].plant && (slotData[name].hasDisease || isPlantDead(slotData[name]))) {
+                        scheduleSicknessDeathCheck(name);
                     }
                 }
             });
@@ -4083,22 +4273,52 @@ function loadState() {
     }
 }
 
+function tryAdvanceToSprout(slotName) {
+    const data = slotData[slotName];
+    if (!data?.plant || data.stage !== 0 || isPlantDead(data) || !data.plantedAt) return false;
+    const plant = PLANTS[data.plant];
+    if (!plant) return false;
+    if (!data.lastWateredAt) return false;
+    if (Date.now() - data.plantedAt < getSeedlingMs(plant)) return false;
+
+    data.stage = 1;
+    data.sproutedAt = data.sproutedAt || Date.now();
+
+    const slotEl = document.querySelector(`[data-slot="${slotName}"]`);
+    if (slotEl) renderSlot(slotEl, data);
+
+    showNotification(`🌱 ${PLANTS[data.plant]?.name} дало росток!`, false);
+    saveState();
+    checkQuestsAfterAction();
+
+    setTimeout(() => {
+        checkLocationDisease(slotName);
+        checkWateringHealth(slotName, slotData[slotName]);
+    }, 100);
+
+    scheduleGrowth(slotName);
+    return true;
+}
+
 function applyGrowthFromTime(slotName) {
     const data = slotData[slotName];
     if (!data || !data.plant || !data.plantedAt || isPlantDead(data)) return;
 
-    const msSincePlanted = Date.now() - data.plantedAt;
+    const plant = PLANTS[data.plant];
+    if (!plant) return;
 
-    if (msSincePlanted >= BLOOM_MS && data.stage < 2) {
+    const msSincePlanted = Date.now() - data.plantedAt;
+    const bloomMs = getBloomMs(plant);
+
+    if (msSincePlanted >= bloomMs && data.stage < 2) {
         syncSlotHealthChecks(slotName);
         const dataAfter = slotData[slotName];
-        const plant = PLANTS[dataAfter.plant];
         const bloomBlock = getBloomBlockReason(dataAfter, plant);
         if (!bloomBlock && dataAfter.stage >= 1) {
             clearBloomBlockNotified(dataAfter);
             const oldStage = dataAfter.stage;
             dataAfter.stage = 2;
-            dataAfter.bloomedAt = dataAfter.bloomedAt || (dataAfter.plantedAt + BLOOM_MS);
+            dataAfter.bloomedAt = dataAfter.bloomedAt || (dataAfter.plantedAt + bloomMs);
             const slotEl = document.querySelector(`[data-slot="${slotName}"]`);
             if (slotEl) renderSlot(slotEl, dataAfter);
 
@@ -4113,24 +4333,8 @@ function applyGrowthFromTime(slotName) {
         } else {
             clearBloomBlockNotified(dataAfter);
         }
-    } else if (msSincePlanted >= SEEDLING_MS && data.stage < 1) {
-        const oldStage = data.stage;
-        data.stage = 1;
-        data.sproutedAt = data.sproutedAt || (data.plantedAt + SEEDLING_MS);
-        const slotEl = document.querySelector(`[data-slot="${slotName}"]`);
-        if (slotEl) renderSlot(slotEl, data);
-
-        if (oldStage !== 1) {
-            showNotification(`🌱 ${PLANTS[data.plant]?.name} дало росток!`, false);
-            setTimeout(() => {
-                checkLocationDisease(slotName);
-                if (data.lastWateredAt) {
-                    checkWateringHealth(slotName, data);
-                }
-            }, 100);
-        }
-        saveState();
-        checkQuestsAfterAction();
+    } else if (data.stage < 1) {
+        tryAdvanceToSprout(slotName);
     }
 }
 
@@ -4138,25 +4342,23 @@ function scheduleGrowth(slotName) {
     const data = slotData[slotName];
     if (!data || !data.plant || !data.plantedAt) return;
 
+    const plant = PLANTS[data.plant];
+    if (!plant) return;
+
     const now = Date.now();
     const msSincePlanted = now - data.plantedAt;
+    const seedlingMs = getSeedlingMs(plant);
+    const bloomMs = getBloomMs(plant);
 
-    if (data.stage === 0 && msSincePlanted < SEEDLING_MS) {
-        const msUntilSeedling = Math.max(0, SEEDLING_MS - msSincePlanted);
-        setTimeout(() => {
-            const d = slotData[slotName];
-            if (!d || !d.plant || d.stage !== 0) return;
-            d.stage = 1;
-            d.sproutedAt = Date.now();
-            const slotEl = document.querySelector(`[data-slot="${slotName}"]`);
-            if (slotEl) renderSlot(slotEl, d);
-            showNotification(`🌱 ${PLANTS[d.plant]?.name} дало росток!`, false);
-            saveState();
-            checkQuestsAfterAction();
-            scheduleGrowth(slotName);
-        }, msUntilSeedling);
-    } else if (data.stage === 1 && msSincePlanted < BLOOM_MS) {
-        const msUntilBloom = Math.max(0, BLOOM_MS - msSincePlanted);
+    if (data.stage === 0) {
+        if (msSincePlanted >= seedlingMs) {
+            tryAdvanceToSprout(slotName);
+            return;
+        }
+        const msUntilSeedling = Math.max(0, seedlingMs - msSincePlanted);
+        setTimeout(() => tryAdvanceToSprout(slotName), msUntilSeedling);
+    } else if (data.stage === 1 && msSincePlanted < bloomMs) {
+        const msUntilBloom = Math.max(0, bloomMs - msSincePlanted);
         setTimeout(() => {
             const d = slotData[slotName];
             if (!d || !d.plant || d.stage !== 1) return;
@@ -4327,10 +4529,11 @@ if (devApplyStateBtn) {
     applyUnlocksForLevel(currentLevel);
     const loadedFromServer = await loadStateFromServer();
     if (!loadedFromServer) {
-        loadState();
+    loadState();
     }
     await loadAchievementsFromServer();
     applyUnlocksForLevel(currentLevel);
+    checkAchievement_level(currentLevel);
     renderQuests();
     renderPotChoices();
     renderFlowerChoices();

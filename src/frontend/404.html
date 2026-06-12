@@ -3,86 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Страница не найдена | Care For Me</title>
+    <title>404 — Страница не найдена | Care For Me</title>
     <link rel="stylesheet" href="css/404.css">
     <link rel="preload" href="music/song.mp3" as="fetch" type="audio/mpeg">
     <script src="js/music.js"></script>
 </head>
 <body>
-    <!-- Декоративные цветы по углам -->
-    <div class="flower-decor flower-decor-1">
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-center"></div>
-    </div>
-    <div class="flower-decor flower-decor-2">
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-center"></div>
-    </div>
-    <div class="flower-decor flower-decor-3">
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-center"></div>
-    </div>
-    <div class="flower-decor flower-decor-4">
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-petal"></div>
-        <div class="flower-decor-center"></div>
-    </div>
-
-    <!-- Маленькие цветочки по краям -->
-    <div class="small-flower small-flower-1">🌸</div>
-    <div class="small-flower small-flower-2">🌼</div>
-    <div class="small-flower small-flower-3">🌻</div>
-    <div class="small-flower small-flower-4">🌺</div>
-    <div class="small-flower small-flower-5">🌷</div>
-    <div class="small-flower small-flower-6">🌸</div>
-    <div class="small-flower small-flower-7">🌼</div>
-    <div class="small-flower small-flower-8">🌻</div>
-
-    <div class="error-container">
-        <!-- Центральное изображение -->
-        <div class="center-image">
-            <img src="images/404/синяк.png" alt="Синяк" class="main-image">
+    <main class="not-found-viewport">
+        <div class="not-found-stage">
+            <img src="images/404/404.png" alt="" class="not-found-bg">
+            <div class="not-found-content">
+                <p class="not-found-code">404</p>
+                <p class="not-found-message">
+                    Эта страница<br>
+                    затерялась среди<br>
+                    растений...
+                </p>
+            </div>
         </div>
-
-        <!-- Текст ошибки -->
-        <h1 class="error-title">Ошибка 404</h1>
-        <p class="error-message">Цветочки от Биркин пропали</p>
-
-        <!-- Кнопки -->
-        <div class="buttons">
-            <a href="register.html" class="btn btn-primary">
-                <span class="btn-icon">🌱</span>
-                На главную
-            </a>
-            <button onclick="history.back()" class="btn btn-secondary">
-                <span class="btn-icon">🌿</span>
-                Вернуться назад
-            </button>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Анимация для маленьких цветочков
-            const smallFlowers = document.querySelectorAll('.small-flower');
-            smallFlowers.forEach((flower, index) => {
-                const delay = Math.random() * 3;
-                const duration = 2 + Math.random() * 2;
-                flower.style.animation = `float ${duration}s ease-in-out infinite`;
-                flower.style.animationDelay = `${delay}s`;
-            });
-        });
-    </script>
+    </main>
+    <script src="js/404.js"></script>
 </body>
 </html>

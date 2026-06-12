@@ -140,7 +140,15 @@ def record_event():
     elif event == 'death':
         result = challenge_interface.record_plant_death(user_id, plant_id)
     elif event == 'mistake':
-        result = challenge_interface.record_mistake(user_id, plant_id, data.get('mistake_type', 'unknown'))
+        check_achievements = data.get('count_for_achievement', True)
+        if isinstance(check_achievements, str):
+            check_achievements = check_achievements.lower() not in ('0', 'false', 'no')
+        result = challenge_interface.record_mistake(
+            user_id,
+            plant_id,
+            data.get('mistake_type', 'unknown'),
+            check_achievements=bool(check_achievements),
+        )
     elif event == 'species_collected':
         result = challenge_interface.record_species_collected(user_id)
     else:

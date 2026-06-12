@@ -1200,7 +1200,12 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     opacity: 1;
 }
 
-.achievement-toast img,
+.achievement-toast img {
+    width: min(300px, 78vw);
+    height: auto;
+    object-fit: contain;
+}
+
 .achievement-unlock-toast img {
     width: min(250px, 70vw);
     height: auto;
@@ -1658,6 +1663,7 @@ body.first-time-onboarding .room-letterbox {
 .notification-item .notif-text {
     flex: 1;
     line-height: 1.35;
+    white-space: pre-line;
 }
 
 .notification-item .notif-close {

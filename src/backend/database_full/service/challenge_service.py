@@ -154,7 +154,14 @@ class ChallengeService:
 
         return completed
 
-    def record_mistake(self, user_id: str, plant_id: str, mistake_type: str) -> Dict[str, Any]:
+    def record_mistake(
+        self,
+        user_id: str,
+        plant_id: str,
+        mistake_type: str,
+        *,
+        check_achievements: bool = True,
+    ) -> Dict[str, Any]:
         """
         Записывает ошибку пользователя и проверяет достижения.
 
@@ -162,6 +169,7 @@ class ChallengeService:
             user_id: ID пользователя
             plant_id: ID растения
             mistake_type: Тип ошибки (overwater, drought, light, cold)
+            check_achievements: Проверять достижения (False для мгновенного предупреждения перелива)
 
         Returns:
             Результат с новыми достижениями
@@ -178,7 +186,7 @@ class ChallengeService:
 
         self.user_repo.increment_stat(user_id, "total_mistakes")
 
-        completed = self.check_all(user_id)
+        completed = self.check_all(user_id) if check_achievements else []
 
         return {
             "success": True,

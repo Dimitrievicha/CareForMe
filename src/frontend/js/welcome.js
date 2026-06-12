@@ -2,6 +2,26 @@ const API_BASE_URL = 'http://localhost:5000/api';
 const WELCOME_ARROW_SRC = 'images/button/кнопка-стрелка обучения.png';
 const WELCOME_LAST_STEP = 1;
 
+const TUTORIAL_DESIGN_W = 550;
+const TUTORIAL_DESIGN_H = 620;
+const TUTORIAL_SIZE_BOOST = 1.05;
+const TUTORIAL_MAX_SCALE = 1.15;
+const TUTORIAL_VIEWPORT_FILL = 0.82;
+const TUTORIAL_MIN_SCALE = 0.28;
+
+function updateWelcomeTutorialScale() {
+    const raw = Math.min(
+        (window.innerWidth * TUTORIAL_VIEWPORT_FILL) / TUTORIAL_DESIGN_W,
+        (window.innerHeight * TUTORIAL_VIEWPORT_FILL) / TUTORIAL_DESIGN_H
+    );
+    const fitScale = Math.max(TUTORIAL_MIN_SCALE, raw);
+    const scale = Math.max(TUTORIAL_MIN_SCALE, Math.min(fitScale * TUTORIAL_SIZE_BOOST, TUTORIAL_MAX_SCALE));
+    document.documentElement.style.setProperty('--tutorial-scale', String(scale));
+}
+
+updateWelcomeTutorialScale();
+window.addEventListener('resize', updateWelcomeTutorialScale);
+
 let welcomeStep = 0;
 let consumedResumeStep = null;
 
@@ -162,8 +182,10 @@ if (consumedResumeStep !== null) {
 document.addEventListener('keydown', (e) => {
     if (!welcomeNavEnabled) return;
     if (isEditableTarget(document.activeElement)) return;
+    const focusedTag = document.activeElement?.tagName;
+    if (focusedTag === 'BUTTON' || focusedTag === 'A') return;
 
-    if (e.key === 'ArrowLeft') {
+    if (e.key === 'ArrowLeft' || e.code === 'ArrowLeft') {
         e.preventDefault();
         if (welcomeStep > 0) {
             showWelcomeStep(welcomeStep - 1);
@@ -171,7 +193,7 @@ document.addEventListener('keydown', (e) => {
         return;
     }
 
-    if (e.key === 'ArrowRight' || e.key === ' ') {
+    if (e.key === 'ArrowRight' || e.code === 'ArrowRight' || e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
         welcomeGoNext();
     }

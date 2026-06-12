@@ -10,7 +10,7 @@ const passwordError = document.getElementById('passwordError');
 let validation = { username: false, password: false };
 
 function setValidState(input, errorElement) {
-    errorElement.textContent = '✓';
+    errorElement.textContent = '✅';
     errorElement.style.color = '#4caf50';
     removeErr(input);
 }
@@ -56,8 +56,8 @@ function validatePassword(value) {
         setInvalidState(passwordInput, passwordError, '❌ Минимум 4 символа');
         return false;
     }
-    if (value.length > 50) {
-        setInvalidState(passwordInput, passwordError, '❌ Максимум 50 символов');
+    if (value.length > 100) {
+        setInvalidState(passwordInput, passwordError, '❌ Слишком длинный');
         return false;
     }
     setValidState(passwordInput, passwordError);
@@ -71,7 +71,9 @@ function removeErr(el) {
     el.closest('.input-field')?.classList.remove('error');
 }
 function updateBtn() {
-    submitBtn.disabled = !(validation.username && validation.password);
+    const ready = validation.username && validation.password;
+    submitBtn.classList.toggle('is-inactive', !ready);
+    submitBtn.setAttribute('aria-disabled', String(!ready));
 }
 
 usernameInput.addEventListener('input', e => {
@@ -218,7 +220,7 @@ async function login(username, password, options = {}) {
             onLoginSuccess(result.data, options);
             return true;
         } else if (result.status === 401) {
-            showNotification(result.data.error || '❌ Неверный пароль');
+            showNotification(result.data.error || 'Неверный пароль');
             resetPassword();
             return false;
         } else {
@@ -252,7 +254,6 @@ function onLoginSuccess(data, { afterRegister = false } = {}) {
     if (afterRegister) {
         sessionStorage.setItem('showWelcomeAfterRegister', '1');
         localStorage.setItem('isReturningUser', 'false');
-        showNotification(`Добро пожаловать, ${data.username}! 🌱`, false);
         setTimeout(() => {
             window.location.href = 'welcome.html';
         }, 1000);
@@ -284,7 +285,6 @@ function clearForm() {
 
 form.addEventListener('submit', async e => {
     e.preventDefault();
-    if (submitBtn.disabled) return;
 
     const username = usernameInput.value.trim();
     const password = passwordInput.value;
@@ -320,3 +320,20 @@ document.addEventListener('click', (e) => {
         clearForm();
     }
 });
+
+const REGISTER_DESIGN_W = 600;
+const REGISTER_DESIGN_H = 500;
+const REGISTER_MIN_SCALE = 0.28;
+
+function updateRegisterScale() {
+    const fill = 0.82;
+    const raw = Math.min(
+        (window.innerWidth * fill) / REGISTER_DESIGN_W,
+        (window.innerHeight * fill) / REGISTER_DESIGN_H
+    );
+    const scale = Math.max(REGISTER_MIN_SCALE, Math.min(raw, 1));
+    document.documentElement.style.setProperty('--register-scale', String(scale));
+}
+
+updateRegisterScale();
+window.addEventListener('resize', updateRegisterScale);

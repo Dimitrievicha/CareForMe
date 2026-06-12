@@ -139,16 +139,17 @@ body {
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-#submitBtn:hover:not(:disabled) {
+#submitBtn:hover:not(:disabled):not(.is-inactive) {
     transform: scale(1.05);
     filter: brightness(1.02);
 }
 
-#submitBtn:active:not(:disabled) {
+#submitBtn:active:not(:disabled):not(.is-inactive) {
     transform: scale(0.97);
 }
 
-#submitBtn:disabled {
+#submitBtn:disabled,
+#submitBtn.is-inactive {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;

@@ -30,6 +30,7 @@ body {
     --plant-desc-scale: 1;
     --achievements-scale: 1;
     --choice-picker-scale: 1;
+    --move-modal-scale: 1;
 }
 
 .room-letterbox {
@@ -246,6 +247,13 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 
 .quest-item.done .quest-check {
     color: #4caf50;
+}
+
+.quest-item.quest-all-done {
+    opacity: 1;
+    text-decoration: none;
+    border-bottom: none;
+    color: #3d6b8c;
 }
 
 /*  КНОПКИ УПРАВЛЕНИЯ */
@@ -1049,7 +1057,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 
 .achievements-custom-window {
     position: relative;
-    width: 820px;
+    width: 1000px;
     max-width: none;
     height: auto;
     background: transparent;
@@ -1097,7 +1105,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     bottom: 12%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: clamp(10px, 3vw, 30px);
+    gap: clamp(12px, 3.5vw, 36px);
     overflow-y: auto;
     padding: clamp(6px, 1.5vw, 15px);
 }
@@ -1142,28 +1150,32 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .achievement-card img {
-    width: clamp(110px, 18vw, 200px);
-    height: clamp(110px, 18vw, 200px);
+    width: clamp(132px, 22vw, 245px);
+    height: clamp(132px, 22vw, 245px);
     object-fit: contain;
 }
 
 .achievement-card[data-id="collector"] img {
-    width: clamp(124px, 20vw, 225px);
-    height: clamp(124px, 20vw, 225px);
+    width: clamp(148px, 24vw, 275px);
+    height: clamp(148px, 24vw, 275px);
+}
+
+.achievement-card[data-id="patient_gardener"] {
+    align-self: start;
+    margin-top: clamp(-12px, -2.2vw, -20px);
 }
 
 .achievement-card[data-id="oops_error"] {
     align-self: start;
-    margin-top: clamp(-18px, -3.5vw, -31px);
+    margin-top: clamp(-46px, -8.5vw, -76px);
 }
 
 .achievement-card[data-id="oops_error"] img {
-    width: clamp(132px, 21vw, 240px);
-    height: clamp(132px, 21vw, 240px);
+    width: clamp(158px, 25vw, 290px);
+    height: clamp(158px, 25vw, 290px);
 }
 
 .achievement-toast,
-.reward-toast,
 .achievement-unlock-toast {
     position: fixed;
     bottom: 50%;
@@ -1183,14 +1195,12 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .achievement-toast.show,
-.reward-toast.show,
 .achievement-unlock-toast.show {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
 }
 
 .achievement-toast img,
-.reward-toast img,
 .achievement-unlock-toast img {
     width: min(250px, 70vw);
     height: auto;
@@ -1216,7 +1226,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     animation: toastPopAchievementReason 5s ease forwards;
 }
 
-.reward-toast.show,
 .achievement-unlock-toast.show {
     animation: toastPopReward 3s ease forwards;
 }
@@ -1256,6 +1265,10 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 .tutorial-overlay .tutorial-window,
 .welcome-overlay .tutorial-window {
     max-width: 100%;
+}
+
+body:not(.first-time-onboarding) .tutorial-overlay .tutorial-window {
+    transform: scale(calc(var(--tutorial-scale, 1) * 0.93));
 }
 
 .tutorial-window > img,
@@ -1392,32 +1405,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     letter-spacing: 0.01em;
 }
 
-.tut-next-btn--start-game {
-    width: 110px;
-    height: var(--tutorial-nav-btn-h);
-}
-
-.tut-next-btn--start-game .tut-next-arrow {
-    display: none;
-}
-
-.tut-next-btn--start-game .tut-action-btn {
-    display: inline-flex;
-    width: 100%;
-    height: 100%;
-    min-width: 0;
-    padding: 0 8px;
-    font-size: 13px;
-    line-height: 1.2;
-    white-space: normal;
-    box-sizing: border-box;
-    border-radius: 10px;
-}
-
-.tut-next-btn--start-game img {
-    transform: none;
-}
-
 .first-time-room-bg {
     display: none;
     position: fixed;
@@ -1462,11 +1449,15 @@ body.first-time-onboarding .room-letterbox {
     --tutorial-nav-btn-visible-h: calc(var(--tutorial-nav-btn-h) - 8px);
 }
 
+/* Сетка 110+20+110: левая стрелка не смещается, когда справа «Начать игру» (160px) */
 .tutorial-nav-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 110px 110px;
+    column-gap: 20px;
+    width: 240px;
+    margin-inline: auto;
+    align-items: start;
+    overflow: visible;
 }
 
 .tut-back-btn,
@@ -1481,6 +1472,18 @@ body.first-time-onboarding .room-letterbox {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+.tut-back-btn {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.tut-next-btn {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+    min-width: 0;
 }
 
 .tut-back-btn img,
@@ -1518,10 +1521,11 @@ body.first-time-onboarding .room-letterbox {
     display: none;
 }
 
-/* Кнопка "Начать игру" (режим первого обучения) */
+/* Кнопка "Начать игру" (режим первого обучения) — шире 110px, выходит вправо за сетку */
 .tut-next-btn.tut-next-btn--start-game {
     background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
     width: 160px;
+    max-width: none;
     height: 55px;
 }
 
@@ -1543,145 +1547,40 @@ body.first-time-onboarding .room-letterbox {
     font-family: inherit;
 }
 
-/* ===== КНОПКА ПРОПУСКА ОБУЧЕНИЯ ===== */
+/* ===== ССЫЛКА ПРОПУСКА ОБУЧЕНИЯ ===== */
 .tutorial-skip-wrapper {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 6px;
     flex-shrink: 0;
+    width: 100%;
 }
 
 .tutorial-skip-wrapper.is-hidden {
     visibility: hidden;
 }
 
-.tut-skip-btn {
-    background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-    padding: 0;
-    width: 160px;
-    height: 55px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-}
-
-.tut-skip-btn .tut-action-btn {
-    display: inline-flex !important;
-    background: none;
-    box-shadow: none;
-    color: #3d2a1a;
-    font-size: 14px;
-    font-weight: normal;
-    min-width: 0;
-    padding: 0;
-    white-space: nowrap;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-    font-family: inherit;
-}
-
-.tut-skip-btn:hover {
-    transform: scale(1.05);
-}
-
-/* Скрываем старую картинку внутри кнопки */
-.tut-skip-btn img {
-    display: none;
-}
-
-/* Маленькая версия кнопки пропуска (если нужна) */
-.tut-skip-btn.small-skip-btn {
-    width: 120px;
-    height: 45px;
-}
-
-.tut-skip-btn.small-skip-btn .tut-action-btn {
-    font-size: 12px;
-}
-
-/* ===== СТИЛИ ДЛЯ КНОПКИ ПРОПУСКА ОБУЧЕНИЯ ===== */
-.tutorial-skip-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    flex-shrink: 0;
-}
-
-.tutorial-skip-wrapper.is-hidden {
-    visibility: hidden;
-}
-
-.tutorial-skip-wrapper.is-hidden .tut-skip-btn {
+.tutorial-skip-wrapper.is-hidden .tut-skip-link {
     pointer-events: none;
 }
 
-.tut-skip-btn {
-    background: url('../images/button/кнопка.png') center / 100% 100% no-repeat;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-    padding: 0;
-    width: 160px;
-    height: 55px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-}
-
-.tut-skip-btn .tut-action-btn {
-    display: inline-flex !important;
+.tut-skip-link {
     background: none;
-    box-shadow: none;
-    color: #3d2a1a;
-    font-size: 14px;
-    min-width: 0;
-    padding: 0;
-    white-space: nowrap;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-    font-family: inherit;
-}
-
-.tut-skip-btn:hover {
-    transform: scale(1.05);
-}
-
-/* Маленькая версия кнопки пропуска */
-.tut-skip-btn.small-skip-btn {
-    width: 120px;
-    height: 45px;
-}
-
-.tut-skip-btn.small-skip-btn .tut-action-btn {
-    font-size: 12px;
-}
-
-/* Скрываем старую картинку внутри кнопки */
-.tut-skip-btn img {
-    display: none;
-}
-
-.tut-skip-btn--complete img {
-    display: none;
-}
-
-.tut-skip-btn--complete .tut-action-btn {
-    display: inline-flex !important;
-    width: auto;
-    min-width: 0;
-    padding: 0 8px;
+    border: none;
+    padding: 2px 0 0;
+    margin: 0;
+    cursor: pointer;
+    font-family: Georgia, 'Times New Roman', serif;
     font-size: 13px;
-    line-height: 1.2;
-    white-space: normal;
-    box-sizing: border-box;
-    border-radius: 10px;
+    font-weight: normal;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    color: #4a3d30;
+    line-height: 1.3;
 }
 
-.tut-skip-btn--complete:hover {
-    transform: scale(1.05);
+.tut-skip-link:hover {
+    color: #2d2418;
 }
 
 @keyframes fadeIn {
@@ -1730,6 +1629,14 @@ body.first-time-onboarding .room-letterbox {
 
 .notification-item.is-error {
     border-left-color: #c45c5c;
+}
+
+.notification-item.is-warning {
+    border-left-color: #d4a017;
+}
+
+.notification-item.is-info {
+    border-left-color: #5b8fd4;
 }
 
 .notification-item.show {
@@ -1822,19 +1729,19 @@ body.first-time-onboarding .room-letterbox {
 
 .plant-desc-window {
     width: 500px;
-    max-width: none;
+    max-width: 85vw;
     background: none;
     border: none;
     box-shadow: none;
     position: relative;
     overflow: visible;
-    flex-shrink: 0;
     transform: scale(var(--plant-desc-scale, 1));
     transform-origin: center center;
 }
 
 .tutorial-window.plant-desc-window {
     width: 500px;
+    max-width: 85vw;
     transform: scale(var(--plant-desc-scale, 1));
 }
 
@@ -1905,8 +1812,7 @@ body.first-time-onboarding .room-letterbox {
 }
 
 .plant-desc-info .desc-section h3,
-.plant-desc-info .desc-point-title,
-.tutorial-step .desc-point-title {
+.plant-desc-info .desc-point-title {
     color: #3a1f0a;
     font-weight: bold;
 }
@@ -1914,6 +1820,16 @@ body.first-time-onboarding .room-letterbox {
 .plant-desc-info .desc-section h3 {
     font-size: 18px;
     margin-bottom: 6px;
+}
+
+.plant-desc-info .desc-point-title {
+    font-size: 16px;
+}
+
+.tutorial-step .desc-point-title {
+    color: #3a1f0a;
+    font-weight: bold;
+    font-size: 16px;
     text-align: center;
 }
 
@@ -1922,12 +1838,6 @@ body.first-time-onboarding .room-letterbox {
     font-size: 26px;
     font-weight: bold;
     margin: 0 0 12px;
-    text-align: center;
-}
-
-.plant-desc-info .desc-point-title,
-.tutorial-step .desc-point-title {
-    font-size: 16px;
     text-align: center;
 }
 
@@ -2086,37 +1996,46 @@ body.first-time-onboarding .room-letterbox {
 }
 
 /* Дополнительные стили для окна перестановки */
-#moveChoicesRow .occupied-label {
+#moveChoicesRow .choice-card-title {
+    color: #5d3a1a;
+}
+
+#moveChoicesRow .occupied-label,
+#moveChoicesRow .free-label {
     display: inline-block;
+    color: #5d3a1a;
     background: rgba(93, 58, 26, 0.15);
     padding: 4px 10px;
     border-radius: 20px;
-    font-size: clamp(10px, 1.3vw, 12px);
+    font-size: 12px;
     font-weight: 500;
 }
 
-#moveChoicesRow .free-label {
-    display: inline-block;
-    background: rgba(76, 175, 80, 0.15);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: clamp(10px, 1.3vw, 12px);
-    font-weight: 500;
-}
-
-#moveChoicesRow .pot-choice.occupied-slot {
+#moveChoicesRow .pot-choice.occupied-slot,
+#moveChoicesRow .pot-choice.empty-slot,
+#moveChoicesRow .pot-choice.empty-pot-slot {
     border: 1px solid #d4a373;
 }
 
-#moveChoicesRow .pot-choice.empty-slot {
-    border: 1px dashed #4caf50;
+#moveChoicesRow .pot-choice.pot-choice--source {
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px dashed rgba(76, 175, 80, 0.55);
+    cursor: default;
+    pointer-events: none;
 }
 
-/* Увеличиваем окно перестановки для 5 слотов в ряд */
-#modalMovePlant.modal-overlay .modal-window {
-    width: 90vw;
-    max-width: 1000px;
-    min-width: 800px;
+#moveChoicesRow .pot-choice.pot-choice--source:hover {
+    transform: none;
+}
+
+/* Окно перестановки: фиксированный макет + масштаб под экран (как у других модалок) */
+#modalMovePlant.modal-overlay .modal-window.choice-picker-modal {
+    width: 1100px;
+    min-height: 500px;
+    max-width: none;
+    min-width: 0;
+    transform: scale(var(--move-modal-scale, 1));
+    transform-origin: center center;
 }
 
 #modalMovePlant .modal-pots-row {
@@ -2124,36 +2043,23 @@ body.first-time-onboarding .room-letterbox {
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: center;
+    align-items: stretch;
     gap: 15px;
-    overflow: visible; /* убираем скролл */
+    overflow: visible;
+    flex: 1;
+    margin-bottom: 28px;
 }
 
 #modalMovePlant .pot-choice {
-    flex: 0 0 auto;
-    width: 160px; /* фиксированная ширина каждого слота */
+    flex: 0 0 160px;
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+    padding: 18px 10px;
+    box-sizing: border-box;
 }
 
-/* Для маленьких экранов - делаем чуть уже */
-@media (max-width: 900px) {
-    #modalMovePlant.modal-overlay .modal-window {
-        min-width: auto;
-        width: 95vw;
-    }
-
-    #modalMovePlant .pot-choice {
-        width: 140px;
-    }
-
-    #modalMovePlant .modal-pots-row {
-        gap: 10px;
-    }
-}
-
-/* Для очень маленьких экранов - все же добавляем скролл */
-@media (max-width: 800px) {
-    #modalMovePlant .modal-pots-row {
-        overflow-x: auto;
-        justify-content: flex-start;
-        padding-bottom: 10px;
-    }
+#modalMovePlant .choice-card-title {
+    font-size: 15px;
+    line-height: 1.25;
 }

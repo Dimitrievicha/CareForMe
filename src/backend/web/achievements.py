@@ -3,7 +3,7 @@ API маршруты для достижений
 Префикс: /api/achievements
 """
 
-from flask import Blueprint, jsonify, session
+from flask import Blueprint, jsonify, request, session
 from database_full.interface.challenge_interface import challenge_interface
 
 achievements_bp = Blueprint('achievements', __name__)
@@ -109,6 +109,46 @@ def check_achievements():
         'success': True,
         'new_achievements': result
     })
+
+
+@achievements_bp.route('/event', methods=['POST'])
+def record_event():
+    """
+    Записать игровое событие и проверить достижения.
+
+    POST /api/achievements/event
+    Body: {
+        "event": "perfect_growth" | "death" | "mistake" | "species_collected",
+        "plant_id": str   (опционально, для perfect_growth / death / mistake)
+    }
+
+    Returns: {
+        "success": bool,
+        "new_achievements": [ { "name": str, "id": str } ]
+    }
+    """
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Не авторизован'}), 401
+
+    data = request.get_json() or {}
+    event = data.get('event')
+    plant_id = data.get('plant_id', 'unknown')
+
+    if event == 'perfect_growth':
+        result = challenge_interface.record_perfect_growth(user_id, plant_id)
+    elif event == 'death':
+        result = challenge_interface.record_plant_death(user_id, plant_id)
+    elif event == 'mistake':
+        result = challenge_interface.record_mistake(user_id, plant_id, data.get('mistake_type', 'unknown'))
+    elif event == 'species_collected':
+        result = challenge_interface.record_species_collected(user_id)
+    else:
+        # Просто проверяем достижения без записи нового события
+        result = {'new_achievements': challenge_interface.check_all_achievements(user_id)}
+
+    new_achievements = result.get('new_achievements', [])
+    return jsonify({'success': True, 'new_achievements': new_achievements})
 
 
 @achievements_bp.route('/recent', methods=['GET'])

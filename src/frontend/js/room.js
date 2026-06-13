@@ -191,7 +191,7 @@ async function loadStateFromServer() {
         }
         return false;
     } catch (error) {
-        console.error('Ошибка загрузки TESTING_REPORT.md сервера:', error);
+        console.error('Ошибка загрузки с сервера:', error);
         return false;
     }
 }
@@ -243,8 +243,6 @@ const WATER_TIMING_TEST = true;
 const TEST_WATER_MIN_MS = 20 * 1000;
 const TEST_WATER_MAX_MS = 60 * 1000;
 const OVERWATER_MIN_FAST_POLIVS = 2;
-
-/** Тест: 45 сек болезни → смерть. Релиз: заменить на дни (напр. 5 * 24 * 3600000). */
 const SICK_UNTIL_DEATH_MS = WATER_TIMING_TEST ? 45 * 1000 : 5 * 24 * 3600000;
 const SICK_DEATH_CHECK_TICK_MS = WATER_TIMING_TEST ? 5 * 1000 : 60 * 60 * 1000;
 
@@ -411,7 +409,7 @@ const ACHIEVEMENTS_CONFIG = {
         reasonImage: 'images/achivement/gardens/за что.png',
         unlockImage: 'images/achivement/gardens/окно получения достижения.png',
         description: 'Проявите терпение и заботу, ухаживая за растениями целую неделю без пропусков.',
-        requirement: 'Ухаживать за растениями 7 дней подряд (TESTING_REPORT.md ежедневным входом)'
+        requirement: 'Ухаживать за растениями 7 дней подряд (с ежедневным входом)'
     },
     oops_error: {
         name: 'Упс, ошибка',
@@ -1237,7 +1235,7 @@ const NOTIFICATION_TEXTS = {
         under_watered: 'Он ждал воды слишком долго... Поставь напоминание в телефоне или просто заглядывай почаще. Ты справишься!',
         too_light: 'Жара сделала своё дело. Но теперь ты знаешь: каждому цветку нужно своё место. Давай посадим новый?',
         too_dark: 'Тень сделала своё дело. Но теперь ты знаешь: каждому цветку нужно своё место. Давай посадим новый?',
-        complex: 'Бывает. Не кори себя. Просто начни заново — твой сад никуда не денется. А я всегда рядом TESTING_REPORT.md советами. 🌸'
+        complex: 'Бывает. Не кори себя. Просто начни заново — твой сад никуда не денется. А я всегда рядом с советами. 🌸'
     },
     positive: {
         idealWater: 'Идеально! Ты чувствуешь своего зелёного друга. Так держать!',
@@ -2459,16 +2457,12 @@ function getMoveModalVisual(plantId, visualState, potNum, diseaseType = null) {
     return MOVE_MODAL_VISUAL.global.defaultFallback;
 }
 
-<<<<<<< HEAD
-// Обновленная версия renderMoveChoices TESTING_REPORT.md использованием MOVE_MODAL_VISUAL
-=======
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
->>>>>>> origin/second_version_frontend
 function renderMoveChoices() {
     const row = document.getElementById('moveChoicesRow');
     if (!row) return;
@@ -2984,7 +2978,7 @@ function showFixAdvice(data) {
         let advice = '';
         const norm = normalizePlantText(data.disease);
         if (norm.includes('ожог') || norm.includes('пятна') || norm.includes('свет')) {
-            advice = '💡 Решение: Убери TESTING_REPORT.md подоконника — слишком яркий свет. Переставь горшок через «Переставить горшок».';
+            advice = '💡 Решение: Убери с подоконника — слишком яркий свет. Переставь горшок через «Переставить горшок».';
         } else if (norm.includes('недостаток полива') || norm.includes('сохнут кончики')) {
             advice = '💧 Решение: Полей растение. Следи, чтобы полив был регулярным.';
         } else if (norm.includes('перелив') || norm.includes('увядание')) {
@@ -3300,7 +3294,7 @@ const removeBtnLeft = document.getElementById('removeBtnLeft');
 if (removeBtnLeft) {
     removeBtnLeft.addEventListener('click', () => {
         if (!zoomedSlot) return;
-        if (confirm('Вы уверены, что хотите выбросить растение вместе TESTING_REPORT.md горшком?')) {
+        if (confirm('Вы уверены, что хотите выбросить растение вместе с горшком?')) {
             removePotFromSlot(zoomedSlot.name);
             closeModal(zoomOverlay);
         }
@@ -3311,7 +3305,7 @@ const removePotBtn = document.getElementById('removePotBtn');
 if (removePotBtn) {
     removePotBtn.addEventListener('click', () => {
         if (!zoomedSlot) return;
-        if (confirm('Убрать горшок вместе TESTING_REPORT.md растением?')) {
+        if (confirm('Убрать горшок вместе с растением?')) {
             removePotFromSlot(zoomedSlot.name);
         }
     });
@@ -3632,91 +3626,6 @@ function loadLevel() {
 updateRoomScale();
 window.addEventListener('resize', updateRoomScale);
 
-<<<<<<< HEAD
-(async function init() {
-
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.id = 'loadingOverlay';
-    loadingOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;justify-content:center;align-items:center;flex-direction:column;';
-    loadingOverlay.innerHTML = '<div style="font-size:50px;animation:spin 1s linear infinite;">🌱</div><div style="color:white;margin-top:20px;">Загрузка игры...</div>';
-    document.body.appendChild(loadingOverlay);
-
-    const style = document.createElement('style');
-    style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
-    document.head.appendChild(style);
-
-    const isAuth = await checkAuth();
-    if (!isAuth) return;
-
-    loadLevel();
-
-    const results = await Promise.all([
-        loadPlantsCatalog(),
-        loadPots(),
-        loadWateringCans()
-    ]);
-
-    if (!results[0] || Object.keys(PLANTS).length === 0) {
-        console.error('КРИТИЧЕСКАЯ ОШИБКА: Не удалось загрузить растения TESTING_REPORT.md сервера');
-        showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
-    }
-
-    if (!results[1] || Object.keys(POT_CONFIG).length === 0) {
-        console.warn('Не удалось загрузить горшки, использую стандартные');
-        showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
-    }
-
-    if (!results[2] || Object.keys(WATERING_CAN_CONFIG).length === 0) {
-        console.warn('Не удалось загрузить лейки, использую стандартные');
-        showNotification('Ошибка загрузки данных. Попробуйте обновить страницу.', true);
-    }
-
-    applyUnlocksForLevel(currentLevel, { markNotified: true });
-    const loadedFromServer = await loadStateFromServer();
-    if (!loadedFromServer) {
-        loadState();
-    }
-    applyUnlocksForLevel(currentLevel, { markNotified: true });
-    renderQuests();
-    renderPotChoices();
-    renderFlowerChoices();
-    renderWateringCanChoices();
-    updateAchievementsDisplay();
-    initAchievementsClick();
-    scheduleOverwateringCheck();
-
-    restoreWateringCanSelection();
-
-    const today = new Date().toDateString();
-    const lastVisit = localStorage.getItem(`lastVisitDate_${currentUser}`);
-    if (lastVisit !== today) {
-        localStorage.setItem(`lastVisitDate_${currentUser}`, today);
-        if (lastVisit) {
-            const yesterday = new Date(lastVisit);
-            yesterday.setDate(yesterday.getDate() + 1);
-            if (yesterday.toDateString() === today) {
-                const streak = getLoginStreak() + 1;
-                localStorage.setItem(`loginStreak_${currentUser}`, String(streak));
-                checkAchievement_streak(streak);
-                checkQuestsAfterAction();
-            } else {
-                localStorage.setItem(`loginStreak_${currentUser}`, '1');
-            }
-        } else {
-            localStorage.setItem(`loginStreak_${currentUser}`, '1');
-        }
-    }
-
-    loadingOverlay.remove();
-
-    if (typeof window.tryOpenFirstTimeTutorial === 'function') {
-        window.tryOpenFirstTimeTutorial();
-    }
-})();
-
-// ===== DEV LEVEL UP (временная отладка уровня) =====
-=======
->>>>>>> origin/second_version_frontend
 const DEV_MAX_LEVEL = 6;
 
 function applyUnlocksForLevel(level, { markNotified = false } = {}) {
@@ -4268,502 +4177,4 @@ if (devApplyStateBtn) {
             openTutorial('short');
         });
     }
-<<<<<<< HEAD
 })();
-
-// ===== МОДАЛКА ОПИСАНИЯ РАСТЕНИЯ =====
-const modalPlantDescription = document.getElementById('modalPlantDescription');
-const closePlantDescBtn = document.getElementById('closePlantDescBtn');
-const plantDescIcon = document.getElementById('plantDescIcon');
-const plantDescTitle = document.getElementById('plantDescTitle');
-const plantDescDescription = document.getElementById('plantDescDescription');
-const plantDescCharacter = document.getElementById('plantDescCharacter');
-const plantDescCharacterTitle = document.getElementById('plantDescCharacterTitle');
-const plantDescCharacterSection = document.getElementById('plantDescCharacterSection');
-const plantDescWater = document.getElementById('plantDescWater');
-const plantDescLight = document.getElementById('plantDescLight');
-const plantDescSymptoms = document.getElementById('plantDescSymptoms');
-const plantDescSymptomsBlock = document.getElementById('plantDescSymptomsBlock');
-const plantDescExtraFeatures = document.getElementById('plantDescExtraFeatures');
-const plantDescFlowering = document.getElementById('plantDescFlowering');
-const plantDescFloweringBlock = document.getElementById('plantDescFloweringBlock');
-const plantDescFeaturesSection = document.getElementById('plantDescFeaturesSection');
-const plantDescAdvice = document.getElementById('plantDescAdvice');
-const plantDescAdviceSection = document.getElementById('plantDescAdviceSection');
-const plantDescNeedsSection = document.getElementById('plantDescNeedsSection');
-
-function escapePlantDescHtml(text) {
-    return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-function normalizeTipsLines(input) {
-    if (input == null || input === '') return [];
-    const rawItems = Array.isArray(input) ? input : [input];
-    return rawItems
-        .flatMap((item) => String(item).replace(/\\n/g, '\n').split(/\r?\n|\|/))
-        .map((line) => line.trim().replace(/^[•\-–—]\s*/, ''))
-        .filter(Boolean);
-}
-
-function splitCharacterAndAdvice(tipsArray) {
-    if (!Array.isArray(tipsArray) || !tipsArray.length) {
-        return { characterBody: '', advice: [] };
-    }
-    const cleaned = normalizeTipsLines(tipsArray);
-    if (cleaned.length === 1 && !cleaned[0].includes('?')) {
-        return { characterBody: cleaned[0], advice: [] };
-    }
-    if (cleaned.length > 1 && !cleaned[0].includes('?')) {
-        return { characterBody: cleaned[0], advice: cleaned.slice(1) };
-    }
-    return { characterBody: '', advice: cleaned };
-}
-
-function getPlantTipsArray(plant) {
-    if (Array.isArray(plant.advice_list) && plant.advice_list.length) {
-        return normalizeTipsLines(plant.advice_list);
-    }
-    if (Array.isArray(plant.tips_array) && plant.tips_array.length) {
-        return normalizeTipsLines(plant.tips_array);
-    }
-    if (typeof plant.tips === 'string' && plant.tips.trim()) {
-        return normalizeTipsLines(plant.tips);
-    }
-    return [];
-}
-
-function getPlantAdviceItems(plant) {
-    if (Array.isArray(plant.advice_list) && plant.advice_list.length) {
-        return normalizeTipsLines(plant.advice_list);
-    }
-    const { advice } = splitCharacterAndAdvice(getPlantTipsArray(plant));
-    return normalizeTipsLines(advice);
-}
-
-function parseSymptomEntries(text) {
-    if (!text) return [];
-    return text.split('|').map((entry) => entry.trim()).filter(Boolean);
-}
-
-function parsePlantFeatureBlocks(text) {
-    const value = String(text || '').trim();
-    if (!value.startsWith('FEATURES||')) return [];
-    return value.slice('FEATURES||'.length).split('||').map((block) => {
-        const idx = block.indexOf('::');
-        if (idx === -1) return null;
-        return {
-            title: block.slice(0, idx).trim(),
-            text: block.slice(idx + 2).trim()
-        };
-    }).filter(Boolean);
-}
-
-function renderPlantDescExtraFeatures(blocks) {
-    if (!plantDescExtraFeatures) return;
-    if (!blocks.length) {
-        plantDescExtraFeatures.innerHTML = '';
-        plantDescExtraFeatures.style.display = 'none';
-        return;
-    }
-    plantDescExtraFeatures.style.display = '';
-    plantDescExtraFeatures.innerHTML = blocks.map((block) => (
-        `<div class="desc-subsection plant-desc-feature-block">`
-        + `<p class="desc-point-title">${escapePlantDescHtml(block.title)}:</p>`
-        + `<p class="desc-point-text">${escapePlantDescHtml(block.text)}</p>`
-        + `</div>`
-    )).join('');
-}
-
-function getPlantDescriptionText(plant) {
-    // Убираем зависимость от PLANT_CATALOG_EXTRAS
-    // const extras = PLANT_CATALOG_EXTRAS[plant.id];
-    // if (extras?.description) return extras.description;
-
-    let text = (plant.description || plant.fullDescription || '').trim();
-
-    // Если description пустой, используем дефолтное значение
-    if (!text) {
-        return 'Описание отсутствует';
-    }
-
-    const charTailPatterns = [
-        /\s*Спатифилл(?:лю|)м\s+очень\s+чувствителен[\s\S]*$/i,
-        /\s*Кактус\s+может\s+простить[\s\S]*$/i
-    ];
-    for (const pattern of charTailPatterns) {
-        const match = text.match(pattern);
-        if (match) {
-            text = text.slice(0, match.index).trim();
-            break;
-        }
-    }
-
-    const charBody = (plant.character_description || '').trim();
-    if (charBody && text.includes(charBody)) {
-        text = text.replace(charBody, '').trim();
-    }
-
-    return text.replace(/\s{2,}/g, ' ').trim() || 'Описание отсутствует';
-}
-
-function renderPlantDescCharacter(plant) {
-    if (!plantDescCharacterSection) return;
-    const trait = (plant.character_trait || '').trim();
-    const { characterBody } = splitCharacterAndAdvice(getPlantTipsArray(plant));
-    const body = (plant.character_description || characterBody || '').trim();
-
-    if (plantDescCharacterTitle) {
-        plantDescCharacterTitle.textContent = trait ? `Характер — ${trait}:` : 'Характер:';
-    }
-
-    if (!trait && !body) {
-        plantDescCharacterSection.style.display = 'none';
-        if (plantDescCharacter) plantDescCharacter.textContent = '';
-        return;
-    }
-
-    plantDescCharacterSection.style.display = '';
-    if (plantDescCharacter) plantDescCharacter.textContent = body;
-}
-
-function renderPlantDescNeeds(plant) {
-    const water = plant.watering_advice || plant.waterAdvice || '';
-    const light = plant.light_advice || plant.lightAdvice || '';
-    if (plantDescWater) plantDescWater.textContent = water || '—';
-    if (plantDescLight) plantDescLight.textContent = light || '—';
-    if (plantDescNeedsSection) {
-        plantDescNeedsSection.style.display = (water || light) ? '' : 'none';
-    }
-}
-
-function renderPlantDescSymptoms(entries) {
-    if (!plantDescSymptoms || !plantDescSymptomsBlock) return;
-    if (!entries.length) {
-        plantDescSymptomsBlock.style.display = 'none';
-        plantDescSymptoms.innerHTML = '';
-        return;
-    }
-    plantDescSymptomsBlock.style.display = '';
-    plantDescSymptoms.innerHTML = entries.map((entry) => {
-        const colonIdx = entry.indexOf(':');
-        if (colonIdx === -1) return `<li>${entry}</li>`;
-        const title = entry.slice(0, colonIdx).trim();
-        const detail = entry.slice(colonIdx + 1).trim();
-        return `<li><span class="plant-desc-symptom-title">${escapePlantDescHtml(title)}:</span> ${escapePlantDescHtml(detail)}</li>`;
-    }).join('');
-}
-
-function parseInlineNumberedFlowering(value) {
-    const numberedStart = value.search(/\s1[.)]\s/i);
-    if (numberedStart === -1) return null;
-
-    const intro = value.slice(0, numberedStart).trim();
-    const body = value.slice(numberedStart).trim();
-    const segments = body.split(/\s*(?=\d+[.)]\s*)/).filter(Boolean);
-    if (segments.length < 2) return null;
-
-    const items = [];
-    let footer = '';
-
-    segments.forEach((segment, index) => {
-        let item = segment.replace(/^\d+[.)]\s*/, '').trim().replace(/,\s*$/, '');
-        if (index === segments.length - 1) {
-            const footerMatch = item.match(/^(.+?\.\s*)(.+)$/);
-            if (footerMatch && footerMatch[2].length > 20) {
-                item = footerMatch[1].trim();
-                footer = footerMatch[2].trim();
-            }
-        }
-        if (item) items.push(item);
-    });
-
-    return items.length >= 2 ? { intro, items, footer } : null;
-}
-
-function parseFloweringContent(text) {
-    const value = String(text || '').replace(/\\n/g, '\n').trim();
-    if (!value) return null;
-
-    if (value.includes('|')) {
-        const parts = value.split('|').map((part) => part.trim()).filter(Boolean);
-        if (parts.length >= 4 && !parts[0].includes(':') && parts[1].includes(':')) {
-            return {
-                prefix: parts[0],
-                intro: parts[1],
-                items: parts.slice(2),
-                footer: ''
-            };
-        }
-        if (parts.length >= 4 && parts[0].includes(':')) {
-            return {
-                intro: parts[0],
-                items: parts.slice(1, -1),
-                footer: parts[parts.length - 1]
-            };
-        }
-        if (parts.length >= 3 && parts[0].includes(':')) {
-            return { intro: parts[0], items: parts.slice(1), footer: '' };
-        }
-    }
-
-    const lines = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-    if (lines.length > 1) {
-        const intro = lines[0];
-        const items = [];
-        let footer = '';
-
-        for (let i = 1; i < lines.length; i++) {
-            const line = lines[i];
-            const isBullet = /^[•\-–—]/.test(line) || /^\d+[.)]\s/.test(line);
-            if (isBullet) {
-                items.push(line.replace(/^(?:•|[\-–—]|\d+[.)])\s*/, '').trim());
-                continue;
-            }
-            if (items.length) {
-                footer = footer ? `${footer} ${line}` : line;
-            }
-        }
-
-        if (items.length) {
-            return { intro, items, footer };
-        }
-    }
-
-    const inline = parseInlineNumberedFlowering(value);
-    if (inline) return inline;
-
-    return { intro: '', items: [], footer: '', plain: value };
-}
-
-function renderPlantDescFlowering(text) {
-    if (!plantDescFlowering || !plantDescFloweringBlock) return;
-    if (parsePlantFeatureBlocks(text).length) {
-        plantDescFloweringBlock.style.display = 'none';
-        plantDescFlowering.innerHTML = '';
-        return;
-    }
-    const parsed = parseFloweringContent(text);
-    if (!parsed) {
-        plantDescFloweringBlock.style.display = 'none';
-        plantDescFlowering.innerHTML = '';
-        return;
-    }
-
-    plantDescFloweringBlock.style.display = '';
-
-    if (parsed.plain) {
-        plantDescFlowering.innerHTML = `<p class="plant-desc-flowering-plain">${escapePlantDescHtml(parsed.plain)}</p>`;
-        return;
-    }
-
-    let html = '';
-    if (parsed.prefix) {
-        html += `<p class="plant-desc-flowering-prefix">${escapePlantDescHtml(parsed.prefix)}</p>`;
-    }
-    if (parsed.intro) {
-        html += `<p class="plant-desc-flowering-intro">${escapePlantDescHtml(parsed.intro)}</p>`;
-    }
-    if (parsed.items.length) {
-        html += `<ol class="plant-desc-numbered-list">${parsed.items.map((item) => `<li>${escapePlantDescHtml(item)}</li>`).join('')}</ol>`;
-    }
-    if (parsed.footer) {
-        html += `<p class="plant-desc-flowering-footer">${escapePlantDescHtml(parsed.footer)}</p>`;
-    }
-    plantDescFlowering.innerHTML = html;
-}
-
-function renderPlantDescAdvice(plant) {
-    if (!plantDescAdvice || !plantDescAdviceSection) return;
-    const items = getPlantAdviceItems(plant);
-    if (!items.length) {
-        plantDescAdviceSection.style.display = 'none';
-        plantDescAdvice.innerHTML = '';
-        return;
-    }
-    plantDescAdviceSection.style.display = '';
-    plantDescAdvice.innerHTML = items.map((item) => `<li>${escapePlantDescHtml(item)}</li>`).join('');
-}
-
-function renderPlantDescFeatures(plant) {
-    const symptoms = parseSymptomEntries(plant.why_disease);
-    const featureBlocks = parsePlantFeatureBlocks(plant.flowering_conditions);
-    renderPlantDescSymptoms(symptoms);
-    renderPlantDescExtraFeatures(featureBlocks);
-    renderPlantDescFlowering(plant.flowering_conditions);
-    if (plantDescFeaturesSection) {
-        const hasFlowering = !!(plant.flowering_conditions || '').trim() && !featureBlocks.length;
-        const hasFeatures = symptoms.length > 0 || featureBlocks.length > 0 || hasFlowering;
-        plantDescFeaturesSection.style.display = hasFeatures ? '' : 'none';
-    }
-}
-
-function getPlantDescIcon() {
-    return '🌸';
-}
-
-// Функция открытия модалки TESTING_REPORT.md описанием растения
-async function openPlantDescription(plantKey) {
-    console.log('🔍 openPlantDescription вызвана TESTING_REPORT.md plantKey:', plantKey);
-    const plantId = parseInt(plantKey, 10);
-    let plant = PLANTS[plantId];
-
-    if (!plant) {
-        await loadPlantsCatalog();
-        plant = PLANTS[plantId];
-    }
-
-    if (!plant) {
-        console.warn('Растение не найдено:', plantKey);
-        showNotification('Ошибка: данные о растении не найдены', true);
-        return;
-    }
-
-    let icon = getPlantDescIcon();
-    if (plantDescIcon) plantDescIcon.textContent = icon;
-
-    const displayName = plant.nickname ? `${plant.name} — ${plant.nickname}` : plant.name;
-    if (plantDescTitle) plantDescTitle.textContent = displayName;
-    if (plantDescDescription) plantDescDescription.textContent = getPlantDescriptionText(plant);
-    renderPlantDescCharacter(plant);
-    renderPlantDescNeeds(plant);
-    renderPlantDescFeatures(plant);
-    renderPlantDescAdvice(plant);
-
-    if (modalPlantDescription) {
-        modalPlantDescription.classList.add('active');
-    }
-
-    if (!localStorage.getItem(`readDescriptionDone_${currentUser}`)) {
-        localStorage.setItem(`readDescriptionDone_${currentUser}`, '1');
-        checkQuestsAfterAction();
-        showNotification('📖 Задание выполнено: описание прочитано!', false);
-    }
-}
-
-// Закрытие модалки описания
-function closePlantDescription() {
-    if (modalPlantDescription) {
-        modalPlantDescription.classList.remove('active');
-    }
-}
-
-/// Обработчик для кнопки описания в зуме (обновлённый)
-const descBtnRight = document.getElementById('descBtnRight');
-if (descBtnRight) {
-    // Удаляем старые обработчики
-    const newDescBtn = descBtnRight.cloneNode(true);
-    descBtnRight.parentNode.replaceChild(newDescBtn, descBtnRight);
-
-    newDescBtn.addEventListener('click', () => {
-        if (!zoomedSlot) {
-            console.log('zoomedSlot отсутствует');
-            return;
-        }
-        const data = slotData[zoomedSlot.name];
-        if (data && data.plant && PLANTS[data.plant]) {
-            openPlantDescription(data.plant);
-        } else {
-            showNotification('Сначала посади цветок! 🌱', false);
-        }
-    });
-    // Обновляем ссылку
-    window.descBtnRight = newDescBtn;
-} else {
-    console.warn('Кнопка descBtnRight не найдена в DOM');
-}
-
-if (closePlantDescBtn) {
-    closePlantDescBtn.addEventListener('click', closePlantDescription);
-}
-
-// Закрытие по клику на overlay
-if (modalPlantDescription) {
-    modalPlantDescription.addEventListener('click', (e) => {
-        if (e.target === modalPlantDescription) {
-            closePlantDescription();
-        }
-    });
-}
-
-function closeZoomView() {
-    closeModal(zoomOverlay);
-    if (devStatePanel) devStatePanel.style.display = 'none';
-}
-
-function closeActiveChoiceModal() {
-    if (modalMovePlant?.classList.contains('active')) {
-        closeModal(modalMovePlant);
-        moveFromSlot = null;
-        return true;
-    }
-
-    const modals = [modalRepot, modalPickFlower, modalPlacePot, modalWaterCan, modalAchievements];
-    for (const modal of modals) {
-        if (modal?.classList.contains('active')) {
-            closeModal(modal);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function handleEscapeOverlays() {
-    if (modalPlantDescription?.classList.contains('active')) {
-        closePlantDescription();
-        return;
-    }
-
-    if (tutorialOverlay?.classList.contains('active')) {
-        const closable = tutorialOverlay.querySelector('.tutorial-window')?.classList.contains('tutorial-window--closable');
-        if (closable && typeof window.closeTutorialGlobal === 'function') {
-            window.closeTutorialGlobal();
-        }
-        return;
-    }
-
-    if (zoomOverlay?.classList.contains('active')) {
-        closeZoomView();
-        return;
-    }
-
-    closeActiveChoiceModal();
-}
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        handleEscapeOverlays();
-        return;
-    }
-
-    if (!tutorialOverlay?.classList.contains('active')) return;
-    if (isEditableTarget(document.activeElement)) return;
-
-    if (e.key === 'ArrowRight' || e.key === ' ') {
-        e.preventDefault();
-        if (typeof window.nextTutorialGlobal === 'function') {
-            window.nextTutorialGlobal();
-        }
-        return;
-    }
-
-    if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        if (typeof window.prevTutorialGlobal === 'function') {
-            window.prevTutorialGlobal();
-        }
-    }
-});
-
-function isEditableTarget(el) {
-    if (!el) return false;
-    const tag = el.tagName;
-    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
-}
-=======
-})();
->>>>>>> origin/second_version_frontend

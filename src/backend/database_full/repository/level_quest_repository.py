@@ -264,24 +264,6 @@ class LevelQuestRepository(BaseRepository):
     def get_current_level_progress(self, user_id: str, current_level: int) -> Dict[str, Any]:
         """
         Получает прогресс по текущему уровню пользователя.
-
-        Args:
-            user_id: ID пользователя
-            current_level: Текущий уровень пользователя
-
-        Returns:
-            Словарь с прогрессом всех заданий текущего уровня
-
-        Returns структура:
-            {
-                "level": 2,
-                "quests": [
-                    {"number": 1, "progress": 1, "completed": True, "target": 1, "description": "..."},
-                    {"number": 2, "progress": 3, "completed": True, "target": 3, "description": "..."},
-                    {"number": 3, "progress": 0, "completed": False, "target": 5, "description": "..."}
-                ],
-                "all_completed": False
-            }
         """
         quests_def = self.get_level_quests(current_level)
         if not quests_def:
@@ -305,12 +287,22 @@ class LevelQuestRepository(BaseRepository):
             prog = progress.get(f'quest{i}_progress', 0)
             completed = progress.get(f'quest{i}_completed', False)
 
+            # ВАЖНО: прогресс может быть больше или равен target, но completed может быть False
+            # Нужно проверять и автоматически отмечать как выполненное
+            if not completed and prog >= target:
+                completed = True
+                # Обновляем в БД
+                self.complete_quest(user_id, current_level, i)
+                # Перезагружаем прогресс
+                progress = self.get_user_progress(user_id, current_level)
+                prog = progress.get(f'quest{i}_progress', 0)
+
             result_quests.append({
                 "number": i,
                 "type": quest_type,
                 "progress": prog,
                 "target": target,
-                "completed": completed,
+                "completed": completed,  # ← это поле важно для фронта
                 "description": description
             })
 

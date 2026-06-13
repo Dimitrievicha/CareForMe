@@ -3968,88 +3968,9 @@ function showDescription(plantKey) {
     if (descriptionBox) descriptionBox.style.display = 'block';
 }
 
-function populateDevPanel(plant) {
-    const sel = devStateSelect;
-    if (!sel) return;
-
-    const currentVal = sel.value;
-    const plantKey = resolveSpeciesId(plant?.id, plant);
-
-    Array.from(sel.options).filter(o => !['sprout', 'healthy', 'dead'].includes(o.value))
-        .forEach(o => sel.removeChild(o));
-
-    const deadOption = Array.from(sel.options).find(o => o.value === 'dead');
-    const diseases = PLANT_DISEASES[plantKey];
-    const typeMap = PLANT_DISEASE_TO_IMAGE_KEY[plantKey];
-
-    if (diseases && typeMap) {
-        for (const [type, imageKey] of Object.entries(typeMap)) {
-            const msg = diseases[type];
-            if (!msg) continue;
-            const opt = document.createElement('option');
-            opt.value = `disease:${type}`;
-            opt.textContent = `🤒 ${msg.replace(/^[^\s]+\s/, '').slice(0, 42)}`;
-            if (deadOption) sel.insertBefore(opt, deadOption);
-            else sel.appendChild(opt);
-        }
-    }
-
-    if (Array.from(sel.options).some(o => o.value === currentVal)) sel.value = currentVal;
-    else sel.value = 'healthy';
-}
-
-async function applyDevPlantState(slotName, state) {
-    const data = slotData[slotName];
-    if (!data?.plant) return false;
-
-    const plant = PLANTS[data.plant];
-    const plantKey = resolveSpeciesId(data.plant, plant);
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/game/dev/apply_state`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            credentials: 'include',
-            body: JSON.stringify({
-                slotName: slotName,
-                state: state
-            })
-        });
-
-        const result = await response.json();
-
-        if (result.success && result.slotData) {
-            Object.assign(slotData[slotName], result.slotData);
-            if (slotData[slotName].hasDisease && !slotData[slotName]._visualShown) {
-                cancelVisualTimer(slotName);
-                scheduleDiseaseVisual(slotName, slotData[slotName]);
-            }
-
-            const slotEl = document.querySelector(`[data-slot="${slotName}"]`);
-            if (slotEl) renderSlot(slotEl, slotData[slotName]);
-
-            if (zoomedSlot?.name === slotName) {
-                openZoom(slotEl, slotName, slotData[slotName]);
-            }
-
-            saveState();
-            showNotification(`🔧 DEV: Состояние изменено на ${state}`, false);
-            return true;
-        } else {
-            showNotification('DEV: Ошибка применения состояния', true);
-            return false;
-        }
-    } catch (error) {
-        console.error('DEV ошибка:', error);
-        showNotification('DEV: Ошибка соединения', true);
-        return false;
-    }
-}
-
 function openZoom(slotEl, name, data) {
     zoomedSlot = { slotEl, name };
     currentZoomedPlantId = name;
-    if (devStatePanel) devStatePanel.style.display = 'block';
     resetZoomButtonDisabledState();
 
     const zoomPotImg = document.getElementById('zoomPotImg');
@@ -4071,8 +3992,6 @@ function openZoom(slotEl, name, data) {
 
     if (hasPlant) {
         const plant = PLANTS[data.plant];
-        populateDevPanel(plant);
-
         if (plantImg) {
             updateZoomPlantVisual(data);
         }
@@ -4561,8 +4480,6 @@ function loadLevel() {
 updateRoomScale();
 window.addEventListener('resize', updateRoomScale);
 
-const DEV_MAX_LEVEL = 6;
-
 function applyUnlocksForLevel(level) {
     Object.entries(POT_CONFIG).forEach(([num, cfg]) => {
         if (cfg) {
@@ -4573,71 +4490,6 @@ function applyUnlocksForLevel(level) {
         if (cfg) {
             cfg.isUnlocked = (cfg.unlockLevel || 1) <= level;
         }
-    });
-}
-
-// ============ DEV КНОПКА (с синхронизацией БД) ============
-
-async function stepDevLevel() {
-    if (!currentUser) return;
-
-    cancelPendingQuestLevelUp();
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/game/dev/level_up`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            credentials: 'include'
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            currentLevel = result.newLevel;
-            localStorage.setItem(`currentLevel_${currentUser}`, String(currentLevel));
-            updateLevelCircle(currentLevel);
-            applyUnlocksForLevel(currentLevel);
-            checkAndUnlockPots();
-            checkAndUnlockWateringCans();
-            renderPotChoices();
-            renderFlowerChoices();
-            renderWateringCanChoices();
-            checkAchievement_level(currentLevel);
-
-            await loadQuestsFromServer();
-
-            if (result.isReset) {
-                showNotification('🛠️ DEV: Уровень сброшен на 1', false);
-            } else {
-                showNotification(`🛠️ DEV: Уровень повышен до ${currentLevel}`, false);
-            }
-        }
-    } catch (error) {
-        console.error('DEV ошибка:', error);
-        showNotification('DEV: Ошибка соединения', true);
-    }
-}
-
-const devBtn = document.getElementById('devBtn');
-if (devBtn) {
-    const newDevBtn = devBtn.cloneNode(true);
-    devBtn.parentNode.replaceChild(newDevBtn, devBtn);
-    newDevBtn.addEventListener('click', stepDevLevel);
-}
-
-if (devApplyStateBtn) {
-    devApplyStateBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!zoomedSlot) {
-            alert('Сначала открой слот (кликни на горшок)');
-            return;
-        }
-        const name = zoomedSlot.name;
-        const state = devStateSelect?.value;
-        if (!state) return;
-
-        await applyDevPlantState(name, state);
     });
 }
 

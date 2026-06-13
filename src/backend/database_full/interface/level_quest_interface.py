@@ -128,15 +128,15 @@ class LevelQuestInterface:
     def get_current_level_progress(self, user_id: str) -> Dict[str, Any]:
         """
         Получить прогресс по текущему уровню пользователя.
-
-        Args:
-            user_id: ID пользователя
-
-        Returns:
-            Прогресс по заданиям текущего уровня
         """
         current_level = self._user_service.get_current_level(user_id)
-        return level_quest_repo.get_current_level_progress(user_id, current_level)
+        result = level_quest_repo.get_current_level_progress(user_id, current_level)
+
+        if 'quests' in result:
+            for quest in result['quests']:
+                quest['completed'] = bool(quest.get('completed', False))
+
+        return result
 
     def get_quest_progress(self, user_id: str, level: int, quest_number: int) -> Dict[str, Any]:
         """

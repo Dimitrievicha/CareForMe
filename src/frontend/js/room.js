@@ -26,9 +26,6 @@ const CHOICE_PICKER_DESIGN_H = 460;
 const MOVE_MODAL_DESIGN_W = 1100;
 const MOVE_MODAL_DESIGN_H = 500;
 
-// Таймеры для визуальных эффектов (в миллисекундах)
-const DISEASE_VISUAL_DELAY_MS = 6 * 60 * 60 * 1000; // 6 часов
-
 function modalViewportScale(designW, designH, fill = MODAL_VIEWPORT_FILL, maxScale = 1) {
     const raw = Math.min(
         (window.innerWidth * fill) / designW,
@@ -211,36 +208,6 @@ const ACHIEVEMENT_NAMES = {
 let serverQuests = [];
 let serverQuestLevel = 1;
 let serverQuestsAllCompleted = false;
-
-// Хранилище таймеров для каждого слота
-const visualTimers = {};
-
-// Функция для отмены таймера
-function cancelVisualTimer(slotName) {
-    if (visualTimers[slotName]) {
-        clearTimeout(visualTimers[slotName]);
-        delete visualTimers[slotName];
-    }
-}
-
-// Отложенное обновление визуала болезни
-function scheduleDiseaseVisual(slotName, data) {
-    cancelVisualTimer(slotName);
-
-    visualTimers[slotName] = setTimeout(() => {
-        const freshData = slotData[slotName];
-        if (freshData && freshData.hasDisease && freshData.diseaseType !== 'dead') {
-            // Обновляем визуал
-            refreshPlantVisual(slotName);
-            // Показываем уведомление о болезни
-            if (freshData.diseaseType) {
-                showDiseaseAdvice(freshData.diseaseType);
-            }
-            freshData._visualShown = true;
-        }
-        delete visualTimers[slotName];
-    }, DISEASE_VISUAL_DELAY_MS);
-}
 
 async function postGameAction(path, body = {}) {
     const response = await fetch(`${API_BASE_URL}/game/${path}`, {
@@ -1481,8 +1448,7 @@ const ZOOM_DISEASE_DEAD_TEXT = 'Растение погибло. Выброси�
 function getZoomStageLabel(data) {
     if (!data?.plant) return '';
     if (isPlantDead(data)) return ZOOM_STAGE_LABEL.dead;
-    if (data.hasDisease && data._visualShown) return ZOOM_STAGE_LABEL.sick;
-    if (data.hasDisease && !data._visualShown) return ZOOM_STAGE_LABEL.sprout;
+    if (data.hasDisease) return ZOOM_STAGE_LABEL.sick;
     const stage = resolvePlantStage(data);
     if (stage === 0) return ZOOM_STAGE_LABEL.seed;
     if (stage === 1) return ZOOM_STAGE_LABEL.sprout;
@@ -1523,11 +1489,8 @@ function getWaterTimerLabel(data, plant) {
 function getDiseaseBlockText(data) {
     if (!data?.plant) return null;
     if (isPlantDead(data)) return ZOOM_DISEASE_DEAD_TEXT;
-    if (data.hasDisease && data._visualShown && data.disease && data.disease !== '__dead__') {
+    if (data.hasDisease && data.disease && data.disease !== '__dead__') {
         return data.disease;
-    }
-    if (data.hasDisease && !data._visualShown) {
-        return null;
     }
     return null;
 }
@@ -1536,7 +1499,7 @@ function getGrowthTimerLabel(data) {
     if (!data?.plant || !data.plantedAt || isPlantDead(data) || data.stage >= 2) {
         return null;
     }
-    if (data.hasDisease && data.stage === 1 && data._visualShown) {
+    if (data.hasDisease && data.stage === 1) {
         return null;
     }
 
@@ -1547,7 +1510,7 @@ function getGrowthTimerLabel(data) {
 
     if (data.stage === 0) {
         if (!data.lastWateredAt) {
-            return '🌱 Полей, чтобы семечко проросло';
+            return null;
         }
         const msLeft = Math.max(0, getSeedlingMs(plant) - msSincePlanted);
         if (msLeft > 0) {
@@ -1699,6 +1662,7 @@ function openModal(el) { if (el) el.classList.add('active'); }
 function closeModal(el) {
     if (el) el.classList.remove('active');
     if (el === zoomOverlay) stopZoomTimerTick();
+    if (el === modalAchievements) hideAchievementReasonToast();
 }
 
 function closeZoomOverlay() {
@@ -1756,18 +1720,6 @@ function refreshZoomPanelTimers() {
     const data = slotData[slotName];
     if (!data?.plant) return;
 
-    // Проверяем, не пора ли показать болезнь визуально
-    if (data.hasDisease && !isPlantDead(data) && data.diseaseType && data.diseaseStartTime) {
-        const timeSinceDisease = Date.now() - data.diseaseStartTime;
-        if (timeSinceDisease >= DISEASE_VISUAL_DELAY_MS && !data._visualShown) {
-            data._visualShown = true;
-            refreshPlantVisual(slotName);
-            if (data.diseaseType) {
-                showDiseaseAdvice(data.diseaseType);
-            }
-        }
-    }
-
     const prevStage = data.stage;
     if (!isPlantDead(data)) {
         applyGrowthFromTime(slotName);
@@ -1791,6 +1743,16 @@ function startZoomTimerTick() {
 }
 
 const ACHIEVEMENT_REASON_TOAST_MS = 5 * 1000;
+let achievementReasonToastTimer = null;
+
+function hideAchievementReasonToast() {
+    const toast = document.getElementById('achievementToast');
+    if (achievementReasonToastTimer) {
+        clearTimeout(achievementReasonToastTimer);
+        achievementReasonToastTimer = null;
+    }
+    if (toast) toast.classList.remove('show');
+}
 
 function showAchievementReasonToast(achievementId) {
     const config = ACHIEVEMENTS_CONFIG[achievementId];
@@ -1803,11 +1765,14 @@ function showAchievementReasonToast(achievementId) {
     const toastImg = document.getElementById('achievementToastImg');
     if (!toast || !toastImg) return;
 
+    hideAchievementReasonToast();
+
     toastImg.src = config.reasonImage;
     toast.classList.add('show');
 
-    setTimeout(() => {
+    achievementReasonToastTimer = setTimeout(() => {
         toast.classList.remove('show');
+        achievementReasonToastTimer = null;
     }, ACHIEVEMENT_REASON_TOAST_MS);
 }
 
@@ -2213,7 +2178,6 @@ function applyPlantDeath(slotName, data, { notificationCause = null } = {}) {
     data.diseaseType = 'dead';
     data.diseaseSource = 'neglect';
     data.devManualState = false;
-    data._visualShown = true;
 
     showPlantDeathNotification(data, notificationCause);
 
@@ -2398,7 +2362,7 @@ function handleOverwaterEarlyWarning(data, plant, now = Date.now()) {
 
 function getBloomBlockReason(data, plant) {
     if (!data || !plant) return 'растение не готово';
-    if (data.hasDisease && data._visualShown) return 'не может расцвести из-за болезни';
+    if (data.hasDisease) return 'не может расцвести из-за болезни';
     if (hasOverwaterRisk(data, plant)) return 'не может расцвести — слишком частый полив';
     if (!hasRegularWatering(data, plant)) return 'не может расцвести — нужен регулярный полив';
     return null;
@@ -2471,14 +2435,10 @@ function applyPlantDisease(slotName, data, diseaseType, source, { triggerAchieve
     data.diseaseType = diseaseType;
     data.diseaseSource = source;
     data.diseaseStartTime = Date.now();
-    data._visualShown = false;
     recordPlantMistakeCategory(data, source);
     showDiseaseAdvice(diseaseType);
     saveState();
-
-    // Отменяем предыдущий таймер и устанавливаем новый
-    cancelVisualTimer(slotName);
-    scheduleDiseaseVisual(slotName, data);
+    refreshPlantVisual(slotName);
 
     if (triggerAchievement) {
         checkAchievement_negativeEffect();
@@ -2587,7 +2547,7 @@ function getPlantVisualMeta(plant, data) {
     ensurePlantDiseaseAssets(plant, plantId);
     const pot = Number(data.pot) || 1;
 
-    const isDiseaseVisible = data.hasDisease && data._visualShown;
+    const isDiseaseVisible = data.hasDisease;
 
     if (data.disease === '__dead__' || data.diseaseType === 'dead') {
         const visualStateKey = 'dead';
@@ -2720,8 +2680,6 @@ function tryHealUnderwaterOnWater(data) {
     data.diseaseType = null;
     data.diseaseSource = null;
     data.diseaseStartTime = null;
-    data._visualShown = false;
-    cancelVisualTimer(zoomedSlot?.name);
     markHealedPlant();
     return true;
 }
@@ -2749,9 +2707,7 @@ function tryHealOverwaterOnDry(slotName, data, plant) {
     data.diseaseType = null;
     data.diseaseSource = null;
     data.diseaseStartTime = null;
-    data._visualShown = false;
     data.wateringHistory = [];
-    cancelVisualTimer(slotName);
     markHealedPlant();
     refreshPlantVisual(slotName);
     return true;
@@ -2839,22 +2795,18 @@ function checkLocationDisease(slotName) {
                 data.diseaseType = diseaseType;
                 data.diseaseSource = mistakeSource;
                 data.diseaseStartTime = Date.now();
-                data._visualShown = false;
                 saveState();
-                cancelVisualTimer(slotName);
-                scheduleDiseaseVisual(slotName, data);
+                showDiseaseAdvice(diseaseType);
+                refreshPlantVisual(slotName);
             }
         }
     } else if (!diseaseMsg && data.hasDisease && isLocationBasedDisease(plantKey, data.disease) && data.stage >= 1) {
-        cancelVisualTimer(slotName);
-
         const clearedType = data.diseaseType || getDiseaseTypeFromMessage(plantKey, data.disease);
         data.hasDisease = false;
         data.disease = null;
         data.diseaseType = null;
         data.diseaseSource = null;
         data.diseaseStartTime = null;
-        data._visualShown = false;
         saveState();
 
         const isLightRecovery = ['too_light', 'too_dark', 'no_flower'].includes(clearedType);
@@ -3507,7 +3459,7 @@ function renderMoveChoices() {
 
             if (isPlantDead(targetData)) {
                 visualState = 'dead';
-            } else if (targetData.hasDisease && targetData._visualShown && targetData.diseaseType) {
+            } else if (targetData.hasDisease && targetData.diseaseType) {
                 visualState = 'disease';
                 diseaseType = targetData.diseaseType;
             }
@@ -3620,12 +3572,8 @@ function movePlantToEmptySlot(fromSlot, toSlot) {
         showNotification('🪴 Растение перемещено на новое место!', false);
         checkQuestsAfterAction();
 
-        if (zoomedSlot && zoomedSlot.name === fromSlot) {
-            closeModal(zoomOverlay);
-            zoomedSlot = null;
-        } else if (zoomedSlot && zoomedSlot.name === toSlot) {
-            openZoom(toSlotEl, toSlot, slotData[toSlot]);
-        }
+        closeModal(zoomOverlay);
+        zoomedSlot = null;
     }).catch((error) => {
         console.error('Ошибка перемещения на сервере:', error);
         showNotification('❌ Ошибка перемещения', true);
@@ -3683,13 +3631,8 @@ function swapPlants(slotA, slotB) {
             refreshPlantVisual(slotB);
         }
 
-        if (zoomedSlot) {
-            if (zoomedSlot.name === slotA) {
-                openZoom(slotElA, slotA, slotData[slotA]);
-            } else if (zoomedSlot.name === slotB) {
-                openZoom(slotElB, slotB, slotData[slotB]);
-            }
-        }
+        closeModal(zoomOverlay);
+        zoomedSlot = null;
     }).catch((error) => {
         console.error('Ошибка обмена местами:', error);
         showNotification('❌ Ошибка при обмене', true);
@@ -3859,7 +3802,7 @@ function renderSlot(slotEl, data) {
             hint.textContent = data.lastWateredAt ? 'Прорастает...' : 'Полей!';
         } else if (isPlantDead(data)) {
             hint.textContent = PLANT_DEAD_LABEL;
-        } else if (data.hasDisease && data._visualShown) {
+        } else if (data.hasDisease) {
             hint.textContent = PLANT_SICK_LABEL;
         } else if (data.stage === 1) {
             hint.textContent = 'Росток';
@@ -3921,7 +3864,7 @@ function showFixAdvice(data) {
 
     if (isPlantDead(data)) {
         fixBox.style.display = 'none';
-    } else if (data.hasDisease && data._visualShown && data.disease && data.stage >= 1) {
+    } else if (data.hasDisease && data.disease && data.stage >= 1) {
         let advice = '';
         const norm = normalizePlantText(data.disease);
         if (norm.includes('ожог') || norm.includes('пятна') || norm.includes('свет')) {
@@ -4192,6 +4135,7 @@ if (moveBtnLeft) {
 
         moveFromSlot = zoomedSlot.name;
         closeModal(zoomOverlay);
+        zoomedSlot = null;
         renderMoveChoices();
         setTimeout(() => {
             openModal(modalMovePlant);

@@ -280,16 +280,23 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .ctrl-btn-dev {
-    background: #e53935;
-    color: #fff;
-    border: none;
+    background: rgba(229, 57, 53, 0.28);
+    color: rgba(255, 255, 255, 0.85);
+    border: calc(1 / 1280 * 100cqw) solid rgba(229, 57, 53, 0.35);
     border-radius: calc(8 / 1280 * 100cqw);
-    padding: calc(6 / 720 * 100cqh) calc(12 / 1280 * 100cqw);
-    font-weight: bold;
-    font-size: calc(13 / 720 * 100cqh);
+    padding: calc(6 / 720 * 100cqh) calc(8 / 1280 * 100cqw);
+    font-weight: 600;
+    font-size: calc(12 / 720 * 100cqh);
     cursor: pointer;
     flex-shrink: 0;
-    line-height: 1.2;
+    line-height: 1;
+    min-width: calc(28 / 1280 * 100cqw);
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.ctrl-btn-dev:hover {
+    background: rgba(229, 57, 53, 0.45);
+    border-color: rgba(229, 57, 53, 0.55);
 }
 
 .light-ctrl-btn {

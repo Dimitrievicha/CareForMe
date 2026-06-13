@@ -868,13 +868,16 @@ let currentZoomedPlantId = null;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/** Быстрые тайминги для демо-показа (секунды вместо дней). Выключить перед релизом. */
+const DEMO_TIMING = true;
+
 const PLANT_GROWTH_DAYS = {
     1: { seedToSprout: 1, plantToBloom: 7 },
     2: { seedToSprout: 4, plantToBloom: 21 },
     3: { seedToSprout: 2, plantToBloom: 14 }
 };
 
-const GROWTH_TIMING_TEST = false;
+const GROWTH_TIMING_TEST = DEMO_TIMING;
 
 const PLANT_WATER_INTERVALS_DAYS = {
     1: { min: 1, max: 2 },
@@ -882,7 +885,15 @@ const PLANT_WATER_INTERVALS_DAYS = {
     3: { min: 3, max: 4 }
 };
 
-const WATER_TIMING_TEST = false;
+const WATER_TIMING_TEST = DEMO_TIMING;
+
+const DEMO_WATER_MIN_MS = 15 * 1000;
+const DEMO_WATER_MAX_MS = 30 * 1000;
+const DEMO_SEEDLING_MS = 20 * 1000;
+const DEMO_BLOOM_MS = 90 * 1000;
+const DEMO_SICK_DEATH_MS = 45 * 1000;
+const DEMO_LOCATION_CHECK_MS = 10 * 1000;
+const DEMO_GAME_TICK_MS = 10 * 1000;
 
 const OVERWATER_MIN_FAST_POLIVS = 2;
 const OVERWATER_DEATH_MIN_FAST_POLIVS = 3;
@@ -1189,12 +1200,12 @@ function plantGrowthDays(plant) {
 }
 
 function getSeedlingMs(plant) {
-    if (GROWTH_TIMING_TEST) return TEST_SEEDLING_MS;
+    if (GROWTH_TIMING_TEST) return DEMO_SEEDLING_MS;
     return plantGrowthDays(plant).seedToSprout * DAY_MS;
 }
 
 function getBloomMs(plant) {
-    if (GROWTH_TIMING_TEST) return TEST_BLOOM_MS;
+    if (GROWTH_TIMING_TEST) return DEMO_BLOOM_MS;
     return plantGrowthDays(plant).plantToBloom * DAY_MS;
 }
 
@@ -1204,7 +1215,7 @@ function plantSickUntilDeathDays(plant) {
 }
 
 function getSickUntilDeathMs(plant) {
-    if (WATER_TIMING_TEST) return 45 * 1000;
+    if (WATER_TIMING_TEST) return DEMO_SICK_DEATH_MS;
     return plantSickUntilDeathDays(plant) * DAY_MS;
 }
 
@@ -1576,9 +1587,6 @@ const plantDescFeaturesSection = document.getElementById('plantDescFeaturesSecti
 const plantDescAdvice = document.getElementById('plantDescAdvice');
 const plantDescAdviceSection = document.getElementById('plantDescAdviceSection');
 const plantDescNeedsSection = document.getElementById('plantDescNeedsSection');
-const devStatePanel = document.getElementById('devStatePanel');
-const devStateSelect = document.getElementById('devStateSelect');
-const devApplyStateBtn = document.getElementById('devApplyState');
 
 const NOTIFICATION_DURATION_MS = 10 * 1000;
 let notificationIdSeq = 0;
@@ -1625,6 +1633,9 @@ function formatDaysRu(n) {
 }
 
 function getSeedlingWaitLabel(plant) {
+    if (GROWTH_TIMING_TEST) {
+        return formatWaitDuration(DEMO_SEEDLING_MS);
+    }
     return formatDaysRu(plantGrowthDays(plant).seedToSprout);
 }
 
@@ -1667,7 +1678,6 @@ function closeModal(el) {
 
 function closeZoomOverlay() {
     closeModal(zoomOverlay);
-    if (devStatePanel) devStatePanel.style.display = 'none';
 }
 
 function getWheelScrollDelta(e, scrollEl) {
@@ -2269,13 +2279,13 @@ function plantWaterIntervalDays(plant) {
 }
 
 function getWaterMinMs(plant) {
-    if (WATER_TIMING_TEST) return TEST_WATER_MIN_MS;
+    if (WATER_TIMING_TEST) return DEMO_WATER_MIN_MS;
     const { min } = plantWaterIntervalDays(plant);
     return min * DAY_MS;
 }
 
 function getWaterMaxMs(plant) {
-    if (WATER_TIMING_TEST) return TEST_WATER_MAX_MS;
+    if (WATER_TIMING_TEST) return DEMO_WATER_MAX_MS;
     const { max } = plantWaterIntervalDays(plant);
     return max * DAY_MS;
 }
@@ -2825,11 +2835,11 @@ function scheduleLocationCheck(slotName) {
         if (slotData[slotName]?.pot) {
             scheduleLocationCheck(slotName);
         }
-    }, 30000);
+    }, DEMO_TIMING ? DEMO_LOCATION_CHECK_MS : 30000);
 }
 
 function scheduleOverwateringCheck() {
-    const tickMs = WATER_TIMING_TEST ? 10 * 1000 : 60 * 1000;
+    const tickMs = DEMO_TIMING ? DEMO_GAME_TICK_MS : 60 * 1000;
     setInterval(() => {
         syncGameTick().catch(console.error);
     }, tickMs);
@@ -3911,88 +3921,9 @@ function showDescription(plantKey) {
     if (descriptionBox) descriptionBox.style.display = 'block';
 }
 
-function populateDevPanel(plant) {
-    const sel = devStateSelect;
-    if (!sel) return;
-
-    const currentVal = sel.value;
-    const plantKey = resolveSpeciesId(plant?.id, plant);
-
-    Array.from(sel.options).filter(o => !['sprout', 'healthy', 'dead'].includes(o.value))
-        .forEach(o => sel.removeChild(o));
-
-    const deadOption = Array.from(sel.options).find(o => o.value === 'dead');
-    const diseases = PLANT_DISEASES[plantKey];
-    const typeMap = PLANT_DISEASE_TO_IMAGE_KEY[plantKey];
-
-    if (diseases && typeMap) {
-        for (const [type, imageKey] of Object.entries(typeMap)) {
-            const msg = diseases[type];
-            if (!msg) continue;
-            const opt = document.createElement('option');
-            opt.value = `disease:${type}`;
-            opt.textContent = `🤒 ${msg.replace(/^[^\s]+\s/, '').slice(0, 42)}`;
-            if (deadOption) sel.insertBefore(opt, deadOption);
-            else sel.appendChild(opt);
-        }
-    }
-
-    if (Array.from(sel.options).some(o => o.value === currentVal)) sel.value = currentVal;
-    else sel.value = 'healthy';
-}
-
-async function applyDevPlantState(slotName, state) {
-    const data = slotData[slotName];
-    if (!data?.plant) return false;
-
-    const plant = PLANTS[data.plant];
-    const plantKey = resolveSpeciesId(data.plant, plant);
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/game/dev/apply_state`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            credentials: 'include',
-            body: JSON.stringify({
-                slotName: slotName,
-                state: state
-            })
-        });
-
-        const result = await response.json();
-
-        if (result.success && result.slotData) {
-            Object.assign(slotData[slotName], result.slotData);
-            if (slotData[slotName].hasDisease && !slotData[slotName]._visualShown) {
-                cancelVisualTimer(slotName);
-                scheduleDiseaseVisual(slotName, slotData[slotName]);
-            }
-
-            const slotEl = document.querySelector(`[data-slot="${slotName}"]`);
-            if (slotEl) renderSlot(slotEl, slotData[slotName]);
-
-            if (zoomedSlot?.name === slotName) {
-                openZoom(slotEl, slotName, slotData[slotName]);
-            }
-
-            saveState();
-            showNotification(`🔧 DEV: Состояние изменено на ${state}`, false);
-            return true;
-        } else {
-            showNotification('DEV: Ошибка применения состояния', true);
-            return false;
-        }
-    } catch (error) {
-        console.error('DEV ошибка:', error);
-        showNotification('DEV: Ошибка соединения', true);
-        return false;
-    }
-}
-
 function openZoom(slotEl, name, data) {
     zoomedSlot = { slotEl, name };
     currentZoomedPlantId = name;
-    if (devStatePanel) devStatePanel.style.display = 'block';
     resetZoomButtonDisabledState();
 
     const zoomPotImg = document.getElementById('zoomPotImg');
@@ -4014,7 +3945,6 @@ function openZoom(slotEl, name, data) {
 
     if (hasPlant) {
         const plant = PLANTS[data.plant];
-        populateDevPanel(plant);
 
         if (plantImg) {
             updateZoomPlantVisual(data);
@@ -4567,22 +4497,6 @@ if (devBtn) {
     const newDevBtn = devBtn.cloneNode(true);
     devBtn.parentNode.replaceChild(newDevBtn, devBtn);
     newDevBtn.addEventListener('click', stepDevLevel);
-}
-
-if (devApplyStateBtn) {
-    devApplyStateBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!zoomedSlot) {
-            alert('Сначала открой слот (кликни на горшок)');
-            return;
-        }
-        const name = zoomedSlot.name;
-        const state = devStateSelect?.value;
-        if (!state) return;
-
-        await applyDevPlantState(name, state);
-    });
 }
 
 (async function init() {

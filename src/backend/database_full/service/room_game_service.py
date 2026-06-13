@@ -21,6 +21,14 @@ from ..repository.user_repository import UserRepository
 class RoomGameService:
     DAY_MS = 24 * 60 * 60 * 1000
 
+    # Быстрые тайминги для демо-показа. Выключить перед релизом.
+    DEMO_TIMING = True
+    DEMO_WATER_MIN_MS = 15 * 1000
+    DEMO_WATER_MAX_MS = 30 * 1000
+    DEMO_SEEDLING_MS = 20 * 1000
+    DEMO_BLOOM_MS = 90 * 1000
+    DEMO_SICK_UNTIL_DEATH_MS = 45 * 1000
+
     OVERWATER_MIN_FAST_POLIVS = 2
     OVERWATER_DEATH_MIN_FAST_POLIVS = 3
 
@@ -141,20 +149,30 @@ class RoomGameService:
         }
 
     def _get_water_min_ms(self, species_id: int) -> int:
+        if self.DEMO_TIMING:
+            return self.DEMO_WATER_MIN_MS
         return self._species_intervals(species_id)["min"] * self.DAY_MS
 
     def _get_water_max_ms(self, species_id: int) -> int:
+        if self.DEMO_TIMING:
+            return self.DEMO_WATER_MAX_MS
         return self._species_intervals(species_id)["max"] * self.DAY_MS
 
     def _get_seedling_ms(self, species_id: int) -> int:
+        if self.DEMO_TIMING:
+            return self.DEMO_SEEDLING_MS
         growth = self.PLANT_GROWTH_DAYS.get(species_id, self.PLANT_GROWTH_DAYS[1])
         return growth["seedToSprout"] * self.DAY_MS
 
     def _get_bloom_ms(self, species_id: int) -> int:
+        if self.DEMO_TIMING:
+            return self.DEMO_BLOOM_MS
         growth = self.PLANT_GROWTH_DAYS.get(species_id, self.PLANT_GROWTH_DAYS[1])
         return growth["plantToBloom"] * self.DAY_MS
 
     def _get_sick_until_death_ms(self, species_id: int) -> int:
+        if self.DEMO_TIMING:
+            return self.DEMO_SICK_UNTIL_DEATH_MS
         days = self.PLANT_SICK_UNTIL_DEATH_DAYS.get(species_id, self.PLANT_SICK_UNTIL_DEATH_DAYS[1])
         return days * self.DAY_MS
 

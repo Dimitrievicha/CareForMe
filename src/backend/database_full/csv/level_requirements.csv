@@ -1,6 +1,6 @@
 level,quest1_type,quest1_target,quest1_description,quest2_type,quest2_target,quest2_description,quest3_type,quest3_target,quest3_description,reward_type,reward_value,reward_description
-1,plant_first,1,Посадить первое растение,water_count,1,Полить растение 1 раз,read_tip,1,Прочитать 1 совет,new_pot,design_pot_1,1 новый дизайнерский горшок
-2,grow_to_stage_2,1,Вырастить цветок до 2-й стадии роста,daily_login_streak,3,Заходить в игру 3 дня подряд,heal_plant,1,Вылечить растение от болезни,new_plant_slot,unlock_slot,возможность выбрать новый цветок для выращивания
-3,grow_different_species,2,Вырастить 2 разных растения до зрелости,water_count,3,Полить растения 3 раза,daily_login_streak,5,Заходить в игру 5 дней подряд,new_watering_can,design_can_1,1 новый дизайн лейки для цветов
-4,no_mistakes_streak,7,Не допускать критических ошибок 7 дней подряд,daily_login_streak,10,Заходить в игру 10 дней подряд,,,,"new_plant_slot",unlock_slot_3,возможность начать выращивать 3 цветок
-5,grow_all_species,3,Вырастить все 3 вида цветов до зрелости,get_achievements_count,5,Получить 5 разных ачивок,,,,"achievement",Страж флоры,Ачивка "Страж флоры" + новый дизайн горшка
+1,plant_first,1,Посадить первое растение,water_once,1,Полить растение 1 раз,read_tip,1,Прочитать описание цветка,new_pot,2,Горшок «С рисунком»
+2,grow_stage2,1,Вырастить цветок до 2-й стадии роста,login_3days,3,Заходить в игру 3 дня подряд,heal_plant,1,Вылечить растение от болезни,new_plant,3,Возможность посадить Кактус
+3,grow_2species,2,Вырастить 2 разных растения до зрелости,water_3times,3,Полить растения 3 раза,login_5days,5,Заходить в игру 5 дней подряд,new_can,2,Розовая лейка
+4,no_mistakes_7days,7,Не допускать критических ошибок 7 дней подряд,login_10days,10,Заходить в игру 10 дней подряд,,,,"new_slot",,Новый слот для растения
+5,grow_all_species,3,Вырастить все 3 вида цветов до зрелости,get_achievements,3,Получить 3 разные ачивки,,,,"achievement",Страж флоры,Ачивка «Страж флоры» + Большой горшок

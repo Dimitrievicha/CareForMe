@@ -467,5 +467,10 @@ class UserService:
         return self.user_repo.update_plant_slots(user_id, 1)
 
 
+    def update_level(self, user_id: str, new_level: int) -> bool:
+        """Обновить уровень пользователя."""
+        return self.user_repo.update_level(user_id, new_level)
+
+
 # Глобальный экземпляр для удобства
 user_service = UserService()

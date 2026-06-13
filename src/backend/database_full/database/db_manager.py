@@ -47,11 +47,13 @@ class DatabaseManager:
             Объект соединения SQLite
         """
         if self._connection is None:
-            self._connection = sqlite3.connect(self.db_path, check_same_thread=False)
+            self._connection = sqlite3.connect(self.db_path, check_same_thread=False, isolation_level=None)
             # Преобразуем строки в словари для удобства
             self._connection.row_factory = sqlite3.Row
             # Включаем поддержку FOREIGN KEY
             self._connection.execute("PRAGMA foreign_keys = ON")
+            # Включаем автоматический commit (autocommit mode)
+            self._connection.isolation_level = None
             logger.info(f"Подключение к БД установлено: {self.db_path}")
         return self._connection
 
@@ -75,7 +77,7 @@ class DatabaseManager:
             params: Кортеж параметров для подстановки
 
         Returns:
-            Список словарей с результатами или None при ошибке
+            Список словарей с результатами или [] при ошибке
 
         """
         try:
@@ -89,7 +91,7 @@ class DatabaseManager:
             logger.error(f"Ошибка выполнения запроса: {e}")
             logger.error(f"Запрос: {query}")
             logger.error(f"Параметры: {params}")
-            return None
+            return []
 
     def execute_update(self, query: str, params: tuple = ()) -> bool:
         """
@@ -107,15 +109,13 @@ class DatabaseManager:
             conn = self.connect()
             cursor = conn.cursor()
             cursor.execute(query, params)
-            conn.commit()
+            # commit происходит автоматически благодаря isolation_level=None
             logger.debug(f"Запрос выполнен успешно: {query[:50]}...")
             return True
         except Exception as e:
             logger.error(f"Ошибка выполнения обновления: {e}")
             logger.error(f"Запрос: {query}")
             logger.error(f"Параметры: {params}")
-            if self._connection:
-                self._connection.rollback()
             return False
 
     def execute_many(self, query: str, params_list: List[tuple]) -> bool:
@@ -133,13 +133,11 @@ class DatabaseManager:
             conn = self.connect()
             cursor = conn.cursor()
             cursor.executemany(query, params_list)
-            conn.commit()
+            # commit происходит автоматически
             logger.debug(f"Массовая вставка: {len(params_list)} записей")
             return True
         except Exception as e:
             logger.error(f"Ошибка массовой вставки: {e}")
-            if self._connection:
-                self._connection.rollback()
             return False
 
     def get_last_insert_id(self) -> int:
@@ -175,15 +173,13 @@ class DatabaseManager:
 
             conn = self.connect()
             conn.executescript(sql_script)
-            conn.commit()
+            # commit происходит автоматически
 
             logger.info(f"БД успешно инициализирована из {sql_file_path}")
             return True
 
         except Exception as e:
             logger.error(f"Ошибка инициализации БД: {e}")
-            if self._connection:
-                self._connection.rollback()
             return False
 
     def table_exists(self, table_name: str) -> bool:
@@ -194,12 +190,26 @@ class DatabaseManager:
             table_name: Имя таблицы для проверки
 
         Returns:
-            True если таблица существует, иначе Falseт")
+            True если таблица существует, иначе False
         """
         query = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
         result = self.execute_query(query, (table_name,))
         return len(result) > 0 if result else False
 
+    def begin_transaction(self):
+        """Начинает транзакцию вручную (если нужно)."""
+        conn = self.connect()
+        conn.execute("BEGIN")
+
+    def commit(self):
+        """Фиксирует текущую транзакцию."""
+        if self._connection:
+            self._connection.commit()
+
+    def rollback(self):
+        """Откатывает текущую транзакцию."""
+        if self._connection:
+            self._connection.rollback()
 
 
 _db_manager = None

@@ -972,7 +972,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 }
 
 .zoom-pot-container .watering-anim[data-can="1"] .watering-can-img {
-    top: calc(-155 / 500 * 100cqh);
+    top: calc(-125 / 500 * 100cqh);
     left: 100%;
     width: calc(195 / 1000 * 100cqw);
     max-width: 93%;

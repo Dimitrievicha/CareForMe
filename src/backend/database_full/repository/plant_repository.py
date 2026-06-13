@@ -329,20 +329,15 @@ class PlantRepository(BaseRepository):
     def get_plants_by_stage(self, user_id: str, stage: str) -> List[Dict[str, Any]]:
         """
         Получает растения пользователя на определенной стадии роста.
-
-        Args:
-            user_id: ID пользователя
-            stage: Стадия (seed, seedling, growing, mature, flowering)
-
-        Returns:
-            Список растений на указанной стадии
+        Всегда возвращает список (даже если результат None).
         """
-        return self.db.execute_query("""
+        result = self.db.execute_query("""
             SELECT up.*, pt.species_name
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.user_id = ? AND up.growth_stage = ? AND up.is_alive = 1
         """, (user_id, stage))
+        return result if result else []
 
     def update_light_level(self, plant_id: str, light_level: str) -> bool:
         """Обновить уровень освещения растения."""

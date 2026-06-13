@@ -48,6 +48,15 @@ class UserRepository(BaseRepository):
         """
         return self.get_by_id("users", "id", user_id)
 
+    def update_level(self, user_id: str, new_level: int) -> bool:
+        """Обновляет уровень пользователя в профиле."""
+        return self.db.execute_update("""
+            UPDATE player_profiles 
+            SET current_level = ? 
+            WHERE user_id = ?
+        """, (new_level, user_id))
+
+
     def get_user_by_username(self, username: str) -> Optional[Dict[str, Any]]:
         """
         Получает пользователя по имени.

@@ -31,10 +31,13 @@ class GameRepository(BaseRepository):
             WHERE user_id = ?
         """, (user_id,))
 
-        if result and len(result) > 0:
-            return {
-                'slotData': json.loads(result[0]['slot_data']) if result[0]['slot_data'] else {},
-                'currentLevel': result[0]['current_level'],
-                'achievements': json.loads(result[0]['achievements']) if result[0]['achievements'] else {}
+        if not result:
+            return None
+        row = result[0]
+        
+        return {
+                'slotData': json.loads(row['slot_data']) if row['slot_data'] else {},
+                'currentLevel': row['current_level'],
+                'achievements': json.loads(row['achievements']) if row['achievements'] else {}
             }
-        return None
+    

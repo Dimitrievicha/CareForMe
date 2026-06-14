@@ -117,27 +117,6 @@ class MistakeRepository(BaseRepository):
             UPDATE user_mistakes SET was_advice_shown = 1 WHERE id = ?
         """, (mistake_id,))
 
-    def get_mistakes_by_type(self, user_id: str) -> Dict[str, int]:
-        """
-        Получает статистику ошибок по типам.
-
-        Args:
-            user_id: ID пользователя
-
-        Returns:
-            Словарь {тип_ошибки: количество}
-        """
-        result = self.db.execute_query("""
-            SELECT mistake_type, COUNT(*) as count
-            FROM user_mistakes 
-            WHERE user_id = ?
-            GROUP BY mistake_type
-        """, (user_id,))
-
-        stats = {'overwater': 0, 'drought': 0, 'light': 0, 'cold': 0}
-        for row in result:
-            stats[row['mistake_type']] = row['count']
-        return stats
 
     def get_today_mistakes(self, user_id: str) -> int:
         """

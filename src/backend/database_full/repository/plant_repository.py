@@ -7,7 +7,7 @@
 """
 
 from typing import Optional, List, Dict, Any
-from datetime import date, datetime
+from datetime import date
 from .base_repository import BaseRepository
 
 
@@ -64,7 +64,7 @@ class PlantRepository(BaseRepository):
         return self.get_by_id("plant_templates", "id", template_id)
 
     def create_user_plant(self, plant_id: str, user_id: str,
-                          template_id: str, custom_name: str) -> bool:
+                          template_id: str, custom_name: str,) -> bool:
         """
         Создает новое растение пользователя (посадка).
 
@@ -77,14 +77,15 @@ class PlantRepository(BaseRepository):
         Returns:
             True при успехе
         """
+        today = date.today().isoformat()
         return self.insert("user_plants", {
             "id": plant_id,
             "user_id": user_id,
             "template_id": template_id,
             "custom_name": custom_name,
             "growth_stage": "seed",
-            "last_watered": date.today().isoformat(),
-            "last_checked": date.today().isoformat()
+            "last_watered": today,
+            "last_checked": today,
         })
 
     def get_user_plants(self, user_id: str, only_alive: bool = True) -> List[Dict[str, Any]]:
@@ -119,7 +120,7 @@ class PlantRepository(BaseRepository):
                    pt.species_name, 
                    pt.water_interval_min, 
                    pt.water_interval_max, 
-                   pt.light_requirement,
+                   pt.light_requirement
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.user_id = ? {alive_filter}
@@ -141,7 +142,7 @@ class PlantRepository(BaseRepository):
                    pt.species_name, 
                    pt.water_interval_min, 
                    pt.water_interval_max, 
-                   pt.light_requirement,
+                   pt.light_requirement
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.id = ?
@@ -207,7 +208,7 @@ class PlantRepository(BaseRepository):
         """
         return self.update("user_plants", "id", plant_id, {
             "growth_stage": growth_stage,
-            "growth_progress": growth_progress
+            "growth_progress": growth_progress,
         })
 
     def increment_growth_progress(self, plant_id: str, increment: float) -> bool:
@@ -308,36 +309,35 @@ class PlantRepository(BaseRepository):
             WHERE id = ?
         """, (plant_id,))
 
-    def get_dead_plants(self, user_id: str) -> List[Dict[str, Any]]:
-        """
-        Получает мертвые растения пользователя.
+    # def get_dead_plants(self, user_id: str) -> List[Dict[str, Any]]:
+    #     """
+    #     Получает мертвые растения пользователя.
 
-        Args:
-            user_id: ID пользователя
+    #     Args:
+    #         user_id: ID пользователя
 
-        Returns:
-            Список мертвых растений с причиной смерти, отсортированные по дате смерти
-        """
-        return self.db.execute_query("""
-            SELECT up.*, pt.species_name, up.death_cause
-            FROM user_plants up
-            JOIN plant_templates pt ON up.template_id = pt.id
-            WHERE up.user_id = ? AND up.is_alive = 0
-            ORDER BY up.death_date DESC
-        """, (user_id,))
+    #     Returns:
+    #         Список мертвых растений с причиной смерти, отсортированные по дате смерти
+    #     """
+    #     return self.db.execute_query("""
+    #         SELECT up.*, pt.species_name, up.death_cause
+    #         FROM user_plants up
+    #         JOIN plant_templates pt ON up.template_id = pt.id
+    #         WHERE up.user_id = ? AND up.is_alive = 0
+    #         ORDER BY up.death_date DESC
+    #     """, (user_id,))
 
     def get_plants_by_stage(self, user_id: str, stage: str) -> List[Dict[str, Any]]:
         """
         Получает растения пользователя на определенной стадии роста.
         Всегда возвращает список (даже если результат None).
         """
-        result = self.db.execute_query("""
+        return self.db.execute_query("""
             SELECT up.*, pt.species_name
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
             WHERE up.user_id = ? AND up.growth_stage = ? AND up.is_alive = 1
         """, (user_id, stage))
-        return result if result else []
 
     def update_light_level(self, plant_id: str, light_level: str) -> bool:
         """Обновить уровень освещения растения."""
@@ -353,36 +353,36 @@ class PlantRepository(BaseRepository):
             (location, plant_id)
         )
 
-    def get_plants_by_species(self, user_id: str, species_id: int) -> List[Dict[str, Any]]:
-        """
-        Получает растения пользователя по виду.
+    # def get_plants_by_species(self, user_id: str, species_id: int) -> List[Dict[str, Any]]:
+    #     """
+    #     Получает растения пользователя по виду.
 
-        Args:
-            user_id: ID пользователя
-            species_id: ID вида растения
+    #     Args:
+    #         user_id: ID пользователя
+    #         species_id: ID вида растения
 
-        Returns:
-            Список растений указанного вида
-        """
-        return self.db.execute_query("""
-            SELECT up.*, pt.species_name
-            FROM user_plants up
-            JOIN plant_templates pt ON up.template_id = pt.id
-            WHERE up.user_id = ? AND pt.species_id = ? AND up.is_alive = 1
-        """, (user_id, species_id))
+    #     Returns:
+    #         Список растений указанного вида
+    #     """
+    #     return self.db.execute_query("""
+    #         SELECT up.*, pt.species_name
+    #         FROM user_plants up
+    #         JOIN plant_templates pt ON up.template_id = pt.id
+    #         WHERE up.user_id = ? AND pt.species_id = ? AND up.is_alive = 1
+    #     """, (user_id, species_id))
 
-    def count_user_plants(self, user_id: str, only_alive: bool = True) -> int:
-        """
-        Подсчитывает количество растений пользователя.
+    # def count_user_plants(self, user_id: str, only_alive: bool = True) -> int:
+    #     """
+    #     Подсчитывает количество растений пользователя.
 
-        Args:
-            user_id: ID пользователя
-            only_alive: Считать только живые растения
+    #     Args:
+    #         user_id: ID пользователя
+    #         only_alive: Считать только живые растения
 
-        Returns:
-            Количество растений
-        """
-        alive_filter = "is_alive = 1" if only_alive else ""
-        return self.count("user_plants",
-                          f"user_id = ? AND {alive_filter}" if only_alive else "user_id = ?",
-                          (user_id,))
+    #     Returns:
+    #         Количество растений
+    #     """
+    #     alive_filter = "is_alive = 1" if only_alive else ""
+    #     return self.count("user_plants",
+    #                       f"user_id = ? AND {alive_filter}" if only_alive else "user_id = ?",
+    #                       (user_id,))

@@ -6,7 +6,7 @@
 
 """
 
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Optional, List, Dict, Any
 from ..database.db_manager import get_db_manager
 
 
@@ -21,7 +21,7 @@ class BaseRepository:
         db (DatabaseManager): Менеджер подключения к БД
     """
 
-    def __init__(self, db_path: str = None):
+    def __init__(self):
         """
         Инициализирует репозиторий с подключением к БД.
 
@@ -29,9 +29,7 @@ class BaseRepository:
             db_path: Путь к файлу БД. Если не указан — используется синглтон,
                      который уже должен быть инициализирован в app.py.
         """
-        # Не передаём None в get_db_manager — синглтон уже создан в app.py.
-        # Если db_path передан явно, он будет учтён только при первом вызове.
-        self.db = get_db_manager(db_path or 'careforme.db')
+        self.db = get_db_manager()
 
     def get_by_id(self, table_name: str, id_column: str, id_value: str) -> Optional[Dict[str, Any]]:
         """
@@ -54,28 +52,6 @@ class BaseRepository:
             (id_value,)
         )
         return result[0] if result else None
-
-    def get_all(self, table_name: str, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
-        """
-        Получает все записи из таблицы с пагинацией.
-
-        Args:
-            table_name: Имя таблицы
-            limit: Максимальное количество записей (по умолчанию 100)
-            offset: Смещение - сколько записей пропустить
-
-        Returns:
-            Список словарей с записями, пустой список если ничего нет
-            
-        Пример:
-            >>> all_users = repo.get_all("users", limit=50, offset=0)
-            >>> for user in all_users:
-            ...     print(user['username'])
-        """
-        return self.db.execute_query(
-            f"SELECT * FROM {table_name} LIMIT ? OFFSET ?",
-            (limit, offset)
-        )
 
     def get_by_field(self, table_name: str, field: str, value: Any) -> List[Dict[str, Any]]:
         """
@@ -116,7 +92,7 @@ class BaseRepository:
         results = self.get_by_field(table_name, field, value)
         return results[0] if results else None
 
-    def insert(self, table_name: str, data: Dict[str, Any]) -> bool:
+    def insert(self, table: str, data: Dict[str, Any]) -> bool:
         """
         Вставляет новую запись в таблицу.
 
@@ -136,10 +112,12 @@ class BaseRepository:
         """
         columns = ", ".join(data.keys())
         placeholders = ", ".join(["?"] * len(data))
-        query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-        return self.db.execute_update(query, tuple(data.values()))
+        return self.db.execute_update(
+            f"INSERT INTO {table} ({columns}) VALUES ({placeholders})",
+            tuple(data.values())
+        )
 
-    def update(self, table_name: str, id_column: str, id_value: str, data: Dict[str, Any]) -> bool:
+    def update(self, table: str, id_column: str, id_value: str, data: Dict[str, Any]) -> bool:
         """
         Обновляет запись по ID.
 
@@ -155,29 +133,14 @@ class BaseRepository:
         Пример:
             >>> repo.update("users", "id", user_id, {"login_count": 5})
         """
-        set_clause = ", ".join([f"{k} = ?" for k in data.keys()])
+        set_clause = ", ".join(f"{k} = ?" for k in data.keys())
         values = list(data.values()) + [id_value]
-        query = f"UPDATE {table_name} SET {set_clause} WHERE {id_column} = ?"
-        return self.db.execute_update(query, tuple(values))
-
-    def delete_by_id(self, table_name: str, id_column: str, id_value: str) -> bool:
-        """
-        Удаляет запись из таблицы по ID.
-
-        Args:
-            table_name: Имя таблицы
-            id_column: Название колонки с ID
-            id_value: Значение ID
-
-        Returns:
-            True если удаление успешно, иначе False
-        """
         return self.db.execute_update(
-            f"DELETE FROM {table_name} WHERE {id_column} = ?",
-            (id_value,)
+            f"UPDATE {table} SET {set_clause} WHERE {id_column} = ?",
+            tuple(values)
         )
 
-    def count(self, table_name: str, where_clause: str = "", params: tuple = ()) -> int:
+    def count(self, table: str, where_clause: str = "", params: tuple = ()) -> int:
         """
         Подсчитывает количество записей в таблице.
 
@@ -192,7 +155,7 @@ class BaseRepository:
         Пример:
             >>> alive_count = repo.count("user_plants", "user_id = ? AND is_alive = 1", (user_id,))
         """
-        query = f"SELECT COUNT(*) as count FROM {table_name}"
+        query = f"SELECT COUNT(*) as count FROM {table}"
         if where_clause:
             query += f" WHERE {where_clause}"
         result = self.db.execute_query(query, params)
@@ -212,21 +175,3 @@ class BaseRepository:
         """
         return self.count(table_name, where_clause, params) > 0
     
-    def execute_custom(self, query: str, params: tuple = ()) -> List[Dict[str, Any]]:
-        """
-        Выполняет произвольный SELECT запрос.
-        
-        Args:
-            query: SQL запрос (SELECT)
-            params: Параметры для подстановки
-            
-        Returns:
-            Список словарей с результатами
-            
-        Пример:
-            >>> result = repo.execute_custom(
-            ...     "SELECT * FROM user_plants WHERE user_id = ? AND is_alive = 1",
-            ...     (user_id,)
-            ... )
-        """
-        return self.db.execute_query(query, params)

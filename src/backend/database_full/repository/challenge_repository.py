@@ -51,17 +51,6 @@ class ChallengeRepository(BaseRepository):
             ORDER BY sort_order
         """)
 
-    def get_achievement_by_id(self, achievement_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Получает достижение по ID.
-
-        Args:
-            achievement_id: UUID достижения
-
-        Returns:
-            Данные достижения или None
-        """
-        return self.get_by_id("achievements", "id", achievement_id)
 
     def get_achievement_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """

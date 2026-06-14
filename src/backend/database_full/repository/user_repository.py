@@ -50,11 +50,9 @@ class UserRepository(BaseRepository):
 
     def update_level(self, user_id: str, new_level: int) -> bool:
         """Обновляет уровень пользователя в профиле."""
-        return self.db.execute_update("""
-            UPDATE player_profiles 
-            SET current_level = ? 
-            WHERE user_id = ?
-        """, (new_level, user_id))
+        return self.update("player_profiles", "user_id", user_id, {
+            "current_level": new_level
+        })
 
 
     def get_user_by_username(self, username: str) -> Optional[Dict[str, Any]]:
@@ -168,27 +166,6 @@ class UserRepository(BaseRepository):
         return self.db.execute_update(
             "UPDATE sessions SET is_revoked = 1 WHERE token = ?",
             (token,)
-        )
-
-    def revoke_all_user_sessions(self, user_id: str, keep_token: str = None) -> bool:
-        """
-        Отзывает все сессии пользователя (выход со всех устройств).
-
-        Args:
-            user_id: ID пользователя
-            keep_token: Токен, который нужно сохранить (опционально)
-
-        Returns:
-            True при успехе
-        """
-        if keep_token:
-            return self.db.execute_update("""
-                UPDATE sessions SET is_revoked = 1 
-                WHERE user_id = ? AND token != ?
-            """, (user_id, keep_token))
-        return self.db.execute_update(
-            "UPDATE sessions SET is_revoked = 1 WHERE user_id = ?",
-            (user_id,)
         )
 
     # ============================================================

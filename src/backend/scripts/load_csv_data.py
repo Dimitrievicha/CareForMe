@@ -1,42 +1,46 @@
 #!/usr/bin/env python3
 """
-Скрипт загрузки данных из CSV файлов
+Скрипт загрузки данных из CSV файлов в базу данных.
+Запускать из любой директории: py scripts/load_csv_data.py
 """
 
 import sys
 from pathlib import Path
 
-# Добавляем корневую директорию backend в путь поиска модулей
-# Определяем путь к папке backend (родительская для scripts)
-backend_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(backend_dir))
+_BACKEND_DIR = Path(__file__).parent.parent
+_DB_PATH     = _BACKEND_DIR / 'careforme.db'
+_SQL_PATH    = _BACKEND_DIR / 'database_full' / 'database' / 'init_db.sql'
+
+sys.path.insert(0, str(_BACKEND_DIR))
 
 from database_full.database.db_manager import get_db_manager
 from database_full.database.raw_sql_loader import (
-        load_plants_from_csv_raw,
-        load_achievements_from_csv_raw,
-        load_tips_from_csv_raw,
-        load_level_requirements_from_csv_raw,
-    )
+    load_plants_from_csv_raw,
+    load_achievements_from_csv_raw,
+    load_tips_from_csv_raw,
+    load_level_requirements_from_csv_raw,
+)
 
-DB_PATH = str(backend_dir / 'careforme.db')
 
 def load_csv_data() -> bool:
-    """Загружает все данные из CSV файлов. Возвращает True при успехе."""
+    """Инициализирует схему БД и загружает все данные из CSV. Возвращает True при успехе."""
+    db = get_db_manager(str(_DB_PATH))
 
-    db = get_db_manager(DB_PATH)
+    if not _SQL_PATH.exists():
+        print(f" SQL файл не найден: {_SQL_PATH}")
+        return False
 
-    # Проверяем, есть ли уже данные
+    with open(_SQL_PATH, encoding='utf-8') as f:
+        db.connect().executescript(f.read())
+
+    # Если данные уже загружены — пропускаем
     result = db.execute_query("SELECT COUNT(*) as count FROM plant_templates")
-
     if result and result[0]['count'] > 0:
         return True
 
-    # Путь к CSV файлам (папка csv в корне backend)
-    csv_dir = backend_dir / 'database_full' / 'csv'
-
+    csv_dir = _BACKEND_DIR / 'database_full' / 'csv'
     if not csv_dir.exists():
-        csv_dir.mkdir(parents=True, exist_ok=True)
+        print(f" Директория CSV не найдена: {csv_dir}")
         return False
 
 
@@ -46,7 +50,7 @@ def load_csv_data() -> bool:
         'tips.csv': ('Советов',load_tips_from_csv_raw),
         'level_requirements.csv': ('Заданий уровней',load_level_requirements_from_csv_raw),
     }
-    
+
     for filename, (label, loader) in files.items():
         path = csv_dir / filename
         if path.exists():
@@ -54,21 +58,22 @@ def load_csv_data() -> bool:
         else:
             print(f"Файл не найден: {path}")
 
-
+    # Итоговая статистика
     stats = db.execute_query("""
-        SELECT 
-            (SELECT COUNT(*) FROM plant_templates) as plants,
-            (SELECT COUNT(*) FROM achievements) as achievements,
-            (SELECT COUNT(*) FROM tips) as tips,
-            (SELECT COUNT(*) FROM level_requirements) as levels
-    """)
+        SELECT
+            (SELECT COUNT(*) FROM plant_templates) AS plants,
+            (SELECT COUNT(*) FROM achievements) AS achievements,
+            (SELECT COUNT(*) FROM tips) AS tips,
+            (SELECT COUNT(*) FROM level_requirements) AS levels
+        """)
 
     if stats:
         s = stats[0]
-        print(f"  🌱 Растений: {stats[0]['plants']}")
-        print(f"  🏆 Достижений: {stats[0]['achievements']}")
-        print(f"  💡 Советов: {stats[0]['tips']}")
-        print(f"  📋 Заданий уровней: {stats[0]['levels']}")
+        print(f"\n Результат загрузки:")
+        print(f"  🌱 Растений:         {s['plants']}")
+        print(f"  🏆 Достижений:       {s['achievements']}")
+        print(f"  💡 Советов:          {s['tips']}")
+        print(f"  📋 Заданий уровней:  {s['levels']}")
 
     return True
 
@@ -76,8 +81,8 @@ def load_csv_data() -> bool:
 if __name__ == "__main__":
 
     if load_csv_data():
-        print("\n✅ Все данные успешно загружены!")
+        print("\n Все данные успешно загружены!")
         sys.exit(0)
     else:
-        print("\n❌ Ошибка загрузки данных")
+        print("\n Ошибка загрузки данных")
         sys.exit(1)

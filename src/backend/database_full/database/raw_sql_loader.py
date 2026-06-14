@@ -10,95 +10,95 @@
 """
 
 import csv
-import json
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import List, Dict
 
 from .db_manager import get_db_manager
 
 # Настройка логирования
 logger = logging.getLogger(__name__)
 
+def _read_csv(csv_path: str) -> List[Dict]:
+    """
+    Читает CSV файл и возвращает список строк как словарей.
+    Возвращает [] если файл не найден или пуст.
+    """
+    path = Path(csv_path)
+    if not path.exists():
+        logger.error(f"CSV файл не найден: {csv_path}")
+        return []
+ 
+    with open(path, encoding='utf-8-sig') as f:
+        rows = list(csv.DictReader(f))
+ 
+    if not rows:
+        logger.warning(f"CSV файл пуст: {csv_path}")
+ 
+    return rows
 
-def load_plants_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
+def load_plants_from_csv_raw(csv_path: str) -> bool:
     """
     Загружает шаблоны растений из CSV файла в таблицу plant_templates.
     """
-    if not Path(csv_path).exists():
-        logger.error(f"CSV файл не найден: {csv_path}")
+    rows = _read_csv(csv_path)
+    if not rows:
         return False
 
-    db = get_db_manager(db_path)
+    db = get_db_manager()
+    db.execute_update("DELETE FROM plant_templates")
+    query = """
+        INSERT INTO plant_templates (
+            species_id, species_name, nickname, description, character_trait,
+            disease, why_disease,
+            water_interval_min, water_interval_max,
+            light_requirement, humidity_preference,
+            watering_advice, light_advice, tips, symptoms, flowering_conditions,
+            unlock_level, sort_order
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
 
-    try:
-        db.execute_update("DELETE FROM plant_templates")
-        logger.info("Таблица plant_templates очищена")
+    successful = 0
 
-        with open(csv_path, 'r', encoding='utf-8-sig') as f:
-            reader = csv.DictReader(f)
-            rows = list(reader)
+    for i, row in enumerate(rows, start=2):
+        try:
+            params = (
+                int(row.get('species_id', 0)),
+                row.get('species_name', '').strip(),
+                row.get('nickname', '').strip(),
+                row.get('description', '').strip(),
+                row.get('character_trait', '').strip(),
+                row.get('disease', '').strip(),
+                row.get('why_disease', '').strip(),
+                int(row.get('water_interval_min', 0)),
+                int(row.get('water_interval_max', 0)),
+                row.get('light_requirement', 'medium').lower(),
+                row.get('humidity_preference', 'medium').strip(),
+                row.get('watering_advice', '').strip(),
+                row.get('light_advice', '').strip(),
+                row.get('tips', '').strip(),
+                row.get('symptoms', '').strip(),
+                row.get('flowering_conditions', '').strip(),
+                int(row.get('unlock_level', 1)),
+                int(row.get('sort_order', 0))
+            )
 
-        if not rows:
-            logger.warning("CSV файл пуст")
-            return False
+            if db.execute_update(query, params):
+                successful += 1
+                print(f"  ✓ Загружен {row.get('species_name', 'Unknown')}")
 
-        successful = 0
-
-        for i, row in enumerate(rows, start=2):
-            try:
-                # ИСПРАВЛЕНО: теперь 18 полей (добавлен unlock_level)
-                query = """
-                    INSERT INTO plant_templates (
-                        species_id, species_name, nickname, description, character_trait,
-                        disease, why_disease,
-                        water_interval_min, water_interval_max,
-                        light_requirement, humidity_preference,
-                        watering_advice, light_advice, tips, symptoms, flowering_conditions,
-                        unlock_level, sort_order
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """
-
-                params = (
-                    int(row.get('species_id', 0)),
-                    row.get('species_name', '').strip(),
-                    row.get('nickname', '').strip(),
-                    row.get('description', '').strip(),
-                    row.get('character_trait', '').strip(),
-                    row.get('disease', '').strip(),
-                    row.get('why_disease', '').strip(),
-                    int(row.get('water_interval_min', 0)),
-                    int(row.get('water_interval_max', 0)),
-                    row.get('light_requirement', 'medium').lower(),
-                    row.get('humidity_preference', 'medium').strip(),
-                    row.get('watering_advice', '').strip(),
-                    row.get('light_advice', '').strip(),
-                    row.get('tips', '').strip(),
-                    row.get('symptoms', '').strip(),
-                    row.get('flowering_conditions', '').strip(),
-                    int(row.get('unlock_level', 1)),  # unlock_level
-                    int(row.get('sort_order', 0))
-                )
-
-                if db.execute_update(query, params):
-                    successful += 1
-                    print(f"  ✓ Загружен {row.get('species_name', 'Unknown')}")
-
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Ошибка в строке {i}: {e}")
                 logger.error(f"Данные строки: {row}")
                 continue
 
-        print(f"Загружено {successful} шаблонов растений")
-        logger.info(f"Загружено {successful} шаблонов растений из {csv_path}")
-        return successful > 0
-
-    except Exception as e:
-        logger.error(f"Критическая ошибка при загрузке растений: {e}")
-        return False
+    print(f"Загружено {successful} шаблонов растений")
+    logger.info(f"Загружено {successful} шаблонов растений из {csv_path}")
+    return successful > 0
 
 
-def load_achievements_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
+
+def load_achievements_from_csv_raw(csv_path: str) -> bool:
     """
     Загружает достижения из CSV файла в таблицу achievements.
 
@@ -106,7 +106,6 @@ def load_achievements_from_csv_raw(csv_path: str, db_path: str = "careforme.db")
 
     Args:
         csv_path: Путь к CSV файлу с достижениями
-        db_path: Путь к файлу БД (по умолчанию 'careforme.db')
 
     Returns:
         True если загружено хотя бы одно достижение, иначе False
@@ -115,70 +114,53 @@ def load_achievements_from_csv_raw(csv_path: str, db_path: str = "careforme.db")
     Ожидаемая структура CSV:
         name,description,requirement_type,target_value,is_active,sort_order
     """
-    if not Path(csv_path).exists():
-        logger.error(f"CSV файл не найден: {csv_path}")
+    rows = _read_csv(csv_path)
+    if not rows:
         return False
 
-    db = get_db_manager(db_path)
+    db = get_db_manager()
+    db.execute_update("DELETE FROM achievements")
 
-    try:
-        db.execute_update("DELETE FROM achievements")
-        logger.info("Таблица achievements очищена")
+    query = """
+        INSERT INTO achievements (
+            name, description, requirement_type, 
+            target_value, is_active, sort_order
+        ) VALUES (?, ?, ?, ?, ?, ?)
+        """
 
-        with open(csv_path, 'r', encoding='utf-8-sig') as f:
-            reader = csv.DictReader(f)
-            rows = list(reader)
+    successful = 0
 
-        if not rows:
-            logger.warning("CSV достижений пуст")
-            return False
+    for i, row in enumerate(rows, start=2):
+        try:
+            is_active = row.get('is_active', 'true').lower() in ('true', '1', 'yes', 'on')
+            params = (
+                row.get('name', '').strip(),
+                row.get('description', ''),
+                row.get('requirement_type', '').strip(),
+                int(row.get('target_value', 0)),
+                is_active,
+                int(row.get('sort_order', 0))
+            )
 
-        successful = 0
+            if db.execute_update(query, params):
+                successful += 1
+                print(f"  ✓ Загружено достижение: {row.get('name', 'Unknown')}")
 
-        for i, row in enumerate(rows, start=2):
-            try:
-                is_active = row.get('is_active', 'true').lower() in ['true', '1', 'yes', 'on']
-
-                query = """
-                    INSERT INTO achievements (
-                        name, description, requirement_type, 
-                        target_value, is_active, sort_order
-                    ) VALUES (?, ?, ?, ?, ?, ?)
-                """
-
-                params = (
-                    row.get('name', '').strip(),
-                    row.get('description', ''),
-                    row.get('requirement_type', '').strip(),
-                    int(row.get('target_value', 0)),
-                    is_active,
-                    int(row.get('sort_order', 0))
-                )
-
-                if db.execute_update(query, params):
-                    successful += 1
-                    print(f"  ✓ Загружено достижение: {row.get('name', 'Unknown')}")
-
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Ошибка в строке {i}: {e}")
-                continue
 
-        print(f"Загружено {successful} достижений")
-        logger.info(f"Загружено {successful} достижений из {csv_path}")
-        return successful > 0
-
-    except Exception as e:
-        logger.error(f"Критическая ошибка: {e}")
-        return False
+    print(f"Загружено {successful} достижений")
+    logger.info(f"Загружено {successful} достижений из {csv_path}")
+    return successful > 0
 
 
-def load_tips_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
+
+def load_tips_from_csv_raw(csv_path: str) -> bool:
     """
     Загружает советы из CSV файла в таблицу tips.
 
     Args:
         csv_path: Путь к CSV файлу с советами
-        db_path: Путь к файлу БД (по умолчанию 'careforme.db')
 
     Returns:
         True если загружено хотя бы один совет, иначе False
@@ -186,67 +168,52 @@ def load_tips_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool
     Ожидаемая структура CSV:
         tip_type,title,message,is_positive
     """
-    if not Path(csv_path).exists():
-        logger.error(f"CSV файл не найден: {csv_path}")
+    rows = _read_csv(csv_path)
+    if not rows:
         return False
 
-    db = get_db_manager(db_path)
+    db = get_db_manager()
+    db.execute_update("DELETE FROM tips")
 
-    try:
-        db.execute_update("DELETE FROM tips")
-        logger.info("Таблица tips очищена")
+    query = """
+        INSERT INTO tips (
+            tip_type, title, message, is_positive
+        ) VALUES (?, ?, ?, ?)
+        """
 
-        with open(csv_path, 'r', encoding='utf-8-sig') as f:
-            reader = csv.DictReader(f)
-            rows = list(reader)
+    successful = 0
 
-        if not rows:
-            logger.warning("CSV советов пуст")
-            return False
+    for i, row in enumerate(rows, start=2):
+        try:
+            is_positive = row.get('is_positive', '0').lower() in ['true', '1', 'yes', 'on']
 
-        successful = 0
+            params = (
+                row.get('tip_type', '').strip(),
+                row.get('title', '').strip(),
+                row.get('message', '').strip(),
+                is_positive
+            )
 
-        for i, row in enumerate(rows, start=2):
-            try:
-                is_positive = row.get('is_positive', '0').lower() in ['true', '1', 'yes', 'on']
+            if db.execute_update(query, params):
+                successful += 1
+                print(f"  ✓ Загружен совет: {row.get('title', row.get('tip_type', 'Unknown'))}")
 
-                query = """
-                    INSERT INTO tips (
-                        tip_type, title, message, is_positive
-                    ) VALUES (?, ?, ?, ?)
-                """
+        except Exception as e:
+            logger.error(f"Ошибка в строке {i}: {e}")
 
-                params = (
-                    row.get('tip_type', '').strip(),
-                    row.get('title', '').strip(),
-                    row.get('message', '').strip(),
-                    is_positive
-                )
+    print(f"Загружено {successful} советов")
+    logger.info(f"Загружено {successful} советов из {csv_path}")
+    return successful > 0
 
-                if db.execute_update(query, params):
-                    successful += 1
-                    print(f"  ✓ Загружен совет: {row.get('title', row.get('tip_type', 'Unknown'))}")
-
-            except Exception as e:
-                logger.error(f"Ошибка в строке {i}: {e}")
-                continue
-
-        print(f"Загружено {successful} советов")
-        logger.info(f"Загружено {successful} советов из {csv_path}")
-        return successful > 0
-
-    except Exception as e:
-        logger.error(f"Критическая ошибка: {e}")
-        return False
+    
 
 
-def load_level_requirements_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
+def load_level_requirements_from_csv_raw(csv_path: str) -> bool:
     """
     Загружает задания уровней из CSV файла в таблицу level_requirements.
 
     Args:
         csv_path: Путь к CSV файлу с заданиями уровней
-        db_path: Путь к файлу БД (по умолчанию 'careforme.db')
 
     Returns:
         True если загружено хотя бы одно задание уровня, иначе False
@@ -256,78 +223,69 @@ def load_level_requirements_from_csv_raw(csv_path: str, db_path: str = "careform
         quest2_description,quest3_type,quest3_target,quest3_description,
         reward_type,reward_value,reward_description
     """
-    if not Path(csv_path).exists():
-        logger.error(f"CSV файл не найден: {csv_path}")
+    rows = _read_csv(csv_path)
+    if not rows:
         return False
 
-    db = get_db_manager(db_path)
+    db = get_db_manager()
+    db.execute_update("DELETE FROM level_requirements")
 
-    try:
-        db.execute_update("DELETE FROM level_requirements")
-        logger.info("Таблица level_requirements очищена")
+    query = """
+        INSERT INTO level_requirements (
+            level, quest1_type, quest1_target, quest1_description,
+            quest2_type, quest2_target, quest2_description,
+            quest3_type, quest3_target, quest3_description,
+            reward_type, reward_value, reward_description
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+    
+    def int_or_none(value: str):
+        """Преобразует строку в int или возвращает None если пусто."""
+        v = value.strip() if value else ''
+        return int(v) if v else None
 
-        with open(csv_path, 'r', encoding='utf-8-sig') as f:
-            reader = csv.DictReader(f)
-            rows = list(reader)
+    def str_or_none(value: str):
+        """Возвращает строку или None если пусто."""
+        v = value.strip() if value else ''
+        return v or None
+    
+    successful = 0
 
-        if not rows:
-            logger.warning("CSV заданий уровней пуст")
-            return False
+    for i, row in enumerate(rows, start=2):
+        try:
+            params = (
+                int(row.get('level', 0)),
+                str_or_none(row.get('quest1_type', '')),
+                int_or_none(row.get('quest1_target', 0)),
+                str_or_none(row.get('quest1_description', '')),
 
-        successful = 0
+                str_or_none(row.get('quest2_type', '')),
+                int_or_none(row.get('quest2_target', 0)),
+                str_or_none(row.get('quest2_description', '')),
 
-        for i, row in enumerate(rows, start=2):
-            try:
-                # Обработка пустых значений для quest3
-                quest3_type = row.get('quest3_type', '').strip()
-                quest3_target = row.get('quest3_target', '')
-                quest3_description = row.get('quest3_description', '').strip()
+                str_or_none(row.get('quest3_type', '')),
+                int_or_none(row.get("quest3_target", '')),
+                str_or_none(row.get("quest3_description", '')),
 
-                query = """
-                    INSERT INTO level_requirements (
-                        level, quest1_type, quest1_target, quest1_description,
-                        quest2_type, quest2_target, quest2_description,
-                        quest3_type, quest3_target, quest3_description,
-                        reward_type, reward_value, reward_description
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """
+                str_or_none(row.get('reward_type', '')),
+                str_or_none(row.get('reward_value', '')),
+                str_or_none(row.get('reward_description', '')),
+            )
 
-                params = (
-                    int(row.get('level', 0)),
-                    row.get('quest1_type', '').strip() or None,
-                    int(row.get('quest1_target', 0)) if row.get('quest1_target', '').strip() else None,
-                    row.get('quest1_description', '').strip() or None,
-                    row.get('quest2_type', '').strip() or None,
-                    int(row.get('quest2_target', 0)) if row.get('quest2_target', '').strip() else None,
-                    row.get('quest2_description', '').strip() or None,
-                    quest3_type or None,
-                    int(quest3_target) if quest3_target and quest3_target.strip() else None,
-                    quest3_description or None,
-                    row.get('reward_type', '').strip() or None,
-                    row.get('reward_value', '').strip() or None,
-                    row.get('reward_description', '').strip() or None
-                )
+            if db.execute_update(query, params):
+                successful += 1
+                print(f"  ✓ Загружен уровень {row.get('level', 'Unknown')}")
 
-                if db.execute_update(query, params):
-                    successful += 1
-                    print(f"  ✓ Загружен уровень {row.get('level', 'Unknown')}")
+        except Exception as e:
+            logger.error(f"Ошибка в строке {i}: {e}")
+            logger.error(f"Данные строки: {row}")
 
-            except Exception as e:
-                logger.error(f"Ошибка в строке {i}: {e}")
-                logger.error(f"Данные строки: {row}")
-                continue
-
-        print(f"Загружено {successful} уровней")
-        logger.info(f"Загружено {successful} уровней из {csv_path}")
-        return successful > 0
-
-    except Exception as e:
-        logger.error(f"Критическая ошибка: {e}")
-        return False
+    print(f"Загружено {successful} уровней")
+    logger.info(f"Загружено {successful} уровней из {csv_path}")
+    return successful > 0
 
 
-
-def verify_data(db_path: str = "careforme.db") -> dict:
+def verify_data() -> dict:
     """
     Проверяет количество записей в основных таблицах.
 
@@ -339,60 +297,19 @@ def verify_data(db_path: str = "careforme.db") -> dict:
     Returns:
         Словарь с количеством записей в таблицах
     """
-    db = get_db_manager(db_path)
-
-    plants = db.execute_query("SELECT COUNT(*) as count FROM plant_templates")
-    achievements = db.execute_query("SELECT COUNT(*) as count FROM achievements")
-    level_quests = db.execute_query("SELECT COUNT(*) as count FROM level_requirements")
-    users = db.execute_query("SELECT COUNT(*) as count FROM users")
-    tips = db.execute_query("SELECT COUNT(*) as count FROM tips")
-
-    result = {
-        'plants_count': plants[0]['count'] if plants else 0,
-        'achievements_count': achievements[0]['count'] if achievements else 0,
-        'level_quests_count': level_quests[0]['count'] if level_quests else 0,
-        'users_count': users[0]['count'] if users else 0,
-        'tips_count': tips[0]['count'] if tips else 0,
+    db = get_db_manager()
+    tables = {
+        'plants_count': 'plant_templates',
+        'achievements_count': 'achievements',
+        'level_quests_count': 'level_requirements',
+        'users_count': 'users',
+        'tips_count': 'tips',
     }
+    result = {}
+    for key, table in tables.items():
+        rows = db.execute_query(f"SELECT COUNT(*) as count FROM {table}")
+        result[key] = rows[0]['count'] if rows else 0
 
     logger.info(f"Статистика БД: {result}")
     return result
 
-
-def get_all_plants(db_path: str = "careforme.db") -> list:
-    """
-    Получает все шаблоны растений из БД.
-
-    Args:
-        db_path: Путь к файлу БД
-
-    Returns:
-        Список всех растений, отсортированных по sort_order
-    """
-    db = get_db_manager(db_path)
-    return db.execute_query("""
-        SELECT species_id, species_name,
-               water_interval_min, water_interval_max, light_requirement, humidity_preference,
-               sort_order
-        FROM plant_templates 
-        ORDER BY sort_order
-    """)
-
-
-def get_plant_by_id(species_id: int, db_path: str = "careforme.db") -> Optional[dict]:
-    """
-    Получает шаблон растения по species_id.
-
-    Args:
-        species_id: ID вида растения (1=Спатифиллум, 2=Кактус, 3=Фикус)
-        db_path: Путь к файлу БД
-
-    Returns:
-        Словарь с данными растения или None
-    """
-    db = get_db_manager(db_path)
-    result = db.execute_query(
-        "SELECT * FROM plant_templates WHERE species_id = ?",
-        (species_id,)
-    )
-    return result[0] if result else None

@@ -4,7 +4,6 @@
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Добавляем путь для импорта модулей backend/
@@ -12,9 +11,17 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from database_full.database.db_manager import get_db_manager
 
+TABLES = [
+    'users',
+    'player_profiles',
+    'plant_templates',
+    'user_plants',
+    'achievements',
+    'level_requirements',
+]
 
-def init_database():
-    """Инициализирует структуру БД из SQL файла"""
+def init_database() -> bool:
+    """Инициализирует структуру БД из SQL файла. Возвращает True при успехе."""
 
     # Путь к БД — рядом с app.py в папке backend/
     db_path = str(Path(__file__).parent.parent / 'careforme.db')
@@ -24,10 +31,10 @@ def init_database():
     sql_path = Path(__file__).parent.parent / 'database_full' / 'database' / 'init_db.sql'
 
     if not sql_path.exists():
-        print(f"❌ Файл {sql_path} не найден")
+        print(f"SQL файл не найден: {sql_path}")
         return False
 
-    print(f"📂 Загрузка схемы БД из {sql_path}")
+    print(f"Загрузка схемы БД из {sql_path}")
 
     try:
         with open(sql_path, 'r', encoding='utf-8') as f:
@@ -35,33 +42,28 @@ def init_database():
 
         conn = db.connect()
         conn.executescript(sql_script)
-        conn.commit()
+        # conn.commit()
 
-        print("✅ Структура БД успешно создана")
+        print("Структура БД успешно создана")
 
-        tables = ['users', 'player_profiles', 'plant_templates', 'user_plants',
-                  'achievements', 'level_requirements', 'designs']
-
-        for table in tables:
-            result = db.execute_query(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'")
-            if result:
-                print(f"  ✓ Таблица {table} создана")
-            else:
-                print(f"  ⚠️  Таблица {table} не найдена")
-
-        return True
+        for table in TABLES:
+            exists = db.execute_query(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                (table,)
+            )
+            status = "OK" if exists else "NOT"
+            print(f" {status} {table}")
+       
 
     except Exception as e:
         print(f"❌ Ошибка инициализации БД: {e}")
-        if db._connection:
-            db._connection.rollback()
         return False
 
 
 if __name__ == "__main__":
     if init_database():
-        print("🎉 База данных готова к работе!")
+        print("База данных готова к работе!")
         sys.exit(0)
     else:
-        print("💥 Ошибка инициализации базы данных")
+        print("\n Ошибка инициализации базы данных")
         sys.exit(1)

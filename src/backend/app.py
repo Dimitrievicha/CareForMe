@@ -13,8 +13,15 @@ from config import Config
 from database_full.database.db_manager import get_db_manager as _init_db
 
 _DB_PATH = str(Path(__file__).parent / 'careforme.db')
-_init_db(_DB_PATH)
+_SQL_PATH = Path(__file__).parent / 'database_full' / 'database' / 'init_db.sql'
+_db = _init_db(_DB_PATH)
 
+if _SQL_PATH.exists():
+    with open(_SQL_PATH, 'r', encoding='utf-8') as _f:
+        _db.connect().executescript(_f.read())
+else:
+    print(f"⚠️  SQL файл не найден: {_SQL_PATH}")
+    
 from web.auth import auth_bp
 from web.garden import garden_bp
 from web.plants import plants_bp

@@ -1,4 +1,4 @@
 # auth package
-from .auth_manager import AuthManager, auth_manager
+from .auth_manager import auth_manager
 
-__all__ = ['AuthManager', 'auth_manager']
+__all__ = ['auth_manager']

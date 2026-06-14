@@ -4,9 +4,10 @@ API интерфейс для работы с растениями.
 Предоставляет внешний API для вызовов из приложения (GUI, CLI, REST API).
 Служит прослойкой между клиентским кодом и FlowerService.
 """
-
+from datetime import date
 from typing import List, Dict, Any, Optional
 from ..service.flower_service import FlowerService
+from ..database.db_manager import get_db_manager
 
 
 class FlowerInterface:
@@ -20,13 +21,7 @@ class FlowerInterface:
         _service (FlowerService): Сервисный слой для бизнес-логики
     """
 
-    def __init__(self, db_path: str = None):
-        """
-        Инициализирует интерфейс с сервисным слоем.
-
-        Args:
-            db_path: Путь к БД (опционально, для тестирования)
-        """
+    def __init__(self):
         self._service = FlowerService()
 
     def set_light_level(self, plant_id: str, user_id: str, light_level: str) -> bool:
@@ -143,7 +138,7 @@ class FlowerInterface:
         repo = PlantRepository()
         return repo.get_all_templates()
 
-    def check_death(self, plant_id: str, user_id: str) -> dict:
+    def check_death(self, plant_id: str, user_id: str) -> Dict[str,Any]:
         """
         Проверить, погибло ли растение (вызывается в check_all).
 
@@ -161,10 +156,8 @@ class FlowerInterface:
         if not plant.get("is_alive", True):
             return {"is_dead": True, "cause": plant.get("death_cause")}
 
-        # Растение считается умирающим → переходит в dead
+        # Растение считается умирающим -> переходит в dead
         if plant.get("health_status") == "dying":
-            from ..database.db_manager import get_db_manager
-            from datetime import date
             db = get_db_manager()
             db.execute_update(
                 """UPDATE user_plants

@@ -14,7 +14,6 @@ from typing import Dict, Any, Optional, List
 from ..auth.auth_manager import auth_manager
 from ..service.user_service import user_service
 from ..service.level_quest_service import level_quest_service
-from ..database.db_manager import get_db_manager
 
 
 class UserInterface:
@@ -37,9 +36,7 @@ class UserInterface:
         self._auth = auth_manager
         self._user_service = user_service
         self._quest_service = level_quest_service
-        self.db = get_db_manager()
 
-    # В user_interface.py добавить:
 
     def complete_tutorial(self, user_id: str) -> bool:
         """Отметить обучение пройденным."""
@@ -95,18 +92,6 @@ class UserInterface:
 
         Returns:
             {"user_id": "...", "username": "..."} или None
-        """
-        return self._auth.verify_session(session_token)
-
-    def get_current_user(self, session_token: str) -> Optional[Dict[str, Any]]:
-        """
-        Получить текущего пользователя по токену.
-
-        Args:
-            session_token: Токен сессии
-
-        Returns:
-            Данные пользователя или None
         """
         return self._auth.verify_session(session_token)
 
@@ -323,6 +308,3 @@ def logout(session_token: str) -> bool:
     return user_interface.logout(session_token)
 
 
-def get_current_user(session_token: str) -> Optional[Dict[str, Any]]:
-    """Быстрая функция получения текущего пользователя."""
-    return user_interface.get_current_user(session_token)

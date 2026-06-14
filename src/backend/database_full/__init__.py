@@ -16,11 +16,11 @@ from .database.db_manager import get_db_manager, DatabaseManager
 from .database.raw_sql_loader import (
     load_plants_from_csv_raw,
     load_achievements_from_csv_raw,
-    verify_data
+    verify_data,
 )
 
 
-from .auth.auth_manager import AuthManager, auth_manager
+from .auth.auth_manager import auth_manager
 from .service.flower_service import FlowerService, flower_service
 from .service.challenge_service import ChallengeService, challenge_service
 from .service.user_service import UserService, user_service
@@ -35,7 +35,7 @@ from .interface.flower_interface import FlowerInterface
 from .interface.challenge_interface import ChallengeInterface
 from .interface.user_interface import UserInterface, user_interface
 from .interface.level_quest_interface import LevelQuestInterface, level_quest_interface
-from .interface.user_interface import register, login, logout, get_current_user
+from .interface.user_interface import register, login, logout
 __all__ = [
     # Database
     'get_db_manager',
@@ -45,7 +45,6 @@ __all__ = [
     'verify_data',
 
     # Auth
-    'AuthManager',
     'auth_manager',
 
     # Services

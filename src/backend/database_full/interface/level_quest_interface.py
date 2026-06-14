@@ -90,23 +90,23 @@ class LevelQuestInterface:
         current_level = self._user_service.get_current_level(user_id)
         max_level = level_quest_repo.get_max_level()
 
-        result = {
-            "current_level": current_level,
-            "max_level": max_level,
-            "levels": {}
-        }
-
+        # result = {
+        #     "current_level": current_level,
+        #     "max_level": max_level,
+        #     "levels": {}
+        # }
+        levels = {}
         for level in range(1, max_level + 1):
             if level < current_level:
                 progress = level_quest_repo.get_user_progress(user_id, level)
-                result["levels"][level] = {
+                levels[level] = {
                     "status": "completed",
                     "completed_at": progress['completed_at'] if progress else None,
                     "reward_claimed": progress['reward_claimed'] if progress else False
                 }
             elif level == current_level:
                 level_progress = level_quest_repo.get_current_level_progress(user_id, current_level)
-                result["levels"][level] = {
+                levels[level] = {
                     "status": "in_progress",
                     "quests": level_progress.get('quests', []),
                     "all_completed": level_progress.get('all_completed', False),
@@ -114,16 +114,17 @@ class LevelQuestInterface:
                 }
             else:
                 quests_def = level_quest_repo.get_level_quests(level)
-                result["levels"][level] = {
+                levels[level] = {
                     "status": "locked",
                     "required_level": level - 1,
                     "reward": {
                         "type": quests_def['reward_type'] if quests_def else None,
                         "description": quests_def['reward_description'] if quests_def else None
-                    }
+                    },
                 }
 
-        return result
+        return {"current_level": current_level, "max_level": max_level,
+                 "levels": levels}
 
     def get_current_level_progress(self, user_id: str) -> Dict[str, Any]:
         """
@@ -247,22 +248,6 @@ class LevelQuestInterface:
             return None
         return self.get_reward_info(current_level + 1)
 
-    def get_total_completed_levels(self, user_id: str) -> int:
-        """
-        Получить количество выполненных уровней.
-
-        Args:
-            user_id: ID пользователя
-
-        Returns:
-            Количество завершенных уровней (0-5)
-        """
-        progress_list = level_quest_repo.get_all_user_progress(user_id)
-        completed = 0
-        for p in progress_list:
-            if p['level_completed']:
-                completed += 1
-        return completed
 
     def is_max_level_reached(self, user_id: str) -> bool:
         """

@@ -23,13 +23,7 @@ class ChallengeInterface:
         _service (ChallengeService): Сервисный слой для бизнес-логики
     """
 
-    def __init__(self, db_path: str = None):
-        """
-        Инициализирует интерфейс с сервисным слоем.
-
-        Args:
-            db_path: Путь к БД (опционально)
-        """
+    def __init__(self):
         self._service = ChallengeService()
 
     # =====================================================
@@ -61,18 +55,6 @@ class ChallengeInterface:
 
         """
         return self._service.get_completed(user_id)
-
-    def get_completed_count(self, user_id: str) -> int:
-        """
-        Получить количество выполненных достижений.
-
-        Args:
-            user_id: ID пользователя
-
-        Returns:
-            Количество выполненных ачивок
-        """
-        return self._service.get_completed_count(user_id)
 
     def get_statistics(self, user_id: str) -> Dict[str, Any]:
         """

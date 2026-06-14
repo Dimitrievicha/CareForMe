@@ -730,6 +730,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     position: absolute;
     bottom: 0;
     z-index: 2;
+    pointer-events: none;
 }
 
 .zoom-plant-img {
@@ -738,6 +739,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     position: absolute;
     bottom: calc(35 / 500 * 100cqh);
     z-index: 3;
+    pointer-events: none;
 }
 
 .zoom-left-panel,
@@ -745,9 +747,12 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     width: calc(250 / 1000 * 100cqw);
     height: calc(var(--zoom-panel-height) / 500 * 100cqh);
     flex-shrink: 0;
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    gap: calc(10 / 500 * 100cqh);
     overflow: hidden;
     background: rgba(255, 248, 235, 0.95);
     border-radius: calc(15 / 1000 * 100cqw);
@@ -763,18 +768,23 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 .zoom-panel .move-btn-left,
 .zoom-panel .desc-btn-right {
     width: 100%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: calc(10 / 500 * 100cqh) calc(25 / 500 * 100cqh);
     border: calc(1 / 500 * 100cqh) solid #d4a373;
     border-radius: calc(40 / 500 * 100cqh);
     font-weight: bold;
     font-family: inherit;
     font-size: calc(16 / 500 * 100cqh);
+    line-height: 1.2;
     color: #5d3a1a;
     background: #f0e0c0;
     cursor: pointer;
-    margin-bottom: calc(10 / 500 * 100cqh);
+    margin: 0;
     box-sizing: border-box;
-    transition: all 0.2s;
+    transition: background 0.2s, border-color 0.2s, opacity 0.2s;
 }
 
 /* Тёплые оттенки — чуть насыщеннее, без градиентов */
@@ -868,7 +878,6 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
 .zoom-right-panel .desc-btn-right:disabled {
     opacity: 0.45;
     cursor: not-allowed;
-    pointer-events: none;
 }
 
 .zoom-panel .plant-name-zoom {

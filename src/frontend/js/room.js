@@ -3137,7 +3137,7 @@ function renderFlowerChoices() {
                     closeModal(modalPickFlower);
                     activeSlot = null;
                     showNotification(
-                        `Цветок посажен\n${plant.name} посажен! 🌱 Первый росток появится через ${getSeedlingWaitLabel(plant)}...`,
+                        `${plant.name} посажен! 🌱 Первый росток появится через ${getSeedlingWaitLabel(plant)}...`,
                         false
                     );
                     saveState();

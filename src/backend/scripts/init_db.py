@@ -6,7 +6,6 @@
 import sys
 from pathlib import Path
 
-# Добавляем путь для импорта модулей backend/
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from database_full.database.db_manager import get_db_manager
@@ -23,11 +22,9 @@ TABLES = [
 def init_database() -> bool:
     """Инициализирует структуру БД из SQL файла. Возвращает True при успехе."""
 
-    # Путь к БД — рядом с app.py в папке backend/
     db_path = str(Path(__file__).parent.parent / 'careforme.db')
     db = get_db_manager(db_path)
 
-    # Путь к SQL файлу (исправлен: database_full/database/)
     sql_path = Path(__file__).parent.parent / 'database_full' / 'database' / 'init_db.sql'
 
     if not sql_path.exists():
@@ -42,7 +39,6 @@ def init_database() -> bool:
 
         conn = db.connect()
         conn.executescript(sql_script)
-        # conn.commit()
 
         print("Структура БД успешно создана")
 
@@ -56,7 +52,7 @@ def init_database() -> bool:
        
 
     except Exception as e:
-        print(f"❌ Ошибка инициализации БД: {e}")
+        print(f" Ошибка инициализации БД: {e}")
         return False
 
 

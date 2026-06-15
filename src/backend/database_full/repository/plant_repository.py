@@ -90,36 +90,18 @@ class PlantRepository(BaseRepository):
 
     def get_user_plants(self, user_id: str, only_alive: bool = True) -> List[Dict[str, Any]]:
         """
-        Получает растения пользователя с данными из шаблона.
-
+        Растения пользователя с JOIN-данными из шаблона.
+ 
         Args:
-            user_id: ID пользователя
-            only_alive: Если True, только живые растения (is_alive = 1)
-
-        Returns:
-            Список растений с JOIN-данными из plant_templates
-
-        Returns структура:
-            [
-                {
-                    "id": "uuid",
-                    "custom_name": "Мой кактус",
-                    "health_status": "healthy",
-                    "growth_stage": "growing",
-                    "species_name": "Кактус Корифанта",
-                    "water_interval_min": 3,
-                    "water_interval_max": 10,
-                    ...
-                }
-            ]
+            only_alive: Если True — только живые растения
         """
         alive_filter = "AND up.is_alive = 1" if only_alive else ""
-
         return self.db.execute_query(f"""
-            SELECT up.*, 
-                   pt.species_name, 
-                   pt.water_interval_min, 
-                   pt.water_interval_max, 
+            SELECT up.*,
+                   pt.species_id,
+                   pt.species_name,
+                   pt.water_interval_min,
+                   pt.water_interval_max,
                    pt.light_requirement
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
@@ -128,20 +110,13 @@ class PlantRepository(BaseRepository):
         """, (user_id,))
 
     def get_user_plant_by_id(self, plant_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Получает конкретное растение пользователя по UUID.
-
-        Args:
-            plant_id: UUID растения
-
-        Returns:
-            Данные растения с JOIN-полями из шаблона или None
-        """
+        """Конкретное растение пользователя с JOIN-полями из шаблона."""
         result = self.db.execute_query("""
-            SELECT up.*, 
-                   pt.species_name, 
-                   pt.water_interval_min, 
-                   pt.water_interval_max, 
+            SELECT up.*,
+                   pt.species_id,
+                   pt.species_name,
+                   pt.water_interval_min,
+                   pt.water_interval_max,
                    pt.light_requirement
             FROM user_plants up
             JOIN plant_templates pt ON up.template_id = pt.id
@@ -309,23 +284,6 @@ class PlantRepository(BaseRepository):
             WHERE id = ?
         """, (plant_id,))
 
-    # def get_dead_plants(self, user_id: str) -> List[Dict[str, Any]]:
-    #     """
-    #     Получает мертвые растения пользователя.
-
-    #     Args:
-    #         user_id: ID пользователя
-
-    #     Returns:
-    #         Список мертвых растений с причиной смерти, отсортированные по дате смерти
-    #     """
-    #     return self.db.execute_query("""
-    #         SELECT up.*, pt.species_name, up.death_cause
-    #         FROM user_plants up
-    #         JOIN plant_templates pt ON up.template_id = pt.id
-    #         WHERE up.user_id = ? AND up.is_alive = 0
-    #         ORDER BY up.death_date DESC
-    #     """, (user_id,))
 
     def get_plants_by_stage(self, user_id: str, stage: str) -> List[Dict[str, Any]]:
         """
@@ -352,37 +310,3 @@ class PlantRepository(BaseRepository):
             "UPDATE user_plants SET location = ? WHERE id = ?",
             (location, plant_id)
         )
-
-    # def get_plants_by_species(self, user_id: str, species_id: int) -> List[Dict[str, Any]]:
-    #     """
-    #     Получает растения пользователя по виду.
-
-    #     Args:
-    #         user_id: ID пользователя
-    #         species_id: ID вида растения
-
-    #     Returns:
-    #         Список растений указанного вида
-    #     """
-    #     return self.db.execute_query("""
-    #         SELECT up.*, pt.species_name
-    #         FROM user_plants up
-    #         JOIN plant_templates pt ON up.template_id = pt.id
-    #         WHERE up.user_id = ? AND pt.species_id = ? AND up.is_alive = 1
-    #     """, (user_id, species_id))
-
-    # def count_user_plants(self, user_id: str, only_alive: bool = True) -> int:
-    #     """
-    #     Подсчитывает количество растений пользователя.
-
-    #     Args:
-    #         user_id: ID пользователя
-    #         only_alive: Считать только живые растения
-
-    #     Returns:
-    #         Количество растений
-    #     """
-    #     alive_filter = "is_alive = 1" if only_alive else ""
-    #     return self.count("user_plants",
-    #                       f"user_id = ? AND {alive_filter}" if only_alive else "user_id = ?",
-    #                       (user_id,))

@@ -1,5 +1,5 @@
 """
-Модуль загрузки данных из CSV файлов DB_TESTING_REPORT.md базу данных.
+Модуль загрузки данных из CSV файлов в базу данных.
 
 Содержит функции для импорта:
     - Шаблонов растений из plant_catalog.csv
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def load_plants_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
     """
-    Загружает шаблоны растений из CSV файла DB_TESTING_REPORT.md таблицу plant_templates.
+    Загружает шаблоны растений из CSV файла в таблицу plant_templates.
     """
     if not Path(csv_path).exists():
         logger.error(f"CSV файл не найден: {csv_path}")
@@ -85,7 +85,7 @@ def load_plants_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bo
                     print(f"  ✓ Загружен {row.get('species_name', 'Unknown')}")
 
             except Exception as e:
-                logger.error(f"Ошибка DB_TESTING_REPORT.md строке {i}: {e}")
+                logger.error(f"Ошибка в строке {i}: {e}")
                 logger.error(f"Данные строки: {row}")
                 continue
 
@@ -100,7 +100,7 @@ def load_plants_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bo
 
 def load_achievements_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
     """
-    Загружает достижения из CSV файла DB_TESTING_REPORT.md таблицу achievements.
+    Загружает достижения из CSV файла в таблицу achievements.
 
     Достижения НЕ дают монет и XP, только эмоциональную ценность.
 
@@ -160,7 +160,7 @@ def load_achievements_from_csv_raw(csv_path: str, db_path: str = "careforme.db")
                     print(f"  ✓ Загружено достижение: {row.get('name', 'Unknown')}")
 
             except Exception as e:
-                logger.error(f"Ошибка DB_TESTING_REPORT.md строке {i}: {e}")
+                logger.error(f"Ошибка в строке {i}: {e}")
                 continue
 
         print(f"Загружено {successful} достижений")
@@ -174,7 +174,7 @@ def load_achievements_from_csv_raw(csv_path: str, db_path: str = "careforme.db")
 
 def load_tips_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
     """
-    Загружает советы из CSV файла DB_TESTING_REPORT.md таблицу tips.
+    Загружает советы из CSV файла в таблицу tips.
 
     Args:
         csv_path: Путь к CSV файлу с советами
@@ -228,7 +228,7 @@ def load_tips_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool
                     print(f"  ✓ Загружен совет: {row.get('title', row.get('tip_type', 'Unknown'))}")
 
             except Exception as e:
-                logger.error(f"Ошибка DB_TESTING_REPORT.md строке {i}: {e}")
+                logger.error(f"Ошибка в строке {i}: {e}")
                 continue
 
         print(f"Загружено {successful} советов")
@@ -242,7 +242,7 @@ def load_tips_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool
 
 def load_level_requirements_from_csv_raw(csv_path: str, db_path: str = "careforme.db") -> bool:
     """
-    Загружает задания уровней из CSV файла DB_TESTING_REPORT.md таблицу level_requirements.
+    Загружает задания уровней из CSV файла в таблицу level_requirements.
 
     Args:
         csv_path: Путь к CSV файлу с заданиями уровней
@@ -313,7 +313,7 @@ def load_level_requirements_from_csv_raw(csv_path: str, db_path: str = "careform
                     print(f"  ✓ Загружен уровень {row.get('level', 'Unknown')}")
 
             except Exception as e:
-                logger.error(f"Ошибка DB_TESTING_REPORT.md строке {i}: {e}")
+                logger.error(f"Ошибка в строке {i}: {e}")
                 logger.error(f"Данные строки: {row}")
                 continue
 
@@ -329,7 +329,7 @@ def load_level_requirements_from_csv_raw(csv_path: str, db_path: str = "careform
 
 def verify_data(db_path: str = "careforme.db") -> dict:
     """
-    Проверяет количество записей DB_TESTING_REPORT.md основных таблицах.
+    Проверяет количество записей в основных таблицах.
 
     Используется для отладки и проверки корректности загрузки данных.
 
@@ -337,7 +337,7 @@ def verify_data(db_path: str = "careforme.db") -> dict:
         db_path: Путь к файлу БД
 
     Returns:
-        Словарь с количеством записей DB_TESTING_REPORT.md таблицах
+        Словарь с количеством записей в таблицах
     """
     db = get_db_manager(db_path)
 

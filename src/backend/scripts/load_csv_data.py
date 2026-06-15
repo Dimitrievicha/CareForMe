@@ -6,8 +6,6 @@
 import sys
 from pathlib import Path
 
-# Добавляем корневую директорию backend DB_TESTING_REPORT.md путь поиска модулей
-# Определяем путь к папке backend (родительская для scripts)
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
@@ -28,14 +26,12 @@ def load_csv_data():
 
     db = get_db_manager()
 
-    # Проверяем, есть ли уже данные
     result = db.execute_query("SELECT COUNT(*) as count FROM plant_templates")
 
     if result and result[0]['count'] > 0:
         print("Данные уже загружены, пропускаем...")
         return True
 
-    # Путь к CSV файлам (папка csv DB_TESTING_REPORT.md корне backend)
     csv_dir = csv_dir = backend_dir / 'database_full' / 'csv'
 
     if not csv_dir.exists():
@@ -55,7 +51,6 @@ def load_csv_data():
     else:
         print(f"Файл не найден: {plant_csv}")
 
-    # 2. Загружаем достижения
     achievements_csv = csv_dir / 'achievements_catalog.csv'
     if achievements_csv.exists():
         print("\nЗагрузка достижений...")
@@ -63,7 +58,6 @@ def load_csv_data():
     else:
         print(f"Файл не найден: {achievements_csv}")
 
-    # 3. Загружаем советы
     tips_csv = csv_dir / 'tips.csv'
     if tips_csv.exists():
         print("\nЗагрузка советов...")
@@ -71,7 +65,6 @@ def load_csv_data():
     else:
         print(f"Файл не найден: {tips_csv}")
 
-    # 4. Загружаем задания уровней
     level_csv = csv_dir / 'level_requirements.csv'
     if level_csv.exists():
         print("\nЗагрузка заданий уровней...")
@@ -89,24 +82,15 @@ def load_csv_data():
             (SELECT COUNT(*) FROM level_requirements) as levels
     """)
 
-    if stats:
-        print(f"  🌱 Растений: {stats[0]['plants']}")
-        print(f"  🏆 Достижений: {stats[0]['achievements']}")
-        print(f"  💡 Советов: {stats[0]['tips']}")
-        print(f"  📋 Заданий уровней: {stats[0]['levels']}")
-        print(f"  🎨 Дизайнов: {stats[0]['designs']}")
 
     return True
 
 
 if __name__ == "__main__":
-    print("Care For Me - Загрузка данных")
-    print(f"Скрипт запущен из: {Path(__file__).parent}")
-    print(f"Корневая директория backend: {Path(__file__).parent.parent}")
 
     if load_csv_data():
-        print("\n✅ Все данные успешно загружены!")
+        print("\nВсе данные успешно загружены!")
         sys.exit(0)
     else:
-        print("\n❌ Ошибка загрузки данных")
+        print("\nОшибка загрузки данных")
         sys.exit(1)

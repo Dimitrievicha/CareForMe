@@ -9,17 +9,17 @@ from database_full.repository.user_repository import UserRepository
 
 def login_required_api(f):
     """
-    Декоратор для проверки авторизации DB_TESTING_REPORT.md API маршрутах
+    Декоратор для проверки авторизации в API маршрутах
 
     Проверяет:
-    1. Наличие user_id DB_TESTING_REPORT.md сессии (cookie)
-    2. ИЛИ наличие session_token DB_TESTING_REPORT.md заголовке Authorization
+    1. Наличие user_id в сессии (cookie)
+    2. ИЛИ наличие session_token в заголовке Authorization
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user_id = session.get('user_id')
 
-        # Если есть DB_TESTING_REPORT.md сессии — используем
+        # Если есть в сессии — используем
         if user_id:
             g.user_id = user_id
             return f(*args, **kwargs)

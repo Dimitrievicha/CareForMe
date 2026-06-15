@@ -163,7 +163,7 @@ class UserService:
         """
         Обновляет ежедневную серию пользователя.
 
-        Вызывается при каждом входе DB_TESTING_REPORT.md игру.
+        Вызывается при каждом входе в игру.
         """
         profile = self.user_repo.get_profile(user_id)
         if not profile:
@@ -172,7 +172,7 @@ class UserService:
         today = date.today()
         last_entry = profile['last_entry']
 
-        # ПРЕОБРАЗОВАНИЕ: если last_entry строка, конвертируем DB_TESTING_REPORT.md date
+        # ПРЕОБРАЗОВАНИЕ: если last_entry строка, конвертируем в date
         if last_entry and isinstance(last_entry, str):
             from datetime import datetime
             last_entry = datetime.strptime(last_entry, '%Y-%m-%d').date()

@@ -145,7 +145,7 @@ class FlowerInterface:
 
     def check_death(self, plant_id: str, user_id: str) -> dict:
         """
-        Проверить, погибло ли растение (вызывается DB_TESTING_REPORT.md check_all).
+        Проверить, погибло ли растение (вызывается в check_all).
 
         Args:
             plant_id: ID растения
@@ -161,7 +161,7 @@ class FlowerInterface:
         if not plant.get("is_alive", True):
             return {"is_dead": True, "cause": plant.get("death_cause")}
 
-        # Растение считается умирающим → переходит DB_TESTING_REPORT.md dead
+        # Растение считается умирающим → переходит в dead
         if plant.get("health_status") == "dying":
             from ..database.db_manager import get_db_manager
             from datetime import date

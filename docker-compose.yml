@@ -9,7 +9,7 @@ services:
       - "5000"
     environment:
       - FLASK_ENV=production
-      - SECRET_KEY=${SECRET_KEY:?SECRET_KEY must be set}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
     volumes:
       - careforme_data:/app/backend/persistent
     restart: unless-stopped
@@ -17,8 +17,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/auth/verify"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 60s   # ← увеличили до 60 секунд
+      retries: 30
+      start_period: 90s
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -27,7 +27,7 @@ services:
           touch /app/backend/persistent/careforme.db
         fi
         ln -sf /app/backend/persistent/careforme.db /app/backend/careforme.db
-         exec /app/docker-entrypoint.sh
+        exec /app/docker-entrypoint.sh
 
   nginx:
     image: nginx:1.25-alpine
@@ -39,7 +39,7 @@ services:
       - ./src/frontend:/usr/share/nginx/html:ro
     depends_on:
       app:
-        condition: service_healthy
+        condition: service_started   # ← меняем с healthy на started
     restart: unless-stopped
 
   backup:

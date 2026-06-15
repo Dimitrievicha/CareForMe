@@ -36,10 +36,10 @@
 
 **Требования:** [Docker](https://www.docker.com/) и Docker Compose.
 
-1. Клонируйте репозиторий и перейдите в папку `src`:
+1. Клонируйте репозиторий:
 
 ```bash
-cd src
+git clone https://github.com/Dimitrievicha/CareForMe.git
 ```
 
 2. Соберите и запустите контейнеры:
@@ -65,32 +65,38 @@ docker compose down
 ```
 CareForMe/
 ├── README.md
-└── src/
-    ├── requirements.txt
-    ├── frontend/          # HTML, CSS, JS, изображения
-    │   ├── register.html
-    │   ├── room.html
-    │   ├── welcome.html
-    │   └── js/
-    └── backend/           # Flask API и игровая логика
-        ├── app.py
-        ├── config.py
-        ├── database_full/ # БД, репозитории, сервисы
-        ├── web/           # REST API
-        ├── scripts/       # Инициализация и загрузка данных
-        └── tests/         # Автотесты API
+├──  src/
+│     ├── requirements.txt
+│     ├── frontend/          # HTML, CSS, JS, изображения
+│     │   ├── register.html
+│     │   ├── room.html
+│     │   ├── welcome.html
+│     │   └── js/
+│     ├── backend/           # Flask API и игровая логика
+│     │     ├── app.py
+│     │     ├── config.py
+│     │     ├── database_full/ # БД, репозитории, сервисы
+│     │     ├── web/           # REST API
+│     │     └──  scripts/       # Инициализация и загрузка данных
+│     ├── test_api/
+│     └── test_db/
+├── .dockerignore
+├── docker-compose.yml
+├── docker-entrypoint.sh
+└── Dockerfile
+
 ```
 
 ---
 
 ## Основные страницы
 
-| URL | Описание |
-|-----|----------|
-| `/register.html` | Регистрация и вход |
-| `/welcome.html` | Приветствие (после входа) |
-| `/room.html` | Игровая комната |
-| `/unauthorized.html` | Доступ закрыт |
+| URL | Описание                      |
+|-----|-------------------------------|
+| `/register.html` | Регистрация и вход            |
+| `/welcome.html` | Приветствие (после входа)     |
+| `/room.html` | Игровая комната (после входа) |
+| `/unauthorized.html` | Доступ закрыт                 |
 
 ---
 
@@ -123,10 +129,9 @@ pytest
 pytest --cov=.
 ```
 
-Подробный отчёт: [`src/backend/tests/TESTING_REPORT.md`](src/backend/tests/TESTING_REPORT.md)
+Подробный отчёт: [`src/tests_api/TESTING_REPORT.md`](src/tests_api/TESTING_REPORT.md) и [`src/tests_db/DB_TESTING_REPORT.md`](src/tests_db/DB_TESTING_REPORT.md)
 
-- **98** автотестов
-- **87%** покрытие Backend API
+- **80%** покрытие
 
 ---
 

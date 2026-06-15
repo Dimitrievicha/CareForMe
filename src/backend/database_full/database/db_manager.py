@@ -48,11 +48,8 @@ class DatabaseManager:
         """
         if self._connection is None:
             self._connection = sqlite3.connect(self.db_path, check_same_thread=False, isolation_level=None)
-            # Преобразуем строки DB_TESTING_REPORT.md словари для удобства
             self._connection.row_factory = sqlite3.Row
-            # Включаем поддержку FOREIGN KEY
             self._connection.execute("PRAGMA foreign_keys = ON")
-            # Включаем автоматический commit (autocommit mode)
             self._connection.isolation_level = None
             logger.info(f"Подключение к БД установлено: {self.db_path}")
         return self._connection
@@ -85,7 +82,7 @@ class DatabaseManager:
             cursor = conn.cursor()
             cursor.execute(query, params)
             rows = cursor.fetchall()
-            # Преобразуем Row объекты DB_TESTING_REPORT.md обычные словари
+            # Преобразуем Row объекты в обычные словари
             return [dict(row) for row in rows] if rows else []
         except Exception as e:
             logger.error(f"Ошибка выполнения запроса: {e}")
@@ -184,7 +181,7 @@ class DatabaseManager:
 
     def table_exists(self, table_name: str) -> bool:
         """
-        Проверяет существование таблицы DB_TESTING_REPORT.md базе данных.
+        Проверяет существование таблицы в базе данных.
 
         Args:
             table_name: Имя таблицы для проверки
@@ -227,7 +224,7 @@ def get_db_manager(db_path: str = None) -> DatabaseManager:
     Returns:
         Единственный экземпляр DatabaseManager
 
-    ВАЖНО: первый вызов должен быть DB_TESTING_REPORT.md app.py с явным путём, ДО импорта
+    ВАЖНО: первый вызов должен быть в app.py с явным путём, ДО импорта
     репозиториев. Иначе синглтон создастся с путём None и упадёт.
     """
     global _db_manager

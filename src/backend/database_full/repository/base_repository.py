@@ -27,10 +27,8 @@ class BaseRepository:
 
         Args:
             db_path: Путь к файлу БД. Если не указан — используется синглтон,
-                     который уже должен быть инициализирован DB_TESTING_REPORT.md app.py.
+                     который уже должен быть инициализирован в app.py.
         """
-        # Не передаём None DB_TESTING_REPORT.md get_db_manager — синглтон уже создан DB_TESTING_REPORT.md app.py.
-        # Если db_path передан явно, он будет учтён только при первом вызове.
         self.db = get_db_manager(db_path or 'careforme.db')
 
     def get_by_id(self, table_name: str, id_column: str, id_value: str) -> Optional[Dict[str, Any]]:
@@ -118,7 +116,7 @@ class BaseRepository:
 
     def insert(self, table_name: str, data: Dict[str, Any]) -> bool:
         """
-        Вставляет новую запись DB_TESTING_REPORT.md таблицу.
+        Вставляет новую запись в таблицу.
 
         Args:
             table_name: Имя таблицы
@@ -179,12 +177,12 @@ class BaseRepository:
 
     def count(self, table_name: str, where_clause: str = "", params: tuple = ()) -> int:
         """
-        Подсчитывает количество записей DB_TESTING_REPORT.md таблице.
+        Подсчитывает количество записей в таблице.
 
         Args:
             table_name: Имя таблицы
             where_clause: Условие WHERE (без слова WHERE), например "user_id = ?"
-            params: Параметры для подстановки DB_TESTING_REPORT.md условие
+            params: Параметры для подстановки в условие
 
         Returns:
             Количество записей

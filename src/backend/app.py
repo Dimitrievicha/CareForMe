@@ -87,10 +87,9 @@ def welcome_page():
 
 @app.route('/unauthorized.html')
 def unauthorized_page():
-    """Страница отказа DB_TESTING_REPORT.md доступе - всегда доступна"""
+    """Страница отказа в доступе - всегда доступна"""
     return send_from_directory(FRONTEND_DIR, 'unauthorized.html')
 
-# СТАТИЧЕСКИЕ ФАЙЛЫ
 
 @app.route('/css/<path:filename>')
 def serve_css(filename):
@@ -127,9 +126,4 @@ def catch_all(path):
     return CUSTOM_404_HTML, 404
 
 if __name__ == '__main__':
-    print(f"Сервер запущен на http://localhost:5000")
-    print("Доступные страницы:")
-    print("  - http://localhost:5000/register.html (всегда доступна)")
-    print("  - http://localhost:5000/room.html (только для авторизованных)")
-    print("  - http://localhost:5000/welcome.html (только для авторизованных)")
     app.run(host='0.0.0.0', port=5000, debug=True)

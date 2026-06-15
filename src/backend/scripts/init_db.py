@@ -16,11 +16,9 @@ from database_full.database.db_manager import get_db_manager
 def init_database():
     """Инициализирует структуру БД из SQL файла"""
 
-    # Путь к БД — рядом с app.py DB_TESTING_REPORT.md папке backend/
     db_path = str(Path(__file__).parent.parent / 'careforme.db')
     db = get_db_manager(db_path)
 
-    # Путь к SQL файлу (исправлен: database_full/database/)
     sql_path = Path(__file__).parent.parent / 'database_full' / 'database' / 'init_db.sql'
 
     if not sql_path.exists():

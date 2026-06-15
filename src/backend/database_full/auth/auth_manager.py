@@ -36,10 +36,10 @@ class AuthManager:
         Хэширует пароль с помощью SHA-256.
 
         Args:
-            password: Пароль DB_TESTING_REPORT.md открытом виде
+            password: Пароль в открытом виде
 
         Returns:
-            Хэш пароля DB_TESTING_REPORT.md виде hex-строки
+            Хэш пароля в виде hex-строки
 
         Note:
             В production рекомендуется использовать bcrypt или PBKDF2
@@ -128,7 +128,7 @@ class AuthManager:
         Example:
             >>> result = auth_manager.login("anna", "qwerty123", remember_me=True)
             >>> if result['success']:
-            ...     # Сохраняем токен DB_TESTING_REPORT.md cookie или localStorage
+            ...     # Сохраняем токен в cookie или localStorage
             ...     save_token(result['session_token'])
         """
         # Поиск пользователя
@@ -252,7 +252,7 @@ class AuthManager:
         """
         Обновляет ежедневную серию пользователя.
 
-        Вызывается при каждом входе DB_TESTING_REPORT.md игру.
+        Вызывается при каждом входе в игру.
         Если пользователь зашел сегодня - серия не меняется.
         Если зашел на следующий день - серия увеличивается.
         Если пропустил день - серия сбрасывается до 1.

@@ -1,8 +1,8 @@
 """
-Игровая логика комнаты (сад DB_TESTING_REPORT.md slotData).
+Игровая логика комнаты (сад в slotData).
 
 Правила роста, полива, болезней и смерти растений живут здесь,
-DB_TESTING_REPORT.md не во frontend/js/room.js.
+в не во frontend/js/room.js.
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ class RoomGameService:
         },
         2: {
             "too_dark": "🌵 Вытягивание и бледность стебля — не хватает света",
-            "no_flower": "🌵 Нет цветения — причина DB_TESTING_REPORT.md нехватке света",
+            "no_flower": "🌵 Нет цветения — причина в нехватке света",
             "under_watered": "🌵 Сморщенный стебель — недостаточный полив",
             "overwatered": "🌵 Сморщенный стебель — перелив или застой воды",
         },

@@ -49,7 +49,7 @@ class UserRepository(BaseRepository):
         return self.get_by_id("users", "id", user_id)
 
     def update_level(self, user_id: str, new_level: int) -> bool:
-        """Обновляет уровень пользователя DB_TESTING_REPORT.md профиле."""
+        """Обновляет уровень пользователя в профиле."""
         return self.db.execute_update("""
             UPDATE player_profiles 
             SET current_level = ? 
@@ -128,7 +128,7 @@ class UserRepository(BaseRepository):
         Args:
             user_id: ID пользователя
             token: Уникальный токен сессии (генерируется через secrets.token_urlsafe)
-            expires_at: Дата истечения DB_TESTING_REPORT.md ISO формате
+            expires_at: Дата истечения в ISO формате
 
         Returns:
             True при успехе
@@ -430,7 +430,7 @@ class UserRepository(BaseRepository):
 
         Args:
             user_id: ID пользователя
-            pot_id: ID дизайна горшка (должен быть DB_TESTING_REPORT.md unlocked_pots)
+            pot_id: ID дизайна горшка (должен быть в unlocked_pots)
 
         Returns:
             True при успехе

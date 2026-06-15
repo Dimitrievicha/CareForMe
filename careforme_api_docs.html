@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareForMe — API Docs</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;line-height:1.6;color:#1a1a1a;background:#f6f6f6;display:flex}
+nav{width:220px;min-height:100vh;background:#1e1e2e;color:#cdd6f4;position:fixed;top:0;left:0;overflow-y:auto;padding:16px 0}
+nav h1{font-size:14px;font-weight:700;color:#cba6f7;padding:8px 16px 16px;border-bottom:1px solid #313244;margin-bottom:8px}
+nav ul{list-style:none;padding:0}
+nav li a{display:block;padding:4px 16px;color:#a6adc8;text-decoration:none;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+nav li a:hover{color:#cba6f7;background:#313244}
+.nav-section{padding:12px 16px 4px;font-size:11px;font-weight:700;color:#6c7086;text-transform:uppercase;letter-spacing:.08em}
+main{margin-left:220px;padding:32px;max-width:960px;width:100%}
+main>h1{font-size:24px;font-weight:700;color:#1e1e2e;margin-bottom:4px}
+main>.subtitle{color:#6c7086;margin-bottom:32px;font-size:14px}
+.class-section{background:#fff;border-radius:8px;margin-bottom:24px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.class-header{display:flex;align-items:center;gap:12px;padding:16px 20px;background:#1e1e2e;border-bottom:2px solid #cba6f7}
+.class-header h2{font-size:16px;font-weight:700;color:#cdd6f4;font-family:"SF Mono",monospace}
+.badge{font-size:11px;color:#a6adc8;background:#313244;padding:2px 8px;border-radius:4px;font-family:monospace}
+.class-doc{padding:12px 20px 0;color:#444;font-size:13px}
+.methods-container{padding:0 20px 12px}
+.method{border-top:1px solid #f0f0f0;padding:12px 0}
+.method.private{opacity:.6}
+.method-sig{font-family:"SF Mono","Fira Code",monospace;font-size:13px;background:#f8f8fb;border-radius:4px;padding:6px 10px;margin-bottom:6px}
+.method-name{color:#8839ef;font-weight:600}
+.method-args{color:#df8e1d}
+.ret{color:#179299}
+.method-doc{font-size:13px;color:#444;margin:6px 0}
+.arg-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+.arg-table th{text-align:left;padding:4px 8px;background:#f5f5ff;color:#666;font-weight:600;border-bottom:1px solid #e0e0f0}
+.arg-table td{padding:4px 8px;border-bottom:1px solid #f5f5f5;vertical-align:top}
+.arg-name{font-family:monospace;color:#8839ef;white-space:nowrap}
+.returns{font-size:12px;color:#555;margin-top:4px;padding:4px 8px;background:#f0fff4;border-radius:4px;border-left:3px solid #40a02b}
+</style>
+</head>
+<body>
+<nav>
+  <h1>🌿 CareForMe Docs</h1>
+  <ul><li class="nav-section">🔐 Auth</li>
+<li><a href="#AuthManager">AuthManager</a></li>
+<li class="nav-section">🔌 Interfaces</li>
+<li><a href="#ChallengeInterface">ChallengeInterface</a></li>
+<li><a href="#FlowerInterface">FlowerInterface</a></li>
+<li><a href="#GameInterface">GameInterface</a></li>
+<li><a href="#LevelQuestInterface">LevelQuestInterface</a></li>
+<li><a href="#TipsInterface">TipsInterface</a></li>
+<li><a href="#UserInterface">UserInterface</a></li>
+<li class="nav-section">⚙️ Services</li>
+<li><a href="#ChallengeService">ChallengeService</a></li>
+<li><a href="#FlowerService">FlowerService</a></li>
+<li><a href="#LevelQuestService">LevelQuestService</a></li>
+<li><a href="#TipsService">TipsService</a></li>
+<li><a href="#UserService">UserService</a></li>
+<li class="nav-section">📦 Repositories</li>
+<li><a href="#BaseRepository">BaseRepository</a></li>
+<li><a href="#ChallengeRepository">ChallengeRepository</a></li>
+<li><a href="#GameRepository">GameRepository</a></li>
+<li><a href="#LevelQuestRepository">LevelQuestRepository</a></li>
+<li><a href="#MistakeRepository">MistakeRepository</a></li>
+<li><a href="#PlantRepository">PlantRepository</a></li>
+<li><a href="#TipsRepository">TipsRepository</a></li>
+<li><a href="#UserRepository">UserRepository</a></li></ul>
+</nav>
+<main>
+  <h1>CareForMe — Backend API</h1>
+  <p class="subtitle">Автоматически сгенерировано из docstring'ов · 20 модулей · 215 методов</p>
+  
+            <section class="class-section" id="AuthManager">
+              <div class="class-header">
+                <h2>class AuthManager</h2>
+                <span class="badge">auth/auth_manager.py</span>
+              </div>
+              <p class="class-doc">Менеджер авторизации.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="AuthManager.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args"></span>)
+                  </div>
+                  <p class="method-doc">Инициализирует менеджер с репозиторием пользователей.</p>
+                  
+                  
+                </div>
+                <div class="method private" id="AuthManager._hash_password">
+                  <div class="method-sig">
+                    <span class="method-name">_hash_password</span>(<span class="method-args">password</span>) → <span class="ret">str</span>
+                  </div>
+                  <p class="method-doc">Хэширует пароль с помощью SHA-256.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">password</td><td>Пароль в открытом виде</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Хэш пароля в виде hex-строки Note: В production рекомендуется использовать bcrypt или PBKDF2</div>
+                </div>
+                <div class="method public" id="AuthManager.register">
+                  <div class="method-sig">
+                    <span class="method-name">register</span>(<span class="method-args">username, password</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Регистрирует нового пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">username</td><td>Имя пользователя (минимум 3 символа)</td></tr><tr><td class="arg-name">password</td><td>Пароль (минимум 4 символа)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Dict с результатом операции { &quot;success&quot;: True, &quot;user_id&quot;: &quot;uuid-...&quot;, &quot;username&quot;: &quot;john&quot; } { &quot;success&quot;: False, &quot;error&quot;: &quot;Пользователь уже существует&quot; }</div>
+                </div>
+                <div class="method public" id="AuthManager.login">
+                  <div class="method-sig">
+                    <span class="method-name">login</span>(<span class="method-args">username, password, remember_me</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Авторизует пользователя и создает сессию.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">username</td><td>Имя пользователя</td></tr><tr><td class="arg-name">password</td><td>Пароль</td></tr><tr><td class="arg-name">remember_me</td><td>Если True, сессия будет активна 30 дней</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Dict с результатом авторизации и токеном сессии { &quot;success&quot;: True, &quot;user_id&quot;: &quot;uuid-...&quot;, &quot;username&quot;: &quot;john&quot;, &quot;session_token&quot;: &quot;base64_token...&quot;, &quot;expires_at&quot;: &quot;2024-01-01T00:00:00&quot; } { &quot;success&quot;: False, &quot;error&quot;: &quot;Неверный логин или пароль&quot; }</div>
+                </div>
+                <div class="method public" id="AuthManager.logout">
+                  <div class="method-sig">
+                    <span class="method-name">logout</span>(<span class="method-args">session_token</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Завершает сессию пользователя (выход).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">session_token</td><td>Токен сессии</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если выход выполнен успешно</div>
+                </div>
+                <div class="method public" id="AuthManager.get_user_id_by_token">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_id_by_token</span>(<span class="method-args">session_token</span>) → <span class="ret">Optional[str]</span>
+                  </div>
+                  <p class="method-doc">Получает ID пользователя по токену сессии.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">session_token</td><td>Токен сессии</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> ID пользователя или None если сессия невалидна или истекла</div>
+                </div>
+                <div class="method public" id="AuthManager.get_user">
+                  <div class="method-sig">
+                    <span class="method-name">get_user</span>(<span class="method-args">user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает данные пользователя по ID.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь с данными пользователя или None { &quot;id&quot;: &quot;uuid-...&quot;, &quot;username&quot;: &quot;john&quot;, &quot;created_at&quot;: &quot;2024-01-01...&quot;, &quot;last_login&quot;: &quot;2024-01-02...&quot;, &quot;login_count&quot;: 5 }</div>
+                </div>
+                <div class="method public" id="AuthManager.get_profile">
+                  <div class="method-sig">
+                    <span class="method-name">get_profile</span>(<span class="method-args">user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает игровой профиль пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные профиля или None { &quot;user_id&quot;: &quot;uuid-...&quot;, &quot;display_name&quot;: &quot;john&quot;, &quot;current_level&quot;: 2, &quot;max_plants_slots&quot;: 2, &quot;total_plants_grown&quot;: 3, &quot;total_waterings&quot;: 15, &quot;total_mistakes&quot;: 2, &quot;total_deaths&quot;: 1, &quot;current_plants_count&quot;: 2, &quot;consecutive_days&quot;: 5, &quot;best_streak&quot;: 5, &quot;unlocked_pots&quot;: &#x27;[&quot;standard&quot;, &quot;design_pot_1&quot;]&#x27;, &quot;unlocked_watering_cans&quot;: &#x27;[&quot;standard&quot;]&#x27;, &quot;current_pot&quot;: &quot;standard&quot;, &quot;current_watering_can&quot;: &quot;standard&quot; }</div>
+                </div>
+                <div class="method public" id="AuthManager.update_streak">
+                  <div class="method-sig">
+                    <span class="method-name">update_streak</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Обновляет ежедневную серию пользователя. Вызывается при каждом входе в игру. Если пользователь зашел сегодня - серия не меняется. Если зашел на следующий день - серия увеличивается. Если пропустил день - серия сбрасывается до 1.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат обновления серии { &quot;success&quot;: True, &quot;consecutive_days&quot;: 5, &quot;best_streak&quot;: 7 }</div>
+                </div>
+                <div class="method public" id="AuthManager.verify_session">
+                  <div class="method-sig">
+                    <span class="method-name">verify_session</span>(<span class="method-args">session_token</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Проверяет валидность сессии и возвращает данные пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">session_token</td><td>Токен сессии</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Dict с данными пользователя или None { &quot;user_id&quot;: &quot;uuid-...&quot;, &quot;username&quot;: &quot;john&quot; }</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="ChallengeInterface">
+              <div class="class-header">
+                <h2>class ChallengeInterface</h2>
+                <span class="badge">interface/challenge_interface.py</span>
+              </div>
+              <p class="class-doc">Интерфейс для API - вызывает методы ChallengeService.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="ChallengeInterface.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args">db_path</span>)
+                  </div>
+                  <p class="method-doc">Инициализирует интерфейс с сервисным слоем.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">db_path</td><td>Путь к БД (опционально)</td></tr></tbody></table>
+                  
+                </div>
+                <div class="method public" id="ChallengeInterface.get_all_achievements">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_achievements</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить все достижения с прогрессом пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список достижений с прогрессом</div>
+                </div>
+                <div class="method public" id="ChallengeInterface.get_completed">
+                  <div class="method-sig">
+                    <span class="method-name">get_completed</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить выполненные достижения пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список выполненных достижений</div>
+                </div>
+                <div class="method public" id="ChallengeInterface.get_completed_count">
+                  <div class="method-sig">
+                    <span class="method-name">get_completed_count</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получить количество выполненных достижений.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество выполненных ачивок</div>
+                </div>
+                <div class="method public" id="ChallengeInterface.get_statistics">
+                  <div class="method-sig">
+                    <span class="method-name">get_statistics</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получить статистику пользователя по достижениям.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь со статистикой { &quot;plants_grown_to_maturity_perfect&quot;: 1,  # идеальных растений &quot;death_count&quot;: 1,                        # смертей &quot;mistake_count&quot;: 5,                      # ошибок &quot;species_collected&quot;: 3,                  # видов &quot;consecutive_days&quot;: 7,                   # серия дней &quot;level&quot;: 3,                              # уровень &quot;total_achievements&quot;: 2                  # получено ачивок }</div>
+                </div>
+                <div class="method public" id="ChallengeInterface.check_all_achievements">
+                  <div class="method-sig">
+                    <span class="method-name">check_all_achievements</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Проверить все достижения пользователя. Вызывается после каждого действия.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список вновь выполненных достижений</div>
+                </div>
+                <div class="method public" id="ChallengeInterface.record_mistake">
+                  <div class="method-sig">
+                    <span class="method-name">record_mistake</span>(<span class="method-args">user_id, plant_id, mistake_type</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Записать ошибку пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">mistake_type</td><td>Тип ошибки (overwater, drought, light, cold)</td></tr><tr><td class="arg-name">check_achievements</td><td>Проверять достижения после записи</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат с новыми достижениями</div>
+                </div>
+                <div class="method public" id="ChallengeInterface.record_perfect_growth">
+                  <div class="method-sig">
+                    <span class="method-name">record_perfect_growth</span>(<span class="method-args">user_id, plant_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Записать, что растение выращено без ошибок.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат с новыми достижениями</div>
+                </div>
+                <div class="method public" id="ChallengeInterface.record_plant_death">
+                  <div class="method-sig">
+                    <span class="method-name">record_plant_death</span>(<span class="method-args">user_id, plant_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Записать смерть растения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат с новыми достижениями</div>
+                </div>
+                <div class="method public" id="ChallengeInterface.record_species_collected">
+                  <div class="method-sig">
+                    <span class="method-name">record_species_collected</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Записать сбор нового вида.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат с новыми достижениями</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="FlowerInterface">
+              <div class="class-header">
+                <h2>class FlowerInterface</h2>
+                <span class="badge">interface/flower_interface.py</span>
+              </div>
+              <p class="class-doc">Интерфейс для работы с растениями.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="FlowerInterface.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args">db_path</span>)
+                  </div>
+                  <p class="method-doc">Инициализирует интерфейс с сервисным слоем.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">db_path</td><td>Путь к БД (опционально, для тестирования)</td></tr></tbody></table>
+                  
+                </div>
+                <div class="method public" id="FlowerInterface.set_light_level">
+                  <div class="method-sig">
+                    <span class="method-name">set_light_level</span>(<span class="method-args">plant_id, user_id, light_level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Сменить уровень освещения растения.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="FlowerInterface.set_location">
+                  <div class="method-sig">
+                    <span class="method-name">set_location</span>(<span class="method-args">plant_id, user_id, location</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Сменить локацию растения.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="FlowerInterface.get_my_garden">
+                  <div class="method-sig">
+                    <span class="method-name">get_my_garden</span>(<span class="method-args">user_id, only_alive</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить сад пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">only_alive</td><td>Если True, только живые растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список растений пользователя</div>
+                </div>
+                <div class="method public" id="FlowerInterface.plant_flower">
+                  <div class="method-sig">
+                    <span class="method-name">plant_flower</span>(<span class="method-args">user_id, species_id, name</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Посадить новый цветок.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">species_id</td><td>ID вида растения (1=Спатифиллум, 2=Кактус, 3=Фикус)</td></tr><tr><td class="arg-name">name</td><td>Пользовательское имя (если не указано, используется видовое)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат посадки</div>
+                </div>
+                <div class="method public" id="FlowerInterface.water_flower">
+                  <div class="method-sig">
+                    <span class="method-name">water_flower</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Полить цветок.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя (для проверки прав)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат полива</div>
+                </div>
+                <div class="method public" id="FlowerInterface.check_health">
+                  <div class="method-sig">
+                    <span class="method-name">check_health</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Проверить здоровье растения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Статус здоровья и рекомендации</div>
+                </div>
+                <div class="method public" id="FlowerInterface.get_plant_details">
+                  <div class="method-sig">
+                    <span class="method-name">get_plant_details</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить детальную информацию о растении.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя (для проверки прав)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные растения или None</div>
+                </div>
+                <div class="method public" id="FlowerInterface.update_growth">
+                  <div class="method-sig">
+                    <span class="method-name">update_growth</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Обновить рост растения (обычно вызывается при проверке).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Информация об изменении стадии роста</div>
+                </div>
+                <div class="method public" id="FlowerInterface.get_growth_stats">
+                  <div class="method-sig">
+                    <span class="method-name">get_growth_stats</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, int]</span>
+                  </div>
+                  <p class="method-doc">Получить статистику по стадиям роста.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь {стадия: количество}</div>
+                </div>
+                <div class="method public" id="FlowerInterface.get_available_plants">
+                  <div class="method-sig">
+                    <span class="method-name">get_available_plants</span>(<span class="method-args"></span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить список доступных для посадки растений.</p>
+                  
+                  <div class="returns"><strong>Returns:</strong> Список шаблонов растений</div>
+                </div>
+                <div class="method public" id="FlowerInterface.check_death">
+                  <div class="method-sig">
+                    <span class="method-name">check_death</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">dict</span>
+                  </div>
+                  <p class="method-doc">Проверить, погибло ли растение (вызывается в check_all).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> { &quot;is_dead&quot;: bool, &quot;cause&quot;: str | None }</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="GameInterface">
+              <div class="class-header">
+                <h2>class GameInterface</h2>
+                <span class="badge">interface/game_interface.py</span>
+              </div>
+              <p class="class-doc">Интерфейс для работы с game_states и игровой логикой комнаты.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="GameInterface.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args"></span>)
+                  </div>
+                  
+                  
+                  
+                </div>
+                <div class="method public" id="GameInterface.save_state">
+                  <div class="method-sig">
+                    <span class="method-name">save_state</span>(<span class="method-args">user_id, slot_data, current_level, achievements</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Сохранить состояние игры.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="GameInterface.load_state">
+                  <div class="method-sig">
+                    <span class="method-name">load_state</span>(<span class="method-args">user_id</span>) → <span class="ret">dict</span>
+                  </div>
+                  <p class="method-doc">Загрузить состояние игры.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="GameInterface.water_slot">
+                  <div class="method-sig">
+                    <span class="method-name">water_slot</span>(<span class="method-args">user_id, slot_name</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  
+                  
+                  
+                </div>
+                <div class="method public" id="GameInterface.plant_in_slot">
+                  <div class="method-sig">
+                    <span class="method-name">plant_in_slot</span>(<span class="method-args">user_id, slot_name, species_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  
+                  
+                  
+                </div>
+                <div class="method public" id="GameInterface.tick">
+                  <div class="method-sig">
+                    <span class="method-name">tick</span>(<span class="method-args">user_id, slot_names</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  
+                  
+                  
+                </div>
+                <div class="method public" id="GameInterface.move_slot">
+                  <div class="method-sig">
+                    <span class="method-name">move_slot</span>(<span class="method-args">user_id, from_slot, to_slot</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  
+                  
+                  
+                </div>
+                <div class="method public" id="GameInterface.mark_read_description">
+                  <div class="method-sig">
+                    <span class="method-name">mark_read_description</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  
+                  
+                  
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="LevelQuestInterface">
+              <div class="class-header">
+                <h2>class LevelQuestInterface</h2>
+                <span class="badge">interface/level_quest_interface.py</span>
+              </div>
+              <p class="class-doc">Интерфейс для API - вызывает методы LevelQuestService.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="LevelQuestInterface.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args"></span>)
+                  </div>
+                  <p class="method-doc">Инициализирует интерфейс с сервисным слоем.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="LevelQuestInterface.get_level_quests">
+                  <div class="method-sig">
+                    <span class="method-name">get_level_quests</span>(<span class="method-args">level</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить задания для указанного уровня.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">level</td><td>Номер уровня (1-5)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные заданий уровня или None</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.get_all_levels_quests">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_levels_quests</span>(<span class="method-args"></span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить задания для всех уровней.</p>
+                  
+                  <div class="returns"><strong>Returns:</strong> Список заданий для уровней 1-5</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.get_progress">
+                  <div class="method-sig">
+                    <span class="method-name">get_progress</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получить полную информацию о прогрессе пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Полная информация о прогрессе по уровням { &quot;current_level&quot;: 2, &quot;max_level&quot;: 5, &quot;levels&quot;: { 1: { &quot;status&quot;: &quot;completed&quot;, &quot;completed_at&quot;: &quot;2024-01-01&quot;, &quot;reward_claimed&quot;: True }, 2: { &quot;status&quot;: &quot;in_progress&quot;, &quot;quests&quot;: [...], &quot;reward_claimed&quot;: False }, 3: {&quot;status&quot;: &quot;locked&quot;}, 4: {&quot;status&quot;: &quot;locked&quot;}, 5: {&quot;status&quot;: &quot;locked&quot;} } }</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.get_current_level_progress">
+                  <div class="method-sig">
+                    <span class="method-name">get_current_level_progress</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получить прогресс по текущему уровню пользователя.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="LevelQuestInterface.get_quest_progress">
+                  <div class="method-sig">
+                    <span class="method-name">get_quest_progress</span>(<span class="method-args">user_id, level, quest_number</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получить прогресс конкретного задания.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">level</td><td>Номер уровня</td></tr><tr><td class="arg-name">quest_number</td><td>Номер задания (1, 2, 3)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Прогресс задания { &quot;quest_number&quot;: 1, &quot;type&quot;: &quot;plant_first&quot;, &quot;progress&quot;: 1, &quot;target&quot;: 1, &quot;completed&quot;: True, &quot;description&quot;: &quot;Посадить первое растение&quot; }</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.check_quests">
+                  <div class="method-sig">
+                    <span class="method-name">check_quests</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Принудительно проверить выполнение заданий. Вызывается после каждого действия пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат проверки с информацией о повышении уровня { &quot;success&quot;: True, &quot;leveled_up&quot;: True, &quot;old_level&quot;: 1, &quot;new_level&quot;: 2, &quot;reward&quot;: { &quot;type&quot;: &quot;new_pot&quot;, &quot;value&quot;: &quot;design_pot_1&quot;, &quot;description&quot;: &quot;1 новый дизайнерский горшок&quot; } } { &quot;success&quot;: True, &quot;leveled_up&quot;: False, &quot;current_level&quot;: 2, &quot;quests_completed&quot;: 1 }</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.trigger_check">
+                  <div class="method-sig">
+                    <span class="method-name">trigger_check</span>(<span class="method-args">user_id, action</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Триггер для проверки заданий после действия пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">action</td><td>Тип действия (water, plant, mistake, read_tip, grow_to_mature, heal)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат проверки заданий</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.get_reward_info">
+                  <div class="method-sig">
+                    <span class="method-name">get_reward_info</span>(<span class="method-args">level</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить информацию о награде за уровень.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">level</td><td>Номер уровня</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Информация о награде</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.get_next_reward">
+                  <div class="method-sig">
+                    <span class="method-name">get_next_reward</span>(<span class="method-args">user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить информацию о следующей награде.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Информация о награде за следующий уровень</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.get_total_completed_levels">
+                  <div class="method-sig">
+                    <span class="method-name">get_total_completed_levels</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получить количество выполненных уровней.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество завершенных уровней (0-5)</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.is_max_level_reached">
+                  <div class="method-sig">
+                    <span class="method-name">is_max_level_reached</span>(<span class="method-args">user_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Проверить, достиг ли пользователь максимального уровня.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если уровень 5 достигнут</div>
+                </div>
+                <div class="method public" id="LevelQuestInterface.get_user_progress">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_progress</span>(<span class="method-args">user_id, level</span>) → <span class="ret">dict</span>
+                  </div>
+                  <p class="method-doc">Получить прогресс пользователя по конкретному уровню.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">level</td><td>Номер уровня (1-5)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Строка из user_level_progress или None</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="TipsInterface">
+              <div class="class-header">
+                <h2>class TipsInterface</h2>
+                <span class="badge">interface/tips_interface.py</span>
+              </div>
+              <p class="class-doc">Интерфейс для API — только вызов сервиса, никакой логики.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="TipsInterface.get_all_tips">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_tips</span>(<span class="method-args"></span>)
+                  </div>
+                  <p class="method-doc">Получить все советы.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="TipsInterface.get_positive_tips">
+                  <div class="method-sig">
+                    <span class="method-name">get_positive_tips</span>(<span class="method-args"></span>)
+                  </div>
+                  <p class="method-doc">Получить позитивные советы.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="TipsInterface.get_tip_by_type">
+                  <div class="method-sig">
+                    <span class="method-name">get_tip_by_type</span>(<span class="method-args">tip_type</span>)
+                  </div>
+                  <p class="method-doc">Получить совет по типу.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="TipsInterface.get_plant_tips">
+                  <div class="method-sig">
+                    <span class="method-name">get_plant_tips</span>(<span class="method-args">species_id</span>)
+                  </div>
+                  <p class="method-doc">Получить советы для растения.</p>
+                  
+                  
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="UserInterface">
+              <div class="class-header">
+                <h2>class UserInterface</h2>
+                <span class="badge">interface/user_interface.py</span>
+              </div>
+              <p class="class-doc">Интерфейс для работы с пользователями.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="UserInterface.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args"></span>)
+                  </div>
+                  <p class="method-doc">Инициализирует интерфейс со всеми сервисами.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="UserInterface.complete_tutorial">
+                  <div class="method-sig">
+                    <span class="method-name">complete_tutorial</span>(<span class="method-args">user_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отметить обучение пройденным.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="UserInterface.register">
+                  <div class="method-sig">
+                    <span class="method-name">register</span>(<span class="method-args">username, password</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Регистрация нового пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">username</td><td>Имя пользователя (мин. 3 символа)</td></tr><tr><td class="arg-name">password</td><td>Пароль (мин. 4 символа)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат регистрации</div>
+                </div>
+                <div class="method public" id="UserInterface.login">
+                  <div class="method-sig">
+                    <span class="method-name">login</span>(<span class="method-args">username, password, remember_me</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Вход пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">username</td><td>Имя пользователя</td></tr><tr><td class="arg-name">password</td><td>Пароль</td></tr><tr><td class="arg-name">remember_me</td><td>Запомнить на 30 дней (иначе на 1 день)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат авторизации с токеном сессии</div>
+                </div>
+                <div class="method public" id="UserInterface.logout">
+                  <div class="method-sig">
+                    <span class="method-name">logout</span>(<span class="method-args">session_token</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Выход пользователя (завершение сессии).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">session_token</td><td>Токен сессии</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если успешно</div>
+                </div>
+                <div class="method public" id="UserInterface.verify_session">
+                  <div class="method-sig">
+                    <span class="method-name">verify_session</span>(<span class="method-args">session_token</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Проверить валидность сессии.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">session_token</td><td>Токен сессии</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> {&quot;user_id&quot;: &quot;...&quot;, &quot;username&quot;: &quot;...&quot;} или None</div>
+                </div>
+                <div class="method public" id="UserInterface.get_current_user">
+                  <div class="method-sig">
+                    <span class="method-name">get_current_user</span>(<span class="method-args">session_token</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить текущего пользователя по токену.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">session_token</td><td>Токен сессии</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные пользователя или None</div>
+                </div>
+                <div class="method public" id="UserInterface.get_profile">
+                  <div class="method-sig">
+                    <span class="method-name">get_profile</span>(<span class="method-args">user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить игровой профиль пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные профиля</div>
+                </div>
+                <div class="method public" id="UserInterface.get_stats">
+                  <div class="method-sig">
+                    <span class="method-name">get_stats</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получить основную статистику пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Статистика (уровень, растения, поливы, серии)</div>
+                </div>
+                <div class="method public" id="UserInterface.get_user_info">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_info</span>(<span class="method-args">user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить основную информацию о пользователе.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> {&quot;id&quot;: &quot;...&quot;, &quot;username&quot;: &quot;...&quot;, &quot;created_at&quot;: &quot;...&quot;, &quot;last_login&quot;: &quot;...&quot;, &quot;login_count&quot;: 0}</div>
+                </div>
+                <div class="method public" id="UserInterface.get_level_info">
+                  <div class="method-sig">
+                    <span class="method-name">get_level_info</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получить информацию об уровне пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Информация о текущем уровне и следующих заданиях</div>
+                </div>
+                <div class="method public" id="UserInterface.get_current_level">
+                  <div class="method-sig">
+                    <span class="method-name">get_current_level</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получить текущий уровень пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Уровень (1-5)</div>
+                </div>
+                <div class="method public" id="UserInterface.get_quests_status">
+                  <div class="method-sig">
+                    <span class="method-name">get_quests_status</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[int, Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить статус всех заданий для всех уровней.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь {уровень: статус}</div>
+                </div>
+                <div class="method public" id="UserInterface.check_quests">
+                  <div class="method-sig">
+                    <span class="method-name">check_quests</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Принудительно проверить выполнение заданий.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат проверки с информацией о повышении уровня</div>
+                </div>
+                <div class="method public" id="UserInterface.update_daily_streak">
+                  <div class="method-sig">
+                    <span class="method-name">update_daily_streak</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Обновить серию дней подряд (вызывать при ежедневном входе).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат обновления серии</div>
+                </div>
+                <div class="method public" id="UserInterface.get_streak_info">
+                  <div class="method-sig">
+                    <span class="method-name">get_streak_info</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, int]</span>
+                  </div>
+                  <p class="method-doc">Получить информацию о серии дней.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> {&quot;consecutive_days&quot;: 5, &quot;best_streak&quot;: 10}</div>
+                </div>
+                <div class="method public" id="UserInterface.get_plant_slots_info">
+                  <div class="method-sig">
+                    <span class="method-name">get_plant_slots_info</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, int]</span>
+                  </div>
+                  <p class="method-doc">Получить информацию о слотах для растений.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> {&quot;current&quot;: 2, &quot;max&quot;: 5, &quot;available&quot;: 3}</div>
+                </div>
+                <div class="method public" id="UserInterface.has_free_slot">
+                  <div class="method-sig">
+                    <span class="method-name">has_free_slot</span>(<span class="method-args">user_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Проверить, есть ли свободный слот для посадки.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если есть свободный слот</div>
+                </div>
+                <div class="method public" id="UserInterface.get_unlocked_pots">
+                  <div class="method-sig">
+                    <span class="method-name">get_unlocked_pots</span>(<span class="method-args">user_id</span>) → <span class="ret">List[str]</span>
+                  </div>
+                  <p class="method-doc">Получить список открытых горшков.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список ID дизайнов горшков</div>
+                </div>
+                <div class="method public" id="UserInterface.get_unlocked_watering_cans">
+                  <div class="method-sig">
+                    <span class="method-name">get_unlocked_watering_cans</span>(<span class="method-args">user_id</span>) → <span class="ret">List[str]</span>
+                  </div>
+                  <p class="method-doc">Получить список открытых леек.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список ID дизайнов леек</div>
+                </div>
+                <div class="method public" id="UserInterface.get_current_designs">
+                  <div class="method-sig">
+                    <span class="method-name">get_current_designs</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, str]</span>
+                  </div>
+                  <p class="method-doc">Получить текущие выбранные дизайны.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> {&quot;pot&quot;: &quot;standard&quot;, &quot;watering_can&quot;: &quot;standard&quot;}</div>
+                </div>
+                <div class="method public" id="UserInterface.change_pot">
+                  <div class="method-sig">
+                    <span class="method-name">change_pot</span>(<span class="method-args">user_id, pot_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Сменить текущий горшок.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">pot_id</td><td>ID дизайна горшка</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> {&quot;success&quot;: True} или {&quot;success&quot;: False, &quot;error&quot;: &quot;...&quot;}</div>
+                </div>
+                <div class="method public" id="UserInterface.change_watering_can">
+                  <div class="method-sig">
+                    <span class="method-name">change_watering_can</span>(<span class="method-args">user_id, can_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Сменить текущую лейку.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">can_id</td><td>ID дизайна лейки</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> {&quot;success&quot;: True} или {&quot;success&quot;: False, &quot;error&quot;: &quot;...&quot;}</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="ChallengeService">
+              <div class="class-header">
+                <h2>class ChallengeService</h2>
+                <span class="badge">service/challenge_service.py</span>
+              </div>
+              <p class="class-doc">Сервис для работы с достижениями (ачивками).</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="ChallengeService.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args"></span>)
+                  </div>
+                  <p class="method-doc">Инициализирует сервис с необходимыми репозиториями.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="ChallengeService.get_achievements">
+                  <div class="method-sig">
+                    <span class="method-name">get_achievements</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает все достижения с прогрессом пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список достижений с прогрессом [ { &quot;id&quot;: &quot;uuid&quot;, &quot;name&quot;: &quot;Заботливый родитель&quot;, &quot;description&quot;: &quot;...&quot;, &quot;current_progress&quot;: 0, &quot;is_completed&quot;: False, &quot;completed_at&quot;: None }, ... ]</div>
+                </div>
+                <div class="method public" id="ChallengeService.get_completed">
+                  <div class="method-sig">
+                    <span class="method-name">get_completed</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает выполненные достижения пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список выполненных достижений с датами</div>
+                </div>
+                <div class="method public" id="ChallengeService.get_completed_count">
+                  <div class="method-sig">
+                    <span class="method-name">get_completed_count</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получает количество выполненных достижений.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество выполненных ачивок</div>
+                </div>
+                <div class="method private" id="ChallengeService._get_progress">
+                  <div class="method-sig">
+                    <span class="method-name">_get_progress</span>(<span class="method-args">user_id, req_type</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Внутренний метод для получения прогресса по типу требования.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">req_type</td><td>Тип требования</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Текущий прогресс Типы требований и соответствующие проверки: - grow_to_maturity_perfect: растение без ошибок до зрелости - first_wither: первая смерть растения - first_negative_effect: первый негативный эффект (ошибка) - grow_all_species: все 3 вида цветов до зрелости - daily_streak: серия дней подряд - reach_level: достигнут уровень X</div>
+                </div>
+                <div class="method public" id="ChallengeService.check_all">
+                  <div class="method-sig">
+                    <span class="method-name">check_all</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Проверяет все достижения и отмечает выполненные. Вызывается после каждого действия (полив, посадка, ошибка и т.д.)</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список вновь выполненных достижений</div>
+                </div>
+                <div class="method public" id="ChallengeService.record_mistake">
+                  <div class="method-sig">
+                    <span class="method-name">record_mistake</span>(<span class="method-args">user_id, plant_id, mistake_type</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Записывает ошибку пользователя и проверяет достижения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">mistake_type</td><td>Тип ошибки (overwater, drought, light, cold)</td></tr><tr><td class="arg-name">check_achievements</td><td>Проверять достижения (False для мгновенного предупреждения перелива)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат с новыми достижениями { &quot;success&quot;: True, &quot;mistake_type&quot;: &quot;overwater&quot;, &quot;new_achievements&quot;: [...] }</div>
+                </div>
+                <div class="method public" id="ChallengeService.record_perfect_growth">
+                  <div class="method-sig">
+                    <span class="method-name">record_perfect_growth</span>(<span class="method-args">user_id, plant_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Записывает, что растение выращено без ошибок. Вызывается, когда растение достигает стадии mature без ошибок.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат с новыми достижениями</div>
+                </div>
+                <div class="method public" id="ChallengeService.record_plant_death">
+                  <div class="method-sig">
+                    <span class="method-name">record_plant_death</span>(<span class="method-args">user_id, plant_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Записывает смерть растения и проверяет достижения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат с новыми достижениями</div>
+                </div>
+                <div class="method public" id="ChallengeService.record_species_collected">
+                  <div class="method-sig">
+                    <span class="method-name">record_species_collected</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Записывает сбор нового вида и проверяет достижения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат с новыми достижениями</div>
+                </div>
+                <div class="method public" id="ChallengeService.record_daily_streak">
+                  <div class="method-sig">
+                    <span class="method-name">record_daily_streak</span>(<span class="method-args">user_id, streak</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Записывает обновление ежедневной серии и проверяет достижения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">streak</td><td>Текущая серия дней</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат с новыми достижениями</div>
+                </div>
+                <div class="method public" id="ChallengeService.get_statistics">
+                  <div class="method-sig">
+                    <span class="method-name">get_statistics</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получает полную статистику пользователя по достижениям.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь со статистикой { &quot;plants_grown_to_maturity_perfect&quot;: 1,  # идеальных растений &quot;death_count&quot;: 1,                        # количество смертей &quot;mistake_count&quot;: 5,                      # количество ошибок &quot;species_collected&quot;: 3,                  # собранных видов (макс 3) &quot;consecutive_days&quot;: 7,                   # серия дней &quot;level&quot;: 3,                              # текущий уровень &quot;total_achievements&quot;: 2                  # получено ачивок }</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="FlowerService">
+              <div class="class-header">
+                <h2>class FlowerService</h2>
+                <span class="badge">service/flower_service.py</span>
+              </div>
+              <p class="class-doc">Сервис для управления растениями.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="FlowerService.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args"></span>)
+                  </div>
+                  <p class="method-doc">Инициализирует сервис с необходимыми репозиториями.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="FlowerService.plant_flower">
+                  <div class="method-sig">
+                    <span class="method-name">plant_flower</span>(<span class="method-args">user_id, species_id, custom_name</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Посадить новый цветок для пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">species_id</td><td>ID вида растения (1=Спатифиллум, 2=Кактус, 3=Фикус)</td></tr><tr><td class="arg-name">custom_name</td><td>Пользовательское имя растения (опционально)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат операции с данными посаженного растения { &quot;success&quot;: True, &quot;plant_id&quot;: &quot;uuid-...&quot;, &quot;plant_name&quot;: &quot;Мой кактус&quot;, &quot;species_name&quot;: &quot;Кактус Корифанта&quot;, &quot;species_id&quot;: 2 } { &quot;success&quot;: False, &quot;error&quot;: &quot;Нет свободных слотов&quot; }</div>
+                </div>
+                <div class="method public" id="FlowerService.water_flower">
+                  <div class="method-sig">
+                    <span class="method-name">water_flower</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Полить растение.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения пользователя</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя (для проверки прав)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат полива { &quot;success&quot;: True, &quot;message&quot;: &quot;Мой кактус полит!&quot;, &quot;plant_name&quot;: &quot;Мой кактус&quot;, &quot;was_overwatered&quot;: False  # предупреждение о переливе }</div>
+                </div>
+                <div class="method public" id="FlowerService.set_light_level">
+                  <div class="method-sig">
+                    <span class="method-name">set_light_level</span>(<span class="method-args">plant_id, user_id, light_level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Сменить уровень освещения растения.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="FlowerService.set_location">
+                  <div class="method-sig">
+                    <span class="method-name">set_location</span>(<span class="method-args">plant_id, user_id, location</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Сменить локацию растения.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="FlowerService.check_health">
+                  <div class="method-sig">
+                    <span class="method-name">check_health</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Проверить здоровье растения. Анализирует, когда растение было полито в последний раз, и определяет статус здоровья.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения пользователя</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя (для проверки прав)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Статус здоровья и предупреждения { &quot;success&quot;: True, &quot;plant_name&quot;: &quot;Мой кактус&quot;, &quot;health_status&quot;: &quot;healthy|wilting|dying&quot;, &quot;days_since_water&quot;: 3, &quot;water_interval_min&quot;: 3, &quot;water_interval_max&quot;: 7, &quot;warning&quot;: &quot;Пора поливать!&quot;  # если status != healthy }</div>
+                </div>
+                <div class="method public" id="FlowerService.update_growth">
+                  <div class="method-sig">
+                    <span class="method-name">update_growth</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Обновляет рост растения (вызывается при проверке).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Информация об изменении стадии роста</div>
+                </div>
+                <div class="method public" id="FlowerService.check_death">
+                  <div class="method-sig">
+                    <span class="method-name">check_death</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Проверяет, не умерло ли растение, и обрабатывает смерть.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат проверки</div>
+                </div>
+                <div class="method public" id="FlowerService.revive_plant">
+                  <div class="method-sig">
+                    <span class="method-name">revive_plant</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Воскрешает мертвое растение (пересадка заново).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат воскрешения</div>
+                </div>
+                <div class="method public" id="FlowerService.get_my_garden">
+                  <div class="method-sig">
+                    <span class="method-name">get_my_garden</span>(<span class="method-args">user_id, only_alive</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить сад пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">only_alive</td><td>Только живые растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список растений пользователя</div>
+                </div>
+                <div class="method public" id="FlowerService.get_plant_details">
+                  <div class="method-sig">
+                    <span class="method-name">get_plant_details</span>(<span class="method-args">plant_id, user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить детальную информацию о растении.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя (для проверки прав)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные растения или None</div>
+                </div>
+                <div class="method public" id="FlowerService.get_all_growth_stages">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_growth_stages</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, int]</span>
+                  </div>
+                  <p class="method-doc">Получить статистику по стадиям роста всех растений пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь {стадия: количество}</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="LevelQuestService">
+              <div class="class-header">
+                <h2>class LevelQuestService</h2>
+                <span class="badge">service/level_quest_service.py</span>
+              </div>
+              <p class="class-doc">Сервис для управления уровневыми заданиями.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="LevelQuestService.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args"></span>)
+                  </div>
+                  <p class="method-doc">Инициализирует сервис с необходимыми репозиториями.</p>
+                  
+                  
+                </div>
+                <div class="method private" id="LevelQuestService._game_flags">
+                  <div class="method-sig">
+                    <span class="method-name">_game_flags</span>(<span class="method-args">user_id</span>) → <span class="ret">dict</span>
+                  </div>
+                  
+                  
+                  
+                </div>
+                <div class="method public" id="LevelQuestService.get_level_quests">
+                  <div class="method-sig">
+                    <span class="method-name">get_level_quests</span>(<span class="method-args">level</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает задания для указанного уровня.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="LevelQuestService.get_user_level_progress">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_level_progress</span>(<span class="method-args">user_id, level</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает прогресс пользователя по заданиям уровня.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="LevelQuestService.init_user_level_progress">
+                  <div class="method-sig">
+                    <span class="method-name">init_user_level_progress</span>(<span class="method-args">user_id, level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Инициализирует прогресс для нового уровня.</p>
+                  
+                  
+                </div>
+                <div class="method private" id="LevelQuestService._check_quest_completion">
+                  <div class="method-sig">
+                    <span class="method-name">_check_quest_completion</span>(<span class="method-args">user_id, quest_type, target</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Проверяет прогресс выполнения конкретного задания.</p>
+                  
+                  <div class="returns"><strong>Returns:</strong> Текущий прогресс (всегда int)</div>
+                </div>
+                <div class="method public" id="LevelQuestService.check_and_update_quests">
+                  <div class="method-sig">
+                    <span class="method-name">check_and_update_quests</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Проверяет все задания для текущего уровня пользователя.</p>
+                  
+                  
+                </div>
+                <div class="method private" id="LevelQuestService._claim_reward">
+                  <div class="method-sig">
+                    <span class="method-name">_claim_reward</span>(<span class="method-args">user_id, level, quests</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Выдает награду за завершение уровня.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="LevelQuestService.trigger_quest_check">
+                  <div class="method-sig">
+                    <span class="method-name">trigger_quest_check</span>(<span class="method-args">user_id, action</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Триггер для проверки заданий после действия пользователя.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="LevelQuestService.get_all_quests_status">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_quests_status</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[int, Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает статус всех заданий для всех уровней.</p>
+                  
+                  
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="TipsService">
+              <div class="class-header">
+                <h2>class TipsService</h2>
+                <span class="badge">service/tips_service.py</span>
+              </div>
+              <p class="class-doc">Сервис для бизнес-логики советов.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="TipsService.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args"></span>)
+                  </div>
+                  
+                  
+                  
+                </div>
+                <div class="method public" id="TipsService.get_all_tips">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_tips</span>(<span class="method-args"></span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить все советы с форматированием.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="TipsService.get_positive_tips">
+                  <div class="method-sig">
+                    <span class="method-name">get_positive_tips</span>(<span class="method-args"></span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить позитивные советы.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="TipsService.get_tip_by_type">
+                  <div class="method-sig">
+                    <span class="method-name">get_tip_by_type</span>(<span class="method-args">tip_type</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получить совет по типу.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="TipsService.get_plant_tips">
+                  <div class="method-sig">
+                    <span class="method-name">get_plant_tips</span>(<span class="method-args">species_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получить советы для конкретного вида растения.</p>
+                  
+                  
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="UserService">
+              <div class="class-header">
+                <h2>class UserService</h2>
+                <span class="badge">service/user_service.py</span>
+              </div>
+              <p class="class-doc">Сервис для работы с пользовательскими данными.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="UserService.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args"></span>)
+                  </div>
+                  <p class="method-doc">Инициализирует сервис с репозиторием пользователей.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="UserService.complete_tutorial">
+                  <div class="method-sig">
+                    <span class="method-name">complete_tutorial</span>(<span class="method-args">user_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отметить обучение пройденным.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="UserService.get_profile">
+                  <div class="method-sig">
+                    <span class="method-name">get_profile</span>(<span class="method-args">user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает игровой профиль пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные профиля или None</div>
+                </div>
+                <div class="method public" id="UserService.get_stats">
+                  <div class="method-sig">
+                    <span class="method-name">get_stats</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получает основную статистику пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь со статистикой { &quot;level&quot;: 2, &quot;max_plants_slots&quot;: 2, &quot;current_plants&quot;: 1, &quot;total_plants_grown&quot;: 3, &quot;total_waterings&quot;: 15, &quot;consecutive_days&quot;: 5, &quot;best_streak&quot;: 5 }</div>
+                </div>
+                <div class="method public" id="UserService.get_current_level">
+                  <div class="method-sig">
+                    <span class="method-name">get_current_level</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получает текущий уровень пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Уровень (1-5)</div>
+                </div>
+                <div class="method public" id="UserService.get_level_info">
+                  <div class="method-sig">
+                    <span class="method-name">get_level_info</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получает полную информацию об уровне пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Информация об уровне и следующих заданиях { &quot;current_level&quot;: 2, &quot;max_level&quot;: 5, &quot;next_level_quests&quot;: { &quot;quest1&quot;: {...}, &quot;quest2&quot;: {...}, &quot;quest3&quot;: {...} } }</div>
+                </div>
+                <div class="method public" id="UserService.update_daily_streak">
+                  <div class="method-sig">
+                    <span class="method-name">update_daily_streak</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Обновляет ежедневную серию пользователя. Вызывается при каждом входе в игру.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="UserService.get_streak_info">
+                  <div class="method-sig">
+                    <span class="method-name">get_streak_info</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, int]</span>
+                  </div>
+                  <p class="method-doc">Получает информацию о серии дней.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Информация о серии { &quot;consecutive_days&quot;: 5, &quot;best_streak&quot;: 10 }</div>
+                </div>
+                <div class="method public" id="UserService.get_plant_slots">
+                  <div class="method-sig">
+                    <span class="method-name">get_plant_slots</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, int]</span>
+                  </div>
+                  <p class="method-doc">Получает информацию о слотах для растений.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь с информацией о слотах { &quot;current&quot;: 2,      # текущее количество растений &quot;max&quot;: 5,          # максимум слотов &quot;available&quot;: 3     # свободных слотов }</div>
+                </div>
+                <div class="method public" id="UserService.has_free_slot">
+                  <div class="method-sig">
+                    <span class="method-name">has_free_slot</span>(<span class="method-args">user_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Проверяет, есть ли свободный слот для посадки.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если есть свободный слот</div>
+                </div>
+                <div class="method public" id="UserService.get_unlocked_pots">
+                  <div class="method-sig">
+                    <span class="method-name">get_unlocked_pots</span>(<span class="method-args">user_id</span>) → <span class="ret">List[str]</span>
+                  </div>
+                  <p class="method-doc">Получает список открытых горшков.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список ID дизайнов горшков</div>
+                </div>
+                <div class="method public" id="UserService.get_unlocked_watering_cans">
+                  <div class="method-sig">
+                    <span class="method-name">get_unlocked_watering_cans</span>(<span class="method-args">user_id</span>) → <span class="ret">List[str]</span>
+                  </div>
+                  <p class="method-doc">Получает список открытых леек.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список ID дизайнов леек</div>
+                </div>
+                <div class="method public" id="UserService.get_current_designs">
+                  <div class="method-sig">
+                    <span class="method-name">get_current_designs</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, str]</span>
+                  </div>
+                  <p class="method-doc">Получает текущие выбранные дизайны.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь с текущими дизайнами { &quot;pot&quot;: &quot;standard&quot;, &quot;watering_can&quot;: &quot;standard&quot; }</div>
+                </div>
+                <div class="method public" id="UserService.change_pot">
+                  <div class="method-sig">
+                    <span class="method-name">change_pot</span>(<span class="method-args">user_id, pot_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Сменить текущий горшок.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">pot_id</td><td>ID дизайна горшка</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат смены горшка {&quot;success&quot;: True} или {&quot;success&quot;: False, &quot;error&quot;: &quot;Горшок не открыт&quot;}</div>
+                </div>
+                <div class="method private" id="UserService._watering_can_allowed">
+                  <div class="method-sig">
+                    <span class="method-name">_watering_can_allowed</span>(<span class="method-args">user_id, can_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  
+                  
+                  
+                </div>
+                <div class="method public" id="UserService.change_watering_can">
+                  <div class="method-sig">
+                    <span class="method-name">change_watering_can</span>(<span class="method-args">user_id, can_id</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Сменить текущую лейку.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">can_id</td><td>ID дизайна лейки</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Результат смены лейки</div>
+                </div>
+                <div class="method public" id="UserService.increment_current_plants">
+                  <div class="method-sig">
+                    <span class="method-name">increment_current_plants</span>(<span class="method-args">user_id, delta</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Изменяет количество текущих растений. Используется LevelQuestService при посадке/смерти растения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">delta</td><td>На сколько изменить (+1 или -1)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserService.increment_stat">
+                  <div class="method-sig">
+                    <span class="method-name">increment_stat</span>(<span class="method-args">user_id, stat_name, delta</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Увеличивает статистику пользователя. Используется LevelQuestService для отслеживания прогресса заданий.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">stat_name</td><td>Название статистики</td></tr><tr><td class="arg-name">delta</td><td>На сколько увеличить</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserService.unlock_pot">
+                  <div class="method-sig">
+                    <span class="method-name">unlock_pot</span>(<span class="method-args">user_id, pot_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Открывает новый дизайн горшка. Используется LevelQuestService при выдаче награды.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">pot_id</td><td>ID дизайна горшка</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserService.unlock_watering_can">
+                  <div class="method-sig">
+                    <span class="method-name">unlock_watering_can</span>(<span class="method-args">user_id, can_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Открывает новый дизайн лейки. Используется LevelQuestService при выдаче награды.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">can_id</td><td>ID дизайна лейки</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserService.add_plant_slot">
+                  <div class="method-sig">
+                    <span class="method-name">add_plant_slot</span>(<span class="method-args">user_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Добавляет один слот для растения. Используется LevelQuestService при выдаче награды.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserService.update_level">
+                  <div class="method-sig">
+                    <span class="method-name">update_level</span>(<span class="method-args">user_id, new_level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновить уровень пользователя.</p>
+                  
+                  
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="BaseRepository">
+              <div class="class-header">
+                <h2>class BaseRepository</h2>
+                <span class="badge">repository/base_repository.py</span>
+              </div>
+              <p class="class-doc">Базовый класс для всех репозиториев.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="BaseRepository.__init__">
+                  <div class="method-sig">
+                    <span class="method-name">__init__</span>(<span class="method-args">db_path</span>)
+                  </div>
+                  <p class="method-doc">Инициализирует репозиторий с подключением к БД.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">db_path</td><td>Путь к файлу БД. Если не указан — используется синглтон,</td></tr></tbody></table>
+                  
+                </div>
+                <div class="method public" id="BaseRepository.get_by_id">
+                  <div class="method-sig">
+                    <span class="method-name">get_by_id</span>(<span class="method-args">table_name, id_column, id_value</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает запись из таблицы по идентификатору.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">table_name</td><td>Имя таблицы (например &#x27;users&#x27;, &#x27;user_plants&#x27;)</td></tr><tr><td class="arg-name">id_column</td><td>Название колонки с ID (обычно &#x27;id&#x27;)</td></tr><tr><td class="arg-name">id_value</td><td>Значение ID для поиска</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь с данными записи или None, если не найдено Пример: &gt;&gt;&gt; user = repo.get_by_id(&quot;users&quot;, &quot;id&quot;, &quot;abc-123&quot;) &gt;&gt;&gt; print(user[&#x27;username&#x27;])</div>
+                </div>
+                <div class="method public" id="BaseRepository.get_all">
+                  <div class="method-sig">
+                    <span class="method-name">get_all</span>(<span class="method-args">table_name, limit, offset</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает все записи из таблицы с пагинацией.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">table_name</td><td>Имя таблицы</td></tr><tr><td class="arg-name">limit</td><td>Максимальное количество записей (по умолчанию 100)</td></tr><tr><td class="arg-name">offset</td><td>Смещение - сколько записей пропустить</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список словарей с записями, пустой список если ничего нет Пример: &gt;&gt;&gt; all_users = repo.get_all(&quot;users&quot;, limit=50, offset=0) &gt;&gt;&gt; for user in all_users: ...     print(user[&#x27;username&#x27;])</div>
+                </div>
+                <div class="method public" id="BaseRepository.get_by_field">
+                  <div class="method-sig">
+                    <span class="method-name">get_by_field</span>(<span class="method-args">table_name, field, value</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает записи по значению поля (может вернуть несколько).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">table_name</td><td>Имя таблицы</td></tr><tr><td class="arg-name">field</td><td>Название поля для фильтрации</td></tr><tr><td class="arg-name">value</td><td>Значение для поиска</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список записей, удовлетворяющих условию Пример: &gt;&gt;&gt; plants = repo.get_by_field(&quot;user_plants&quot;, &quot;user_id&quot;, user_id) &gt;&gt;&gt; alive = [p for p in plants if p[&#x27;is_alive&#x27;]]</div>
+                </div>
+                <div class="method public" id="BaseRepository.get_one_by_field">
+                  <div class="method-sig">
+                    <span class="method-name">get_one_by_field</span>(<span class="method-args">table_name, field, value</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает первую запись по значению поля (для уникальных полей).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">table_name</td><td>Имя таблицы</td></tr><tr><td class="arg-name">field</td><td>Название поля (должно быть уникальным)</td></tr><tr><td class="arg-name">value</td><td>Значение для поиска</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Первую найденную запись или None Пример: &gt;&gt;&gt; user = repo.get_one_by_field(&quot;users&quot;, &quot;username&quot;, &quot;john&quot;)</div>
+                </div>
+                <div class="method public" id="BaseRepository.insert">
+                  <div class="method-sig">
+                    <span class="method-name">insert</span>(<span class="method-args">table_name, data</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Вставляет новую запись в таблицу.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">table_name</td><td>Имя таблицы</td></tr><tr><td class="arg-name">data</td><td>Словарь {колонка: значение} для вставки</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе, False при ошибке Пример: &gt;&gt;&gt; repo.insert(&quot;users&quot;, { ...     &quot;id&quot;: &quot;uuid&quot;, ...     &quot;username&quot;: &quot;john&quot;, ...     &quot;password_hash&quot;: &quot;...&quot; ... })</div>
+                </div>
+                <div class="method public" id="BaseRepository.update">
+                  <div class="method-sig">
+                    <span class="method-name">update</span>(<span class="method-args">table_name, id_column, id_value, data</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновляет запись по ID.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">table_name</td><td>Имя таблицы</td></tr><tr><td class="arg-name">id_column</td><td>Название колонки с ID</td></tr><tr><td class="arg-name">id_value</td><td>Значение ID</td></tr><tr><td class="arg-name">data</td><td>Словарь {колонка: новое значение}</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе, False при ошибке Пример: &gt;&gt;&gt; repo.update(&quot;users&quot;, &quot;id&quot;, user_id, {&quot;login_count&quot;: 5})</div>
+                </div>
+                <div class="method public" id="BaseRepository.delete_by_id">
+                  <div class="method-sig">
+                    <span class="method-name">delete_by_id</span>(<span class="method-args">table_name, id_column, id_value</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Удаляет запись из таблицы по ID.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">table_name</td><td>Имя таблицы</td></tr><tr><td class="arg-name">id_column</td><td>Название колонки с ID</td></tr><tr><td class="arg-name">id_value</td><td>Значение ID</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если удаление успешно, иначе False</div>
+                </div>
+                <div class="method public" id="BaseRepository.count">
+                  <div class="method-sig">
+                    <span class="method-name">count</span>(<span class="method-args">table_name, where_clause, params</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Подсчитывает количество записей в таблице.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">table_name</td><td>Имя таблицы</td></tr><tr><td class="arg-name">where_clause</td><td>Условие WHERE (без слова WHERE), например &quot;user_id = ?&quot;</td></tr><tr><td class="arg-name">params</td><td>Параметры для подстановки в условие</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество записей Пример: &gt;&gt;&gt; alive_count = repo.count(&quot;user_plants&quot;, &quot;user_id = ? AND is_alive = 1&quot;, (user_id,))</div>
+                </div>
+                <div class="method public" id="BaseRepository.exists">
+                  <div class="method-sig">
+                    <span class="method-name">exists</span>(<span class="method-args">table_name, where_clause, params</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Проверяет существование записи по условию.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">table_name</td><td>Имя таблицы</td></tr><tr><td class="arg-name">where_clause</td><td>Условие WHERE (без слова WHERE)</td></tr><tr><td class="arg-name">params</td><td>Параметры для подстановки</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если запись существует, иначе False</div>
+                </div>
+                <div class="method public" id="BaseRepository.execute_custom">
+                  <div class="method-sig">
+                    <span class="method-name">execute_custom</span>(<span class="method-args">query, params</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Выполняет произвольный SELECT запрос.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">query</td><td>SQL запрос (SELECT)</td></tr><tr><td class="arg-name">params</td><td>Параметры для подстановки</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список словарей с результатами Пример: &gt;&gt;&gt; result = repo.execute_custom( ...     &quot;SELECT * FROM user_plants WHERE user_id = ? AND is_alive = 1&quot;, ...     (user_id,) ... )</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="ChallengeRepository">
+              <div class="class-header">
+                <h2>class ChallengeRepository</h2>
+                <span class="badge">repository/challenge_repository.py</span>
+              </div>
+              <p class="class-doc">Репозиторий для таблиц achievements и user_achievements.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="ChallengeRepository.get_all_achievements">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_achievements</span>(<span class="method-args">only_active</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает все достижения из справочника.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">only_active</td><td>Если True, только активные достижения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список достижений (БЕЗ монет и XP) [ { &quot;id&quot;: &quot;uuid-...&quot;, &quot;name&quot;: &quot;Заботливый родитель&quot;, &quot;description&quot;: &quot;Вырастить цветок от семечка до зрелости...&quot;, &quot;requirement_type&quot;: &quot;grow_to_maturity_perfect&quot;, &quot;target_value&quot;: 1, &quot;sort_order&quot;: 1 }, ... ]</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.get_achievement_by_id">
+                  <div class="method-sig">
+                    <span class="method-name">get_achievement_by_id</span>(<span class="method-args">achievement_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает достижение по ID.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">achievement_id</td><td>UUID достижения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные достижения или None</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.get_achievement_by_name">
+                  <div class="method-sig">
+                    <span class="method-name">get_achievement_by_name</span>(<span class="method-args">name</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает достижение по названию.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">name</td><td>Название достижения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные достижения или None</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.get_user_achievements">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_achievements</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает достижения пользователя с текущим прогрессом.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список достижений с прогрессом [ { &quot;id&quot;: &quot;...&quot;, &quot;name&quot;: &quot;Заботливый родитель&quot;, &quot;current_progress&quot;: 0,  # текущий прогресс &quot;is_completed&quot;: 0,      # выполнено или нет &quot;completed_at&quot;: None,   # дата выполнения ... }, ... ]</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.get_completed_achievements">
+                  <div class="method-sig">
+                    <span class="method-name">get_completed_achievements</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает завершенные достижения пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список завершенных достижений с датами выполнения</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.update_progress">
+                  <div class="method-sig">
+                    <span class="method-name">update_progress</span>(<span class="method-args">user_id, achievement_id, progress</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновляет прогресс достижения. Если записи не существует, создает новую.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">achievement_id</td><td>UUID достижения</td></tr><tr><td class="arg-name">progress</td><td>Текущий прогресс (число)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.complete_achievement">
+                  <div class="method-sig">
+                    <span class="method-name">complete_achievement</span>(<span class="method-args">user_id, achievement_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отмечает достижение как выполненное.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">achievement_id</td><td>UUID достижения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.is_achievement_completed">
+                  <div class="method-sig">
+                    <span class="method-name">is_achievement_completed</span>(<span class="method-args">user_id, achievement_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Проверяет, выполнено ли достижение.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">achievement_id</td><td>UUID достижения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если выполнено</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.check_grow_to_maturity_perfect">
+                  <div class="method-sig">
+                    <span class="method-name">check_grow_to_maturity_perfect</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Подсчитывает количество растений, выращенных до зрелости без критических ошибок (для ачивки &quot;Заботливый родитель&quot;).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество &quot;идеальных&quot; растений (1 = ачивка выполнена)</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.check_first_wither">
+                  <div class="method-sig">
+                    <span class="method-name">check_first_wither</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Проверяет, была ли первая смерть растения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> 1 если хотя бы одно растение умерло, иначе 0</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.check_first_negative_effect">
+                  <div class="method-sig">
+                    <span class="method-name">check_first_negative_effect</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Проверяет, был ли получен негативный эффект.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> 1 если была хотя бы одна ошибка, иначе 0</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.check_species_collected">
+                  <div class="method-sig">
+                    <span class="method-name">check_species_collected</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Подсчитывает количество собранных видов растений.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество уникальных видов (максимум 3)</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.get_level">
+                  <div class="method-sig">
+                    <span class="method-name">get_level</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получает текущий уровень пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Уровень (по умолчанию 1)</div>
+                </div>
+                <div class="method public" id="ChallengeRepository.get_consecutive_days">
+                  <div class="method-sig">
+                    <span class="method-name">get_consecutive_days</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получает текущую серию дней подряд.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество дней подряд</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="GameRepository">
+              <div class="class-header">
+                <h2>class GameRepository</h2>
+                <span class="badge">repository/game_repository.py</span>
+              </div>
+              <p class="class-doc">Репозиторий для таблицы game_states.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="GameRepository.save_game_state">
+                  <div class="method-sig">
+                    <span class="method-name">save_game_state</span>(<span class="method-args">user_id, slot_data, current_level, achievements, updated_at</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Сохранить состояние игры.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="GameRepository.load_game_state">
+                  <div class="method-sig">
+                    <span class="method-name">load_game_state</span>(<span class="method-args">user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Загрузить состояние игры.</p>
+                  
+                  
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="LevelQuestRepository">
+              <div class="class-header">
+                <h2>class LevelQuestRepository</h2>
+                <span class="badge">repository/level_quest_repository.py</span>
+              </div>
+              <p class="class-doc">Репозиторий для таблиц level_requirements и user_level_progress.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="LevelQuestRepository.get_level_quests">
+                  <div class="method-sig">
+                    <span class="method-name">get_level_quests</span>(<span class="method-args">level</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает задания для указанного уровня.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">level</td><td>Номер уровня (1-5)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь с данными заданий уровня или None { &quot;level&quot;: 1, &quot;quest1_type&quot;: &quot;plant_first&quot;, &quot;quest1_target&quot;: 1, &quot;quest1_description&quot;: &quot;Посадить первое растение&quot;, &quot;quest2_type&quot;: &quot;water_count&quot;, &quot;quest2_target&quot;: 1, &quot;quest2_description&quot;: &quot;Полить растение 1 раз&quot;, &quot;quest3_type&quot;: &quot;read_tip&quot;, &quot;quest3_target&quot;: 1, &quot;quest3_description&quot;: &quot;Прочитать 1 совет&quot;, &quot;reward_type&quot;: &quot;new_pot&quot;, &quot;reward_value&quot;: &quot;design_pot_1&quot;, &quot;reward_description&quot;: &quot;1 новый дизайнерский горшок&quot; }</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.get_all_level_quests">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_level_quests</span>(<span class="method-args"></span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает задания для всех уровней.</p>
+                  
+                  <div class="returns"><strong>Returns:</strong> Список заданий для уровней 1-5</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.get_max_level">
+                  <div class="method-sig">
+                    <span class="method-name">get_max_level</span>(<span class="method-args"></span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получает максимальный уровень DB_TESTING_REPORT.md системе.</p>
+                  
+                  <div class="returns"><strong>Returns:</strong> Максимальный уровень (5)</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.get_reward_by_level">
+                  <div class="method-sig">
+                    <span class="method-name">get_reward_by_level</span>(<span class="method-args">level</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает награду за завершение уровня.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">level</td><td>Номер уровня</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь с информацией о награде { &quot;reward_type&quot;: &quot;new_pot&quot;, &quot;reward_value&quot;: &quot;design_pot_1&quot;, &quot;reward_description&quot;: &quot;1 новый дизайнерский горшок&quot; }</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.get_user_progress">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_progress</span>(<span class="method-args">user_id, level</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает прогресс пользователя по заданиям уровня.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">level</td><td>Номер уровня</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь с прогрессом или None если нет записи { &quot;user_id&quot;: &quot;uuid&quot;, &quot;level&quot;: 1, &quot;quest1_progress&quot;: 1, &quot;quest1_completed&quot;: 1, &quot;quest2_progress&quot;: 3, &quot;quest2_completed&quot;: 1, &quot;quest3_progress&quot;: 0, &quot;quest3_completed&quot;: 0, &quot;level_completed&quot;: 0, &quot;reward_claimed&quot;: 0, &quot;completed_at&quot;: None }</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.get_all_user_progress">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_user_progress</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает прогресс пользователя по всем уровням.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список прогресса по всем уровням</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.init_user_progress">
+                  <div class="method-sig">
+                    <span class="method-name">init_user_progress</span>(<span class="method-args">user_id, level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Инициализирует прогресс для нового уровня.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">level</td><td>Номер уровня</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.update_quest_progress">
+                  <div class="method-sig">
+                    <span class="method-name">update_quest_progress</span>(<span class="method-args">user_id, level, quest_number, progress</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновляет прогресс конкретного задания.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">level</td><td>Номер уровня</td></tr><tr><td class="arg-name">quest_number</td><td>Номер задания (1, 2, 3)</td></tr><tr><td class="arg-name">progress</td><td>Новое значение прогресса</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.complete_quest">
+                  <div class="method-sig">
+                    <span class="method-name">complete_quest</span>(<span class="method-args">user_id, level, quest_number</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отмечает задание как выполненное.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">level</td><td>Номер уровня</td></tr><tr><td class="arg-name">quest_number</td><td>Номер задания (1, 2, 3)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.complete_level">
+                  <div class="method-sig">
+                    <span class="method-name">complete_level</span>(<span class="method-args">user_id, level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отмечает уровень как полностью выполненный.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">level</td><td>Номер уровня</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.claim_reward">
+                  <div class="method-sig">
+                    <span class="method-name">claim_reward</span>(<span class="method-args">user_id, level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отмечает, что награда за уровень получена.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">level</td><td>Номер уровня</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.is_level_completed">
+                  <div class="method-sig">
+                    <span class="method-name">is_level_completed</span>(<span class="method-args">user_id, level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Проверяет, выполнен ли уровень пользователем.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">level</td><td>Номер уровня</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если уровень выполнен</div>
+                </div>
+                <div class="method public" id="LevelQuestRepository.get_current_level_progress">
+                  <div class="method-sig">
+                    <span class="method-name">get_current_level_progress</span>(<span class="method-args">user_id, current_level</span>) → <span class="ret">Dict[str, Any]</span>
+                  </div>
+                  <p class="method-doc">Получает прогресс по текущему уровню пользователя.</p>
+                  
+                  
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="MistakeRepository">
+              <div class="class-header">
+                <h2>class MistakeRepository</h2>
+                <span class="badge">repository/mistake_repository.py</span>
+              </div>
+              <p class="class-doc">Репозиторий для таблицы user_mistakes.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="MistakeRepository.add_mistake">
+                  <div class="method-sig">
+                    <span class="method-name">add_mistake</span>(<span class="method-args">user_id, plant_id, mistake_type, advice_shown</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Записывает ошибку пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">plant_id</td><td>ID растения, с которым связана ошибка</td></tr><tr><td class="arg-name">mistake_type</td><td>Тип ошибки</td></tr><tr><td class="arg-name">- overwater</td><td>перелив</td></tr><tr><td class="arg-name">- drought</td><td>засуха</td></tr><tr><td class="arg-name">- light</td><td>неправильное освещение</td></tr><tr><td class="arg-name">- cold</td><td>сквозняк/холод</td></tr><tr><td class="arg-name">advice_shown</td><td>Был ли показан совет пользователю</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="MistakeRepository.get_mistakes_count">
+                  <div class="method-sig">
+                    <span class="method-name">get_mistakes_count</span>(<span class="method-args">user_id, mistake_type</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получает количество ошибок пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">mistake_type</td><td>Тип ошибки (опционально, для фильтрации)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество ошибок</div>
+                </div>
+                <div class="method public" id="MistakeRepository.get_user_mistakes">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_mistakes</span>(<span class="method-args">user_id, limit</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает список ошибок пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">limit</td><td>Максимальное количество записей</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список ошибок, отсортированных от новых к старым</div>
+                </div>
+                <div class="method public" id="MistakeRepository.get_plant_mistakes">
+                  <div class="method-sig">
+                    <span class="method-name">get_plant_mistakes</span>(<span class="method-args">plant_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает ошибки для конкретного растения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>ID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список ошибок для растения</div>
+                </div>
+                <div class="method public" id="MistakeRepository.mark_advice_shown">
+                  <div class="method-sig">
+                    <span class="method-name">mark_advice_shown</span>(<span class="method-args">mistake_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отмечает, что совет был показан для этой ошибки.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">mistake_id</td><td>ID записи об ошибке</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="MistakeRepository.get_mistakes_by_type">
+                  <div class="method-sig">
+                    <span class="method-name">get_mistakes_by_type</span>(<span class="method-args">user_id</span>) → <span class="ret">Dict[str, int]</span>
+                  </div>
+                  <p class="method-doc">Получает статистику ошибок по типам.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь {тип_ошибки: количество}</div>
+                </div>
+                <div class="method public" id="MistakeRepository.get_today_mistakes">
+                  <div class="method-sig">
+                    <span class="method-name">get_today_mistakes</span>(<span class="method-args">user_id</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Получает количество ошибок, сделанных сегодня.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество ошибок за сегодня</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="PlantRepository">
+              <div class="class-header">
+                <h2>class PlantRepository</h2>
+                <span class="badge">repository/plant_repository.py</span>
+              </div>
+              <p class="class-doc">Репозиторий для таблиц plant_templates и user_plants.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="PlantRepository.get_all_templates">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_templates</span>(<span class="method-args"></span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает все шаблоны растений, отсортированные по sort_order.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="PlantRepository.get_template_by_species_id">
+                  <div class="method-sig">
+                    <span class="method-name">get_template_by_species_id</span>(<span class="method-args">species_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает шаблон растения по species_id.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">species_id</td><td>ID вида растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные шаблона или None</div>
+                </div>
+                <div class="method public" id="PlantRepository.get_template_by_id">
+                  <div class="method-sig">
+                    <span class="method-name">get_template_by_id</span>(<span class="method-args">template_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает шаблон растения по внутреннему UUID.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">template_id</td><td>UUID шаблона (первичный ключ)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные шаблона или None</div>
+                </div>
+                <div class="method public" id="PlantRepository.create_user_plant">
+                  <div class="method-sig">
+                    <span class="method-name">create_user_plant</span>(<span class="method-args">plant_id, user_id, template_id, custom_name</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Создает новое растение пользователя (посадка).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID нового растения (генерируется заранее)</td></tr><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">template_id</td><td>ID шаблона растения</td></tr><tr><td class="arg-name">custom_name</td><td>Пользовательское имя растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="PlantRepository.get_user_plants">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_plants</span>(<span class="method-args">user_id, only_alive</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает растения пользователя с данными из шаблона.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">only_alive</td><td>Если True, только живые растения (is_alive = 1)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список растений с JOIN-данными из plant_templates [ { &quot;id&quot;: &quot;uuid&quot;, &quot;custom_name&quot;: &quot;Мой кактус&quot;, &quot;health_status&quot;: &quot;healthy&quot;, &quot;growth_stage&quot;: &quot;growing&quot;, &quot;species_name&quot;: &quot;Кактус Корифанта&quot;, &quot;water_interval_min&quot;: 3, &quot;water_interval_max&quot;: 10, ... } ]</div>
+                </div>
+                <div class="method public" id="PlantRepository.get_user_plant_by_id">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_plant_by_id</span>(<span class="method-args">plant_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает конкретное растение пользователя по UUID.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные растения с JOIN-полями из шаблона или None</div>
+                </div>
+                <div class="method public" id="PlantRepository.water_plant">
+                  <div class="method-sig">
+                    <span class="method-name">water_plant</span>(<span class="method-args">plant_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Поливает растение - обновляет дату последнего полива. Также обновляет статус здоровья на &#x27;healthy&#x27;, если он был плохим.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="PlantRepository.update_health_status">
+                  <div class="method-sig">
+                    <span class="method-name">update_health_status</span>(<span class="method-args">plant_id, status</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновляет статус здоровья растения.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID растения</td></tr><tr><td class="arg-name">status</td><td>Статус здоровья</td></tr><tr><td class="arg-name">- healthy</td><td>здоров</td></tr><tr><td class="arg-name">- wilting</td><td>увядает (пора поливать)</td></tr><tr><td class="arg-name">- overwatered</td><td>перелит</td></tr><tr><td class="arg-name">- dying</td><td>умирает (срочно полить)</td></tr><tr><td class="arg-name">- dead</td><td>мертв</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="PlantRepository.update_growth">
+                  <div class="method-sig">
+                    <span class="method-name">update_growth</span>(<span class="method-args">plant_id, growth_stage, growth_progress</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновляет стадию роста и прогресс.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID растения</td></tr><tr><td class="arg-name">growth_stage</td><td>Стадия развития</td></tr><tr><td class="arg-name">- seed</td><td>семечко (0%)</td></tr><tr><td class="arg-name">- seedling</td><td>росток (25%)</td></tr><tr><td class="arg-name">- growing</td><td>растет (50%)</td></tr><tr><td class="arg-name">- mature</td><td>взрослое (75%)</td></tr><tr><td class="arg-name">- flowering</td><td>цветет (100%)</td></tr><tr><td class="arg-name">growth_progress</td><td>Прогресс в процентах (0-100)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="PlantRepository.increment_growth_progress">
+                  <div class="method-sig">
+                    <span class="method-name">increment_growth_progress</span>(<span class="method-args">plant_id, increment</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Увеличивает прогресс роста на указанное значение.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID растения</td></tr><tr><td class="arg-name">increment</td><td>Прирост прогресса (обычно 5-20% в зависимости от здоровья)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="PlantRepository.mark_perfect_growth">
+                  <div class="method-sig">
+                    <span class="method-name">mark_perfect_growth</span>(<span class="method-args">plant_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отмечает растение как выращенное без критических ошибок. Используется для ачивки &quot;Заботливый родитель&quot;.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="PlantRepository.increment_times_flowered">
+                  <div class="method-sig">
+                    <span class="method-name">increment_times_flowered</span>(<span class="method-args">plant_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Увеличивает счетчик цветений растения. Вызывается каждый раз, когда растение достигает стадии &#x27;flowering&#x27;.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="PlantRepository.kill_plant">
+                  <div class="method-sig">
+                    <span class="method-name">kill_plant</span>(<span class="method-args">plant_id, cause</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Помечает растение как мертвое.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID растения</td></tr><tr><td class="arg-name">cause</td><td>Причина смерти</td></tr><tr><td class="arg-name">- drought</td><td>засуха (не поливали слишком долго)</td></tr><tr><td class="arg-name">- overwater</td><td>перелив (поливали слишком часто)</td></tr><tr><td class="arg-name">- neglect</td><td>запустение (комбинация факторов)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="PlantRepository.revive_plant">
+                  <div class="method-sig">
+                    <span class="method-name">revive_plant</span>(<span class="method-args">plant_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Воскрешает мертвое растение - пересаживает заново. Сбрасывает все параметры к начальным (как при посадке).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">plant_id</td><td>UUID растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="PlantRepository.get_dead_plants">
+                  <div class="method-sig">
+                    <span class="method-name">get_dead_plants</span>(<span class="method-args">user_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает мертвые растения пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список мертвых растений с причиной смерти, отсортированные по дате смерти</div>
+                </div>
+                <div class="method public" id="PlantRepository.get_plants_by_stage">
+                  <div class="method-sig">
+                    <span class="method-name">get_plants_by_stage</span>(<span class="method-args">user_id, stage</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает растения пользователя на определенной стадии роста. Всегда возвращает список (даже если результат None).</p>
+                  
+                  
+                </div>
+                <div class="method public" id="PlantRepository.update_light_level">
+                  <div class="method-sig">
+                    <span class="method-name">update_light_level</span>(<span class="method-args">plant_id, light_level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновить уровень освещения растения.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="PlantRepository.update_location">
+                  <div class="method-sig">
+                    <span class="method-name">update_location</span>(<span class="method-args">plant_id, location</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновить локацию растения.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="PlantRepository.get_plants_by_species">
+                  <div class="method-sig">
+                    <span class="method-name">get_plants_by_species</span>(<span class="method-args">user_id, species_id</span>) → <span class="ret">List[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает растения пользователя по виду.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">species_id</td><td>ID вида растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список растений указанного вида</div>
+                </div>
+                <div class="method public" id="PlantRepository.count_user_plants">
+                  <div class="method-sig">
+                    <span class="method-name">count_user_plants</span>(<span class="method-args">user_id, only_alive</span>) → <span class="ret">int</span>
+                  </div>
+                  <p class="method-doc">Подсчитывает количество растений пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">only_alive</td><td>Считать только живые растения</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Количество растений</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="TipsRepository">
+              <div class="class-header">
+                <h2>class TipsRepository</h2>
+                <span class="badge">repository/tips_repository.py</span>
+              </div>
+              <p class="class-doc">Репозиторий для таблиц tips и plant_templates.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="TipsRepository.get_all_tips">
+                  <div class="method-sig">
+                    <span class="method-name">get_all_tips</span>(<span class="method-args"></span>) → <span class="ret">List[tuple]</span>
+                  </div>
+                  <p class="method-doc">Получить все советы.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="TipsRepository.get_positive_tips">
+                  <div class="method-sig">
+                    <span class="method-name">get_positive_tips</span>(<span class="method-args"></span>) → <span class="ret">List[tuple]</span>
+                  </div>
+                  <p class="method-doc">Получить позитивные советы.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="TipsRepository.get_tip_by_type">
+                  <div class="method-sig">
+                    <span class="method-name">get_tip_by_type</span>(<span class="method-args">tip_type</span>) → <span class="ret">Optional[List[tuple]]</span>
+                  </div>
+                  <p class="method-doc">Получить совет по типу.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="TipsRepository.get_plant_template">
+                  <div class="method-sig">
+                    <span class="method-name">get_plant_template</span>(<span class="method-args">species_id</span>) → <span class="ret">Optional[List[tuple]]</span>
+                  </div>
+                  <p class="method-doc">Получить шаблон растения.</p>
+                  
+                  
+                </div>
+              </div>
+            </section>
+
+            <section class="class-section" id="UserRepository">
+              <div class="class-header">
+                <h2>class UserRepository</h2>
+                <span class="badge">repository/user_repository.py</span>
+              </div>
+              <p class="class-doc">Репозиторий для таблиц users, sessions и player_profiles.</p>
+              <div class="methods-container">
+                
+                <div class="method public" id="UserRepository.get_user_by_id">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_by_id</span>(<span class="method-args">user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает пользователя по ID.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>UUID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь с данными пользователя или None { &quot;id&quot;: &quot;uuid-...&quot;, &quot;username&quot;: &quot;john&quot;, &quot;password_hash&quot;: &quot;sha256...&quot;, &quot;created_at&quot;: &quot;2024-01-01 12:00:00&quot;, &quot;last_login&quot;: &quot;2024-01-02 15:30:00&quot;, &quot;login_count&quot;: 5 }</div>
+                </div>
+                <div class="method public" id="UserRepository.update_level">
+                  <div class="method-sig">
+                    <span class="method-name">update_level</span>(<span class="method-args">user_id, new_level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновляет уровень пользователя в профиле.</p>
+                  
+                  
+                </div>
+                <div class="method public" id="UserRepository.get_user_by_username">
+                  <div class="method-sig">
+                    <span class="method-name">get_user_by_username</span>(<span class="method-args">username</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает пользователя по имени.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">username</td><td>Имя пользователя (уникальное)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Словарь с данными пользователя или None</div>
+                </div>
+                <div class="method public" id="UserRepository.create_user">
+                  <div class="method-sig">
+                    <span class="method-name">create_user</span>(<span class="method-args">user_id, username, password_hash</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Создает нового пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>UUID нового пользователя (генерируется заранее)</td></tr><tr><td class="arg-name">username</td><td>Имя пользователя (уникальное, мин. 3 символа)</td></tr><tr><td class="arg-name">password_hash</td><td>Хэш пароля (SHA-256)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе, False при ошибке (например, дубликат username)</div>
+                </div>
+                <div class="method public" id="UserRepository.update_last_login">
+                  <div class="method-sig">
+                    <span class="method-name">update_last_login</span>(<span class="method-args">user_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновляет время последнего входа и счетчик входов. Вызывается при каждом успешном входе.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.user_exists">
+                  <div class="method-sig">
+                    <span class="method-name">user_exists</span>(<span class="method-args">username</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Проверяет существование пользователя с таким именем.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">username</td><td>Имя пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True если пользователь существует, иначе False</div>
+                </div>
+                <div class="method public" id="UserRepository.create_session">
+                  <div class="method-sig">
+                    <span class="method-name">create_session</span>(<span class="method-args">user_id, token, expires_at</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Создает новую сессию для пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">token</td><td>Уникальный токен сессии (генерируется через secrets.token_urlsafe)</td></tr><tr><td class="arg-name">expires_at</td><td>Дата истечения в ISO формате</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.get_session_by_token">
+                  <div class="method-sig">
+                    <span class="method-name">get_session_by_token</span>(<span class="method-args">token</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает сессию по токену (только активные, не отозванные).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">token</td><td>Токен сессии</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные сессии или None, если токен не найден или отозван</div>
+                </div>
+                <div class="method public" id="UserRepository.revoke_session">
+                  <div class="method-sig">
+                    <span class="method-name">revoke_session</span>(<span class="method-args">token</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отзывает (завершает) сессию при выходе.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">token</td><td>Токен сессии</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.revoke_all_user_sessions">
+                  <div class="method-sig">
+                    <span class="method-name">revoke_all_user_sessions</span>(<span class="method-args">user_id, keep_token</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Отзывает все сессии пользователя (выход со всех устройств).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">keep_token</td><td>Токен, который нужно сохранить (опционально)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.get_profile">
+                  <div class="method-sig">
+                    <span class="method-name">get_profile</span>(<span class="method-args">user_id</span>) → <span class="ret">Optional[Dict[str, Any]]</span>
+                  </div>
+                  <p class="method-doc">Получает игровой профиль пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Данные профиля или None { &quot;user_id&quot;: &quot;uuid-...&quot;, &quot;display_name&quot;: &quot;john&quot;, &quot;current_level&quot;: 2,           # Текущий уровень (1-5) &quot;max_plants_slots&quot;: 2,        # Максимум слотов &quot;total_plants_grown&quot;: 3,      # Всего выращено &quot;total_waterings&quot;: 15,        # Всего поливов &quot;total_mistakes&quot;: 2,          # Всего ошибок &quot;total_deaths&quot;: 1,            # Всего смертей &quot;current_plants_count&quot;: 2,    # Текущих растений &quot;consecutive_days&quot;: 5,        # Серия дней &quot;best_streak&quot;: 5,             # Лучшая серия &quot;unlocked_pots&quot;: &#x27;[&quot;standard&quot;, &quot;design_pot_1&quot;]&#x27;,  # JSON строка &quot;unlocked_watering_cans&quot;: &#x27;[&quot;standard&quot;]&#x27;,         # JSON строка &quot;current_pot&quot;: &quot;standard&quot;, &quot;current_watering_can&quot;: &quot;standard&quot; }</div>
+                </div>
+                <div class="method public" id="UserRepository.create_profile">
+                  <div class="method-sig">
+                    <span class="method-name">create_profile</span>(<span class="method-args">user_id, display_name</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Создает игровой профиль для нового пользователя. Вызывается сразу после регистрации.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">display_name</td><td>Отображаемое имя (по умолчанию будет установлено позже)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.update_level">
+                  <div class="method-sig">
+                    <span class="method-name">update_level</span>(<span class="method-args">user_id, new_level</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновляет уровень пользователя. Уровень повышается только после выполнения всех заданий текущего уровня.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">new_level</td><td>Новый уровень (1-5)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.update_streak">
+                  <div class="method-sig">
+                    <span class="method-name">update_streak</span>(<span class="method-args">user_id, consecutive_days, best_streak</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Обновляет серию дней подряд. Вызывается при ежедневном входе.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">consecutive_days</td><td>Текущая серия дней</td></tr><tr><td class="arg-name">best_streak</td><td>Лучшая серия за все время</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.update_plant_slots">
+                  <div class="method-sig">
+                    <span class="method-name">update_plant_slots</span>(<span class="method-args">user_id, delta</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Изменяет количество слотов для растений. Используется для выдачи награды за уровни.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">delta</td><td>На сколько изменить (+1 = +1 слот, -1 = -1 слот)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.update_current_plants_count">
+                  <div class="method-sig">
+                    <span class="method-name">update_current_plants_count</span>(<span class="method-args">user_id, delta</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Изменяет количество текущих растений. Вызывается при посадке (+1) и при смерти растения (-1).</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">delta</td><td>На сколько изменить (+1 или -1)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.increment_stat">
+                  <div class="method-sig">
+                    <span class="method-name">increment_stat</span>(<span class="method-args">user_id, stat_name, delta</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Увеличивает статистику пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">stat_name</td><td>Название статистики</td></tr><tr><td class="arg-name">- total_plants_grown</td><td>выращено растений</td></tr><tr><td class="arg-name">- total_waterings</td><td>поливов</td></tr><tr><td class="arg-name">- total_mistakes</td><td>ошибок</td></tr><tr><td class="arg-name">- total_deaths</td><td>смертей</td></tr><tr><td class="arg-name">delta</td><td>На сколько увеличить (по умолчанию 1)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе, False если stat_name некорректен</div>
+                </div>
+                <div class="method public" id="UserRepository.get_unlocked_pots">
+                  <div class="method-sig">
+                    <span class="method-name">get_unlocked_pots</span>(<span class="method-args">user_id</span>) → <span class="ret">List[str]</span>
+                  </div>
+                  <p class="method-doc">Получает список открытых горшков пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список ID дизайнов горшков (например, [&#x27;standard&#x27;, &#x27;design_pot_1&#x27;])</div>
+                </div>
+                <div class="method public" id="UserRepository.unlock_pot">
+                  <div class="method-sig">
+                    <span class="method-name">unlock_pot</span>(<span class="method-args">user_id, pot_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Открывает новый дизайн горшка для пользователя. Используется как награда за выполнение заданий уровня.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">pot_id</td><td>ID дизайна горшка (из таблицы designs)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе (даже если горшок уже открыт)</div>
+                </div>
+                <div class="method public" id="UserRepository.get_unlocked_watering_cans">
+                  <div class="method-sig">
+                    <span class="method-name">get_unlocked_watering_cans</span>(<span class="method-args">user_id</span>) → <span class="ret">List[str]</span>
+                  </div>
+                  <p class="method-doc">Получает список открытых леек пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> Список ID дизайнов леек</div>
+                </div>
+                <div class="method public" id="UserRepository.unlock_watering_can">
+                  <div class="method-sig">
+                    <span class="method-name">unlock_watering_can</span>(<span class="method-args">user_id, can_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Открывает новый дизайн лейки для пользователя.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">can_id</td><td>ID дизайна лейки</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.change_pot">
+                  <div class="method-sig">
+                    <span class="method-name">change_pot</span>(<span class="method-args">user_id, pot_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Сменить текущий горшок.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">pot_id</td><td>ID дизайна горшка (должен быть в unlocked_pots)</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+                <div class="method public" id="UserRepository.change_watering_can">
+                  <div class="method-sig">
+                    <span class="method-name">change_watering_can</span>(<span class="method-args">user_id, can_id</span>) → <span class="ret">bool</span>
+                  </div>
+                  <p class="method-doc">Сменить текущую лейку.</p>
+                  <table class="arg-table"><thead><tr><th>Параметр</th><th>Описание</th></tr></thead><tbody><tr><td class="arg-name">user_id</td><td>ID пользователя</td></tr><tr><td class="arg-name">can_id</td><td>ID дизайна лейки</td></tr></tbody></table>
+                  <div class="returns"><strong>Returns:</strong> True при успехе</div>
+                </div>
+              </div>
+            </section>
+</main>
+</body>
+</html>

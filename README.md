@@ -44,7 +44,13 @@ git clone https://github.com/Dimitrievicha/CareForMe.git
 
 2. Соберите и запустите контейнеры:
 
+Если вы планируете запускать проект на **Windows**, то выполните сначала следующую команду в powershell:
+```powershell
+(Get-Content docker-entrypoint.sh -Raw) -replace "`r`n", "`n" | Set-Content -NoNewline docker-entrypoint.sh
+```
+
 ```bash
+docker-compose build --no-cache app
 docker compose up --build -d
 ```
 
@@ -83,7 +89,7 @@ CareForMe/
 ├── .dockerignore
 ├── docker-compose.yml
 ├── docker-entrypoint.sh
-└── Dockerfile
+└── Dockerfile****
 
 ```
 

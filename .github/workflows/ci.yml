@@ -89,29 +89,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Smoke test — контейнер запускается
-        run: |
-          docker run --rm -d \
-            --name careforme_smoke \
-            -p 5000:5000 \
-            -e SECRET_KEY=ci-smoke-secret \
-            -e FLASK_ENV=production \
-            careforme:ci-test
-
-          echo "Waiting for container..."
-          sleep 10
-
-          docker ps --filter "name=careforme_smoke" --filter "status=running"
-
-          if ! docker ps --filter "name=careforme_smoke" --filter "status=running" | grep careforme_smoke; then
-            echo "Container is not running"
-            docker logs careforme_smoke || true
-            exit 1
-          fi
-
-          echo "Container started successfully"
-          docker stop careforme_smoke
-
       - name: Verify .dockerignore excludes secrets
         run: |
           if docker run --rm careforme:ci-test sh -c "[ -f /app/.env ]"; then

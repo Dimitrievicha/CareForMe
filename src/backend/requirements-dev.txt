@@ -1,0 +1,5 @@
+# Dev/test зависимости (не попадают в Docker-образ)
+-r requirements.txt
+pytest>=8.0.0
+pytest-cov>=6.0.0
+flake8>=7.0.0

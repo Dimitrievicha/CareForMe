@@ -1,0 +1,25 @@
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+.git/
+.gitignore
+*.md
+.github/
+.idea/
+.vscode/
+
+# SQLite базы данных (в образ не включаем — только volume)
+**/careforme.db
+**/careforme_test.db
+**/careforme_dev.db
+
+# Тесты не нужны в production-образе
+src/backend/tests/
+
+# Логи
+*.log

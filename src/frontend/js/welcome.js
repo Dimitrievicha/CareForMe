@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = '';
 const WELCOME_ARROW_SRC = 'images/button/кнопка-стрелка обучения.png';
 const WELCOME_LAST_STEP = 1;
 

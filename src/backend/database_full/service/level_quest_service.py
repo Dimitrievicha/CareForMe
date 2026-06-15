@@ -7,7 +7,7 @@
 """
 
 from typing import Dict, Any, Optional, List
-from datetime import date
+from datetime import date, datetime
 
 from ..repository.user_repository import UserRepository
 from ..repository.plant_repository import PlantRepository
@@ -112,7 +112,6 @@ class LevelQuestService:
             mistakes = self.mistake_repo.get_user_mistakes(user_id, limit=1)
             if not mistakes:
                 return profile['consecutive_days']
-            from datetime import datetime
             last_mistake = datetime.fromisoformat(mistakes[0]['occurred_at']).date()
             days_since = (date.today() - last_mistake).days
             return days_since
@@ -253,32 +252,26 @@ class LevelQuestService:
 
         result = {"type": reward_type, "value": reward_value, "description": reward_description}
 
-        print(f"DEBUG: Выдача награды за уровень {level}: type={reward_type}, value={reward_value}")
+        
 
         if reward_type == 'new_pot':
             # reward_value = '2' - ID горшка
             pot_id = reward_value
             user_service.unlock_pot(user_id, str(pot_id))
-            print(f"DEBUG: Разблокирован горшок {pot_id} для пользователя {user_id}")
 
         elif reward_type == 'new_can' or reward_type == 'new_watering_can':
             # reward_value = '2' - ID лейки
             can_id = reward_value
             user_service.unlock_watering_can(user_id, str(can_id))
-            print(f"DEBUG: Разблокирована лейка {can_id} для пользователя {user_id}")
 
         elif reward_type == 'new_plant_slot' or reward_type == 'new_slot':
             # reward_value может быть пустым
             user_service.add_plant_slot(user_id)
-            print(f"DEBUG: Добавлен слот для растения пользователю {user_id}")
 
             # Также разблокируем новый вид растения, если указан
             if reward_value and reward_value.isdigit():
                 # Это ID растения для разблокировки (1, 2, 3)
                 pass
-
-        elif reward_type == 'new_plant':
-            print(f"DEBUG: Разблокировано новое растение с ID {reward_value}")
 
         elif reward_type == 'achievement':
             # reward_value = 'Страж флоры'
@@ -286,12 +279,10 @@ class LevelQuestService:
             if achievement:
                 self.challenge_repo.update_progress(user_id, achievement['id'], 1)
                 self.challenge_repo.complete_achievement(user_id, achievement['id'])
-                print(f"DEBUG: Выдано достижение {reward_value}")
 
             # Также выдаём большой горшок за 5 уровень
             if level == 5:
                 user_service.unlock_pot(user_id, '3')
-                print(f"DEBUG: Разблокирован большой горшок 3")
 
         self.db.execute_update("""
             UPDATE user_level_progress SET reward_claimed = 1
@@ -310,7 +301,7 @@ class LevelQuestService:
         profile = self.user_repo.get_profile(user_id)
         current_level = profile['current_level'] if profile else 1
 
-        for level in range(1, 7):
+        for level in range(1, 6):
             quests = self.get_level_quests(level)
             progress = self.get_user_level_progress(user_id, level)
 

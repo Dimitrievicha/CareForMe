@@ -25,7 +25,7 @@ class TipsService:
                 'is_positive': bool(r['is_positive'])
             }
             for r in rows
-        ] if rows else []
+        ] 
 
     def get_positive_tips(self) -> List[Dict[str, Any]]:
         """Получить позитивные советы."""
@@ -38,44 +38,41 @@ class TipsService:
                 'message': r['message']
             }
             for r in rows
-        ] if rows else []
+        ] 
 
-    def get_tip_by_type(self, tip_type: str) -> Dict[str, Any]:
-        """Получить совет по типу."""
-        rows = self._repo.get_tip_by_type(tip_type)
-        if not rows:
+
+    def get_tip_by_type(self, tip_type: str) -> Optional[Dict[str, Any]]:
+        """Совет по типу."""
+        r = self._repo.get_tip_by_type(tip_type)
+        if not r:
             return {
                 'id': None,
                 'title': 'Совет',
-                'message': 'Присматривай за цветком — он тебя порадует! 🌿',
-                'is_positive': True
+                'message': 'Присматривай за цветком — он тебя порадует!',
+                'is_positive': True,
             }
-        r = rows[0]
         return {
             'id': r['id'],
             'title': r['title'],
             'message': r['message'],
-            'is_positive': bool(r['is_positive'])
+            'is_positive': bool(r['is_positive']),
         }
 
     def get_plant_tips(self, species_id: int) -> Optional[Dict[str, Any]]:
-        """Получить советы для конкретного вида растения."""
-        rows = self._repo.get_plant_template(species_id)
-        if not rows:
+        """Советы для конкретного вида растения."""
+        r = self._repo.get_plant_template(species_id)
+        if not r:
             return None
-
-        r = rows[0]
+ 
         species_name = r['species_name']
         raw_tips = r['tips'] or '[]'
         raw_symptoms = r['symptoms'] or ''
-
-        # Парсинг советов
+ 
         try:
             tips = json.loads(raw_tips)
         except (json.JSONDecodeError, TypeError):
             tips = [t.strip() for t in str(raw_tips).split('|') if t.strip()]
-
-        # Парсинг симптомов
+ 
         symptoms = []
         for entry in str(raw_symptoms).split('|'):
             entry = entry.strip()
@@ -83,24 +80,17 @@ class TipsService:
                 continue
             if '->' in entry:
                 left, advice = entry.split('->', 1)
-                if ':' in left:
-                    symptom, cause = left.split(':', 1)
-                else:
-                    symptom, cause = left, ''
+                symptom, cause = left.split(':', 1) if ':' in left else (left, '')
                 symptoms.append({
                     'symptom': symptom.strip(),
                     'cause': cause.strip(),
-                    'advice': advice.strip()
+                    'advice': advice.strip(),
                 })
             else:
                 symptoms.append({'symptom': entry, 'cause': '', 'advice': ''})
-
-        return {
-            'species_name': species_name,
-            'tips': tips,
-            'symptoms': symptoms
-        }
-
-
+ 
+        return {'species_name': species_name, 'tips': tips, 'symptoms': symptoms}
+ 
+ 
 # Глобальный экземпляр
 tips_service = TipsService()

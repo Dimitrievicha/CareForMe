@@ -11,7 +11,7 @@
 """
 
 from typing import Optional, Dict, Any, List
-from datetime import date
+from datetime import date, datetime
 import json
 
 from ..repository.user_repository import UserRepository
@@ -172,9 +172,7 @@ class UserService:
         today = date.today()
         last_entry = profile['last_entry']
 
-        # ПРЕОБРАЗОВАНИЕ: если last_entry строка, конвертируем в date
         if last_entry and isinstance(last_entry, str):
-            from datetime import datetime
             last_entry = datetime.strptime(last_entry, '%Y-%m-%d').date()
 
         # Проверка: заходил ли уже сегодня

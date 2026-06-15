@@ -76,18 +76,6 @@ class ChallengeService:
         """
         return self.challenge_repo.get_completed_achievements(user_id)
 
-    def get_completed_count(self, user_id: str) -> int:
-        """
-        Получает количество выполненных достижений.
-
-        Args:
-            user_id: ID пользователя
-
-        Returns:
-            Количество выполненных ачивок
-        """
-        return len(self.get_completed(user_id))
-
     def _get_progress(self, user_id: str, req_type: str) -> int:
         """
         Внутренний метод для получения прогресса по типу требования.
@@ -107,25 +95,16 @@ class ChallengeService:
             - daily_streak: серия дней подряд
             - reach_level: достигнут уровень X
         """
-        if req_type == 'grow_to_maturity_perfect':
-            return self.challenge_repo.check_grow_to_maturity_perfect(user_id)
-
-        elif req_type == 'first_wither':
-            return self.challenge_repo.check_first_wither(user_id)
-
-        elif req_type == 'first_negative_effect':
-            return self.challenge_repo.check_first_negative_effect(user_id)
-
-        elif req_type == 'grow_all_species':
-            return self.challenge_repo.check_species_collected(user_id)
-
-        elif req_type == 'daily_streak':
-            return self.challenge_repo.get_consecutive_days(user_id)
-
-        elif req_type == 'reach_level':
-            return self.challenge_repo.get_level(user_id)
-
-        return 0
+        handlers = {
+            'grow_to_maturity_perfect': self.challenge_repo.check_grow_to_maturity_perfect,
+            'first_wither':             self.challenge_repo.check_first_wither,
+            'first_negative_effect':    self.challenge_repo.check_first_negative_effect,
+            'grow_all_species':         self.challenge_repo.check_species_collected,
+            'daily_streak':             self.challenge_repo.get_consecutive_days,
+            'reach_level':              self.challenge_repo.get_level,
+        }
+        handler = handlers.get(req_type)
+        return handler(user_id) if handler else 0
 
     def check_all(self, user_id: str) -> List[Dict[str, Any]]:
         """
@@ -248,25 +227,6 @@ class ChallengeService:
 
         return {
             "success": True,
-            "new_achievements": completed
-        }
-
-    def record_daily_streak(self, user_id: str, streak: int) -> Dict[str, Any]:
-        """
-        Записывает обновление ежедневной серии и проверяет достижения.
-
-        Args:
-            user_id: ID пользователя
-            streak: Текущая серия дней
-
-        Returns:
-            Результат с новыми достижениями
-        """
-        completed = self.check_all(user_id)
-
-        return {
-            "success": True,
-            "streak": streak,
             "new_achievements": completed
         }
 

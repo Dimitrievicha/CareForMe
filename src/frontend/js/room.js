@@ -1,4 +1,4 @@
-const API_BASE_URL = '';
+const API_BASE_URL = '/api';
 
 const ROOM_DESIGN_WIDTH = 1280;
 const ROOM_DESIGN_HEIGHT = 720;

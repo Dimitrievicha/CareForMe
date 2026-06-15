@@ -1,4 +1,4 @@
-const API_BASE_URL = '';
+const API_BASE_URL = '/api';
 const WELCOME_ARROW_SRC = 'images/button/кнопка-стрелка обучения.png';
 const WELCOME_LAST_STEP = 1;
 

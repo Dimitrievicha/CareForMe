@@ -9,19 +9,51 @@ from pathlib import Path
 
 from config import Config
 
-# Инициализация БД
+# ─────────────────────────────────────────────────────────
+# Инициализация БД — ДО импорта репозиториев и Blueprint'ов
+# ─────────────────────────────────────────────────────────
 from database_full.database.db_manager import get_db_manager as _init_db
 
-_DB_PATH = str(Path(__file__).parent / 'careforme.db')
+_DB_PATH  = str(Path(__file__).parent / 'careforme.db')
 _SQL_PATH = Path(__file__).parent / 'database_full' / 'database' / 'init_db.sql'
+_CSV_DIR  = Path(__file__).parent / 'database_full' / 'csv'
+
 _db = _init_db(_DB_PATH)
 
+# Создаём таблицы (CREATE TABLE IF NOT EXISTS — безопасно при каждом старте)
 if _SQL_PATH.exists():
     with open(_SQL_PATH, 'r', encoding='utf-8') as _f:
         _db.connect().executescript(_f.read())
 else:
     print(f"⚠️  SQL файл не найден: {_SQL_PATH}")
-    
+
+# Загружаем CSV-данные если таблица пустая
+_count = _db.execute_query("SELECT COUNT(*) as c FROM plant_templates")
+if not _count or _count[0]['c'] == 0:
+    print(" Загрузка данных из CSV...")
+    from database_full.database.raw_sql_loader import (
+        load_plants_from_csv_raw,
+        load_achievements_from_csv_raw,
+        load_tips_from_csv_raw,
+        load_level_requirements_from_csv_raw,
+    )
+    _files = {
+        'plant_catalog.csv': load_plants_from_csv_raw,
+        'achievements_catalog.csv':load_achievements_from_csv_raw,
+        'tips.csv': load_tips_from_csv_raw,
+        'level_requirements.csv': load_level_requirements_from_csv_raw,
+    }
+    for _fname, _loader in _files.items():
+        _path = _CSV_DIR / _fname
+        if _path.exists():
+            _loader(str(_path))
+        else:
+            print(f"  Файл не найден: {_path}")
+    print(" Данные загружены")
+
+# ─────────────────────────────────────────────────────────
+# Blueprint'ы
+# ─────────────────────────────────────────────────────────
 from web.auth import auth_bp
 from web.garden import garden_bp
 from web.plants import plants_bp
@@ -52,49 +84,43 @@ CORS(app, origins=[
     'http://127.0.0.1:5500'
 ], supports_credentials=True)
 
-app.register_blueprint(auth_bp, url_prefix='/api/auth')
-app.register_blueprint(garden_bp, url_prefix='/api/garden')
-app.register_blueprint(plants_bp, url_prefix='/api/plants')
-app.register_blueprint(user_bp, url_prefix='/api/user')
-app.register_blueprint(quests_bp, url_prefix='/api/quests')
+app.register_blueprint(auth_bp,         url_prefix='/api/auth')
+app.register_blueprint(garden_bp,       url_prefix='/api/garden')
+app.register_blueprint(plants_bp,       url_prefix='/api/plants')
+app.register_blueprint(user_bp,         url_prefix='/api/user')
+app.register_blueprint(quests_bp,       url_prefix='/api/quests')
 app.register_blueprint(achievements_bp, url_prefix='/api/achievements')
-app.register_blueprint(tips_bp, url_prefix='/api/tips')
-app.register_blueprint(game_bp, url_prefix='/api/game')
+app.register_blueprint(tips_bp,         url_prefix='/api/tips')
+app.register_blueprint(game_bp,         url_prefix='/api/game')
 
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), '..', 'frontend')
 
 with open(os.path.join(FRONTEND_DIR, '404.html'), 'r', encoding='utf-8') as f:
     CUSTOM_404_HTML = f.read()
 
-# ЗАЩИТА HTML СТРАНИЦ
 
 @app.route('/')
 def index():
-    """Главная страница - всегда показывает регистрацию"""
     return send_from_directory(FRONTEND_DIR, 'register.html')
 
 @app.route('/register.html')
 def register_page():
-    """Страница регистрации - всегда доступна"""
     return send_from_directory(FRONTEND_DIR, 'register.html')
 
 @app.route('/room.html')
 def room_page():
-    """Только для авторизованных"""
     if 'user_id' not in session:
         return send_from_directory(FRONTEND_DIR, 'unauthorized.html'), 403
     return send_from_directory(FRONTEND_DIR, 'room.html')
 
 @app.route('/welcome.html')
 def welcome_page():
-    """Только для авторизованных"""
     if 'user_id' not in session:
         return send_from_directory(FRONTEND_DIR, 'unauthorized.html'), 403
     return send_from_directory(FRONTEND_DIR, 'welcome.html')
 
 @app.route('/unauthorized.html')
 def unauthorized_page():
-    """Страница отказа в доступе - всегда доступна"""
     return send_from_directory(FRONTEND_DIR, 'unauthorized.html')
 
 # СТАТИЧЕСКИЕ ФАЙЛЫ

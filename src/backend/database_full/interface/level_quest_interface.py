@@ -90,11 +90,6 @@ class LevelQuestInterface:
         current_level = self._user_service.get_current_level(user_id)
         max_level = level_quest_repo.get_max_level()
 
-        # result = {
-        #     "current_level": current_level,
-        #     "max_level": max_level,
-        #     "levels": {}
-        # }
         levels = {}
         for level in range(1, max_level + 1):
             if level < current_level:
@@ -218,6 +213,9 @@ class LevelQuestInterface:
 
         """
         return self._service.trigger_quest_check(user_id, action)
+    
+    def trigger_quest_check(self, user_id: str, action: str) -> Dict[str, Any]:
+        return self.trigger_check(user_id, action)
 
     def get_reward_info(self, level: int) -> Optional[Dict[str, Any]]:
         """
@@ -273,7 +271,7 @@ class LevelQuestInterface:
         Returns:
             Строка из user_level_progress или None
         """
-        return level_quest_repo.get_user_progress(user_id, level)
+        return level_quest_repo.get_user_progress(user_id, level)  
 
 
 # Глобальный экземпляр

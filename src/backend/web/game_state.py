@@ -91,7 +91,6 @@ def tick_game():
 @game_bp.route('/move', methods=['POST'])
 @login_required_api
 def move_slot():
-    """Переместить растение между слотами с серверной проверкой локации."""
     user_id = g.user_id
     data = request.get_json() or {}
     from_slot = data.get('fromSlot')
@@ -100,9 +99,14 @@ def move_slot():
     if not from_slot or not to_slot:
         return jsonify({'success': False, 'error': 'Нужны fromSlot и toSlot'}), 400
 
-    result = game_interface.move_slot(user_id, from_slot, to_slot)
-    status = 200 if result.get('success') else 400
-    return jsonify(result), status
+    try:
+        result = game_interface.move_slot(user_id, from_slot, to_slot)
+        status = 200 if result.get('success') else 400
+        return jsonify(result), status
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())   # ← полный трейсбек в консоль Flask
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @game_bp.route('/read_description', methods=['POST'])

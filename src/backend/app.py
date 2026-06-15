@@ -25,12 +25,12 @@ if _SQL_PATH.exists():
     with open(_SQL_PATH, 'r', encoding='utf-8') as _f:
         _db.connect().executescript(_f.read())
 else:
-    print(f"⚠️  SQL файл не найден: {_SQL_PATH}")
+    print(f"  SQL файл не найден: {_SQL_PATH}")
 
-# Загружаем CSV-данные если таблица пустая
+# Загружаем CSV-данные если таблицы пустые
 _count = _db.execute_query("SELECT COUNT(*) as c FROM plant_templates")
 if not _count or _count[0]['c'] == 0:
-    print(" Загрузка данных из CSV...")
+    print("📦 Загрузка данных из CSV...")
     from database_full.database.raw_sql_loader import (
         load_plants_from_csv_raw,
         load_achievements_from_csv_raw,
@@ -38,10 +38,10 @@ if not _count or _count[0]['c'] == 0:
         load_level_requirements_from_csv_raw,
     )
     _files = {
-        'plant_catalog.csv': load_plants_from_csv_raw,
-        'achievements_catalog.csv':load_achievements_from_csv_raw,
-        'tips.csv': load_tips_from_csv_raw,
-        'level_requirements.csv': load_level_requirements_from_csv_raw,
+        'plant_catalog.csv':        load_plants_from_csv_raw,
+        'achievements_catalog.csv': load_achievements_from_csv_raw,
+        'tips.csv':                 load_tips_from_csv_raw,
+        'level_requirements.csv':   load_level_requirements_from_csv_raw,
     }
     for _fname, _loader in _files.items():
         _path = _CSV_DIR / _fname
@@ -54,14 +54,14 @@ if not _count or _count[0]['c'] == 0:
 # ─────────────────────────────────────────────────────────
 # Blueprint'ы
 # ─────────────────────────────────────────────────────────
-from web.auth import auth_bp
-from web.garden import garden_bp
-from web.plants import plants_bp
-from web.user import user_bp
-from web.quests import quests_bp
+from web.auth         import auth_bp
+from web.garden       import garden_bp
+from web.plants       import plants_bp
+from web.user         import user_bp
+from web.quests       import quests_bp
 from web.achievements import achievements_bp
-from web.tips import tips_bp
-from web.game_state import game_bp
+from web.tips         import tips_bp
+from web.game_state   import game_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -69,19 +69,19 @@ app.config.from_object(Config)
 app.secret_key = app.config.get('SECRET_KEY', 'careforme-dev-key-2024')
 
 # Настройки сессии
-app.config['SESSION_COOKIE_NAME'] = 'careforme_session'
+app.config['SESSION_COOKIE_NAME']     = 'careforme_session'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
-app.config['SESSION_PERMANENT'] = True
+app.config['SESSION_COOKIE_SECURE']   = False
+app.config['SESSION_PERMANENT']       = True
 app.config['PERMANENT_SESSION_LIFETIME'] = 30 * 24 * 60 * 60
 
-# CORS - для разработки
+# CORS — для разработки
 CORS(app, origins=[
     'http://localhost:5000',
     'http://127.0.0.1:5000',
     'http://localhost:5500',
-    'http://127.0.0.1:5500'
+    'http://127.0.0.1:5500',
 ], supports_credentials=True)
 
 app.register_blueprint(auth_bp,         url_prefix='/api/auth')
@@ -98,6 +98,7 @@ FRONTEND_DIR = os.path.join(os.path.dirname(__file__), '..', 'frontend')
 with open(os.path.join(FRONTEND_DIR, '404.html'), 'r', encoding='utf-8') as f:
     CUSTOM_404_HTML = f.read()
 
+# ЗАЩИТА HTML СТРАНИЦ
 
 @app.route('/')
 def index():

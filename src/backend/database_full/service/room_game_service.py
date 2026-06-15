@@ -537,7 +537,7 @@ class RoomGameService:
                 ach_event = event.get("event")
                 plant_id = event.get("plantId")
                 # Пропускаем, если plant_id не передан или это 'slot'
-                if not plant_id or plant_id == 'slot':
+                if not plant_id or plant_id == 'slot' or str(plant_id).isdigit():
                     continue
                 if ach_event == "perfect_growth":
                     result = challenge_interface.record_perfect_growth(user_id, plant_id)

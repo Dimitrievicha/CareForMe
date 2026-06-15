@@ -89,7 +89,7 @@ body.letterbox-logo-visible .room-letterbox--top .room-letterbox-logo {
     display: block;
 }
 
-/* Комната: фон + слоты в одной сцене, равномерный масштаб под экран */
+/* Комната: фон + слоты DB_TESTING_REPORT.md одной сцене, равномерный масштаб под экран */
 .room-viewport {
     position: fixed;
     inset: 0;
@@ -1308,7 +1308,7 @@ body:not(.first-time-onboarding) .tutorial-overlay .tutorial-window {
     z-index: 1;
 }
 
-/* Как у достижений: крестик в рамке, контент ниже — без наслоения */
+/* Как у достижений: крестик DB_TESTING_REPORT.md рамке, контент ниже — без наслоения */
 .tutorial-window--closable .tutorial-content {
     top: 12%;
     left: 8%;

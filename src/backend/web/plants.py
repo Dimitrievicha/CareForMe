@@ -160,7 +160,7 @@ def set_light(plant_id):
 
 @plants_bp.route('/<plant_id>/location', methods=['POST'])
 def set_location(plant_id):
-    """Переставить растение в другое место."""
+    """Переставить растение DB_TESTING_REPORT.md другое место."""
     user_id = _get_user_id()
     if not user_id:
         return jsonify({'success': False, 'error': 'Не авторизован'}), 401

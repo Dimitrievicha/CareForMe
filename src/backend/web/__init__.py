@@ -1,6 +1,6 @@
 """
 API маршруты Flask приложения
-Экспортирует все Blueprint'ы для регистрации в app.py
+Экспортирует все Blueprint'ы для регистрации DB_TESTING_REPORT.md app.py
 """
 
 from .auth import auth_bp

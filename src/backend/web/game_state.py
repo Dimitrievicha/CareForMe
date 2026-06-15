@@ -47,7 +47,7 @@ def load_game_state():
 @game_bp.route('/water', methods=['POST'])
 @login_required_api
 def water_slot():
-    """Полить растение в слоте — игровая логика на сервере."""
+    """Полить растение DB_TESTING_REPORT.md слоте — игровая логика на сервере."""
     user_id = g.user_id
     data = request.get_json() or {}
     slot_name = data.get('slotName')
@@ -63,7 +63,7 @@ def water_slot():
 @game_bp.route('/plant', methods=['POST'])
 @login_required_api
 def plant_in_slot():
-    """Посадить растение в слот — игровая логика на сервере."""
+    """Посадить растение DB_TESTING_REPORT.md слот — игровая логика на сервере."""
     user_id = g.user_id
     data = request.get_json() or {}
     slot_name = data.get('slotName')

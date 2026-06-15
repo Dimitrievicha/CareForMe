@@ -200,7 +200,7 @@ class PlantRepository(BaseRepository):
                 - growing: растет (50%)
                 - mature: взрослое (75%)
                 - flowering: цветет (100%)
-            growth_progress: Прогресс в процентах (0-100)
+            growth_progress: Прогресс DB_TESTING_REPORT.md процентах (0-100)
 
         Returns:
             True при успехе
@@ -216,7 +216,7 @@ class PlantRepository(BaseRepository):
 
         Args:
             plant_id: UUID растения
-            increment: Прирост прогресса (обычно 5-20% в зависимости от здоровья)
+            increment: Прирост прогресса (обычно 5-20% DB_TESTING_REPORT.md зависимости от здоровья)
 
         Returns:
             True при успехе

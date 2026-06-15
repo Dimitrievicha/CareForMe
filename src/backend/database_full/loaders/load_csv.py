@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Скрипт для загрузки данных из CSV в БД"""
+"""Скрипт для загрузки данных из CSV DB_TESTING_REPORT.md БД"""
 
 import sys
 from pathlib import Path
@@ -18,7 +18,7 @@ from database.raw_sql_loader import (
 
 def main():
     print("=" * 50)
-    print("Загрузка данных из CSV файлов в базу данных")
+    print("Загрузка данных из CSV файлов DB_TESTING_REPORT.md базу данных")
     print("=" * 50)
 
     print("\n1. Создание таблиц...")

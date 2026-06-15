@@ -12,17 +12,17 @@ auth_bp = Blueprint('auth', __name__)
 
 def login_required_api(f):
     """
-    Декоратор для проверки авторизации в API маршрутах
+    Декоратор для проверки авторизации DB_TESTING_REPORT.md API маршрутах
 
     Проверяет:
-    1. Наличие user_id в сессии (cookie)
-    2. ИЛИ наличие session_token в заголовке Authorization
+    1. Наличие user_id DB_TESTING_REPORT.md сессии (cookie)
+    2. ИЛИ наличие session_token DB_TESTING_REPORT.md заголовке Authorization
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user_id = session.get('user_id')
 
-        # Если есть в сессии — используем
+        # Если есть DB_TESTING_REPORT.md сессии — используем
         if user_id:
             g.user_id = user_id
             return f(*args, **kwargs)
@@ -33,7 +33,7 @@ def login_required_api(f):
             session_token = auth_header[7:]  # Убираем 'Bearer '
 
             if session_token:
-                # Проверяем токен в БД
+                # Проверяем токен DB_TESTING_REPORT.md БД
                 user = user_interface.verify_session(session_token)
                 if user:
                     g.user_id = user['user_id']
@@ -54,7 +54,7 @@ def login_required_api(f):
 @auth_bp.route('/check_user', methods=['POST'])
 def check_user():
     """
-    Проверить существует ли пользователь в БД.
+    Проверить существует ли пользователь DB_TESTING_REPORT.md БД.
 
     POST /api/auth/check_user
     Body: { "username": "string" }
@@ -166,7 +166,7 @@ def logout():
     # Пытаемся получить токен из сессии
     session_token = session.get('session_token')
 
-    # Если нет в сессии — пробуем из заголовка
+    # Если нет DB_TESTING_REPORT.md сессии — пробуем из заголовка
     if not session_token:
         auth_header = request.headers.get('Authorization')
         if auth_header and auth_header.startswith('Bearer '):
@@ -195,7 +195,7 @@ def verify():
     # Пытаемся получить токен из сессии
     session_token = session.get('session_token')
 
-    # Если нет в сессии — пробуем из заголовка
+    # Если нет DB_TESTING_REPORT.md сессии — пробуем из заголовка
     if not session_token:
         auth_header = request.headers.get('Authorization')
         if auth_header and auth_header.startswith('Bearer '):
@@ -204,7 +204,7 @@ def verify():
     if not session_token:
         return jsonify({'success': False, 'error': 'Нет сессии'}), 401
 
-    # Проверяем токен в БД
+    # Проверяем токен DB_TESTING_REPORT.md БД
     user = user_interface.verify_session(session_token)
     if user:
         # Восстанавливаем сессию

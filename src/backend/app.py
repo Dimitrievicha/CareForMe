@@ -87,7 +87,7 @@ def welcome_page():
 
 @app.route('/unauthorized.html')
 def unauthorized_page():
-    """Страница отказа в доступе - всегда доступна"""
+    """Страница отказа DB_TESTING_REPORT.md доступе - всегда доступна"""
     return send_from_directory(FRONTEND_DIR, 'unauthorized.html')
 
 # СТАТИЧЕСКИЕ ФАЙЛЫ

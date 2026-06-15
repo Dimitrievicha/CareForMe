@@ -6,7 +6,7 @@
 import sys
 from pathlib import Path
 
-# Добавляем корневую директорию backend в путь поиска модулей
+# Добавляем корневую директорию backend DB_TESTING_REPORT.md путь поиска модулей
 # Определяем путь к папке backend (родительская для scripts)
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
@@ -35,7 +35,7 @@ def load_csv_data():
         print("Данные уже загружены, пропускаем...")
         return True
 
-    # Путь к CSV файлам (папка csv в корне backend)
+    # Путь к CSV файлам (папка csv DB_TESTING_REPORT.md корне backend)
     csv_dir = csv_dir = backend_dir / 'database_full' / 'csv'
 
     if not csv_dir.exists():

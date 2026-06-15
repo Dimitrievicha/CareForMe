@@ -71,7 +71,7 @@ class LevelQuestRepository(BaseRepository):
 
     def get_max_level(self) -> int:
         """
-        Получает максимальный уровень в системе.
+        Получает максимальный уровень DB_TESTING_REPORT.md системе.
 
         Returns:
             Максимальный уровень (5)
@@ -291,7 +291,7 @@ class LevelQuestRepository(BaseRepository):
             # Нужно проверять и автоматически отмечать как выполненное
             if not completed and prog >= target:
                 completed = True
-                # Обновляем в БД
+                # Обновляем DB_TESTING_REPORT.md БД
                 self.complete_quest(user_id, current_level, i)
                 # Перезагружаем прогресс
                 progress = self.get_user_progress(user_id, current_level)

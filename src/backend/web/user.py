@@ -100,7 +100,7 @@ def get_streak():
         "success": bool,
         "consecutive_days": int,
         "best_streak": int,
-        "last_entry": str    # дата в ISO-формате
+        "last_entry": str    # дата DB_TESTING_REPORT.md ISO-формате
     }
     """
     user_id = session.get('user_id')
@@ -142,7 +142,7 @@ def set_volume():
     except (TypeError, ValueError):
         return jsonify({'success': False, 'error': 'volume должен быть числом 0–100'}), 400
 
-    # При необходимости можно сохранять в отдельную таблицу settings
+    # При необходимости можно сохранять DB_TESTING_REPORT.md отдельную таблицу settings
     return jsonify({'success': True, 'volume': volume})
 
 
